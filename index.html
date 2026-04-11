@@ -537,12 +537,22 @@
 
 <script>
   function show(id) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
-    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-    document.getElementById(id).classList.add('visible');
-    const navEl = document.getElementById('nav-' + id);
-    if (navEl) navEl.classList.add('active');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById(id).classList.add('visible');
+  const navEl = document.getElementById('nav-' + id);
+  if (navEl) navEl.classList.add('active');
+  history.pushState(null, '', id === 'home' ? '/' : '/' + id);
+}
+
+  function loadFromURL() {
+    const path = window.location.pathname.replace('/', '').replace('/', '') || 'home';
+    const valid = ['home', 'projects', 'resume', 'blog', 'photography'];
+    show(valid.includes(path) ? path : 'home');
   }
+
+  window.addEventListener('popstate', loadFromURL);
+  loadFromURL();
 
   fetch('photos.json')
   .then(res => res.json())
