@@ -524,14 +524,9 @@
   <div class="section-header">
     <span class="section-title">Photography</span>
   </div>
-  <div class="photo-stack">
+  <div class="photo-stack" id="photo-stack">
 
-    <div class="photo-item">
-      <img src="DSC04190.JPG" alt="Cyclist in Taipei." />
-    </div>
-    <div class="photo-item">
-      <img src="DSC01647.JPG" alt="Venturing to Kowloon." />
-    </div>
+    
 
   </div>
 </section>
@@ -548,6 +543,15 @@
     const navEl = document.getElementById('nav-' + id);
     if (navEl) navEl.classList.add('active');
   }
+
+  fetch('photos.json')
+  .then(res => res.json())
+  .then(photos => {
+    const stack = document.getElementById('photo-stack');
+    photos.forEach(src => {
+      stack.innerHTML += `<div class="photo-item"><img src="${src}" alt="" /></div>`;
+    });
+  });
 </script>
 
 </body>
