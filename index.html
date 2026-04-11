@@ -216,9 +216,9 @@
     white-space: nowrap;
   }
 
-  /* ─── Experience ──────────────────────────────────────── */
+  /* ─── EXPERIENCE ──────────────────────────────────── */
   /*
-    HOW TO ADD A Experience ENTRY:
+    HOW TO ADD AN EXPERIENCE ENTRY:
     Copy the block below and paste inside the relevant .experience-section.
 
     <div class="experience-company" style="margin-top: 28px;">
@@ -345,38 +345,105 @@
   /*
     HOW TO ADD A PHOTO:
     1. Add your image file to your GitHub repository
-    2. Copy the block below and paste it inside .photo-stack
+    2. Copy the block below and paste it inside .carousel-track
     3. Replace "your-photo.jpg" with your actual filename
 
-    <div class="photo-item">
+    <div class="carousel-slide">
       <img src="your-photo.jpg" alt="Brief description" />
     </div>
 
     If your photos are in a subfolder, use src="images/your-photo.jpg"
   */
 
-  .photo-stack {
+  .carousel-wrap { overflow: hidden; }
+
+  .carousel-track {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    gap: 8px;
+    transition: transform 0.4s ease;
   }
 
-  .photo-item {
-    width: 100%;
+  .carousel-slide {
+    flex: 0 0 80%;
     aspect-ratio: 16/9;
     overflow: hidden;
     background: var(--border);
+    transition: opacity 0.3s;
   }
 
-  .photo-item img {
+  .carousel-slide:not(.active) { opacity: 0.4; }
+
+  .carousel-slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: opacity 0.3s;
+    cursor: zoom-in;
   }
 
-  .photo-item img:hover { opacity: 0.9; }
+  .carousel-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0 0;
+  }
+
+  .carousel-btn {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 0;
+    font-family: inherit;
+  }
+
+  .carousel-btn:hover { color: var(--black); }
+
+  .carousel-counter {
+    font-size: 11px;
+    color: var(--gray);
+    letter-spacing: 0.06em;
+  }
+
+  /* ─── LIGHTBOX ────────────────────────────────────── */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+  }
+
+  .lightbox.open { display: flex; }
+
+  .lightbox img {
+    max-width: 92vw;
+    max-height: 92vh;
+    object-fit: contain;
+    display: block;
+    cursor: default;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .lightbox-close:hover { color: white; }
 
   /* ─── FOOTER ──────────────────────────────────────── */
   footer {
@@ -390,6 +457,85 @@
     max-width: 960px;
     margin: 0 auto;
   }
+
+  /* ─── MOBILE ──────────────────────────────────────── */
+  @media (max-width: 640px) {
+
+    nav {
+      padding: 0 20px;
+      height: 48px;
+    }
+
+    .nav-links {
+      gap: 20px;
+    }
+
+    .nav-links a {
+      font-size: 10px;
+      letter-spacing: 0.06em;
+    }
+
+    .section {
+      padding: 88px 20px 60px;
+    }
+
+    .hero {
+      padding-top: 100px;
+      padding-bottom: 60px;
+    }
+
+    .hero-name {
+      font-size: clamp(40px, 12vw, 64px);
+    }
+
+    .hero-bio {
+      font-size: 14px;
+    }
+
+    .section-header {
+      margin-bottom: 36px;
+    }
+
+    .project-item {
+      grid-template-columns: 40px 1fr;
+      gap: 12px;
+    }
+
+    .project-tag { display: none; }
+
+    .project-name { font-size: 18px; }
+
+    .experience-company-header {
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .experience-role-row {
+      flex-direction: column;
+      gap: 2px;
+      padding: 10px 0;
+    }
+
+    .experience-role { font-size: 15px; }
+
+    .blog-item {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .blog-title { font-size: 18px; }
+
+    .blog-date { order: -1; }
+
+    .carousel-slide { flex: 0 0 92%; }
+
+    .carousel-btn { font-size: 10px; }
+
+    footer {
+      padding: 32px 20px;
+      font-size: 10px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -398,7 +544,7 @@
   <a class="nav-brand" href="#" onclick="show('home'); return false;">Henry</a>
   <ul class="nav-links">
     <li><a href="#" onclick="show('projects'); return false;" id="nav-projects">Projects</a></li>
-    <li><a href="#" onclick="show('experience'); return false;" id="nav-experience">Experien</a></li>
+    <li><a href="#" onclick="show('experience'); return false;" id="nav-experience">Experience</a></li>
     <li><a href="#" onclick="show('blog'); return false;" id="nav-blog">Blog</a></li>
     <li><a href="#" onclick="show('photography'); return false;" id="nav-photography">Photography</a></li>
   </ul>
@@ -441,7 +587,7 @@
 
 
 <!-- ═══════════════════════════════════════════════════
-     experience
+     EXPERIENCE
 ════════════════════════════════════════════════════ -->
 <section class="section" id="experience">
   <div class="section-header">
@@ -449,7 +595,7 @@
   </div>
 
   <div class="experience-section">
-    <p class="Experience-section-label">Experience</p>
+    <p class="experience-section-label">Work</p>
 
     <div class="experience-company" style="border-top: none; padding-top: 0;">
       <div class="experience-company-header">
@@ -537,7 +683,28 @@
     <div class="carousel-track" id="carousel-track">
       <div class="carousel-slide active"><img src="photography/DSC00083.JPG" alt="" /></div>
       <div class="carousel-slide"><img src="photography/DSC00371.JPG" alt="" /></div>
-      ... (all your photo slides)
+      <div class="carousel-slide"><img src="photography/DSC00609.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC00766.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC00772.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01107.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01388.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01580.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01647.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01754.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01757.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01793.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01921.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01938.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01960.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC02410.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC02411.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC02415.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC02453.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC02460.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC02472.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC03492.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC04190.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC04265.JPG" alt="" /></div>
     </div>
   </div>
   <div class="carousel-nav">
@@ -546,6 +713,12 @@
     <button class="carousel-btn" id="carousel-next">Next →</button>
   </div>
 </section>
+
+
+<div class="lightbox" id="lightbox">
+  <span class="lightbox-close" id="lightbox-close">Close &times;</span>
+  <img id="lightbox-img" src="" alt="" />
+</div>
 
 
 <footer>Henry &mdash; Growth, Strategy, and Research</footer>
@@ -592,6 +765,14 @@
     if (!document.getElementById('photography').classList.contains('visible')) return;
     if (e.key === 'ArrowLeft') goTo(idx - 1);
     if (e.key === 'ArrowRight') goTo(idx + 1);
+  });
+
+  // ── Touch swipe for carousel ──────────────────────
+  let touchStartX = 0;
+  track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  track.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) goTo(diff > 0 ? idx + 1 : idx - 1);
   });
 
   // ── Lightbox ──────────────────────────────────────
