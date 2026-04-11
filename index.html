@@ -152,7 +152,6 @@
   /*
     HOW TO ADD A PROJECT:
     Copy the block below and paste it inside .project-list.
-    Edit the number, title, description, and tag.
 
     <div class="project-item">
       <span class="project-num">01</span>
@@ -211,18 +210,18 @@
   /* ─── RESUME ──────────────────────────────────────── */
   /*
     HOW TO ADD A RESUME ENTRY:
-    Copy the block below and paste it inside .resume-section > after the label.
-    Edit the year, role, and organisation.
+    Copy the block below and paste inside the relevant .resume-section.
 
-    <div class="resume-row">
-      <span class="resume-year">2020 — 2023</span>
-      <div>
-        <p class="resume-role">Your Role</p>
-        <p class="resume-org">Organisation Name</p>
+    <div class="resume-company" style="margin-top: 28px;">
+      <div class="resume-company-header">
+        <span class="resume-company-name">Company Name</span>
+        <span class="resume-company-location">City, Country</span>
+      </div>
+      <div class="resume-role-row">
+        <span class="resume-role">Your Role</span>
+        <span class="resume-dates">Jan 2020 — Jan 2023</span>
       </div>
     </div>
-
-    To add a new group (e.g. Education), copy the entire .resume-section block.
   */
 
   .resume-section { margin-bottom: 56px; }
@@ -283,42 +282,10 @@
     white-space: nowrap;
   }
 
-  .resume-bullets {
-    list-style: none;
-    padding: 8px 0 12px;
-  }
-
-  .resume-bullets li {
-    font-size: 13px;
-    line-height: 1.7;
-    color: #444;
-    font-weight: 300;
-    padding: 4px 0 4px 16px;
-    position: relative;
-  }
-
-  .resume-bullets li::before {
-    content: '—';
-    position: absolute;
-    left: 0;
-    color: var(--gray);
-    font-size: 11px;
-    top: 6px;
-  }
-
-  .resume-para {
-    font-size: 13px;
-    line-height: 1.8;
-    color: #444;
-    font-weight: 300;
-    padding: 10px 0 14px;
-  }
-
   /* ─── BLOG ────────────────────────────────────────── */
   /*
     HOW TO ADD A BLOG POST:
     Copy the block below and paste it inside .blog-list.
-    Edit the title, excerpt, and date.
 
     <div class="blog-item">
       <div>
@@ -365,6 +332,43 @@
     white-space: nowrap;
   }
 
+  /* ─── PHOTOGRAPHY ─────────────────────────────────── */
+  /*
+    HOW TO ADD A PHOTO:
+    1. Add your image file to your GitHub repository
+    2. Copy the block below and paste it inside .photo-stack
+    3. Replace "your-photo.jpg" with your actual filename
+
+    <div class="photo-item">
+      <img src="your-photo.jpg" alt="Brief description" />
+    </div>
+
+    If your photos are in a subfolder, use src="images/your-photo.jpg"
+  */
+
+  .photo-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .photo-item {
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    background: var(--border);
+  }
+
+  .photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.3s;
+  }
+
+  .photo-item img:hover { opacity: 0.9; }
+
   /* ─── FOOTER ──────────────────────────────────────── */
   footer {
     text-align: center;
@@ -382,12 +386,12 @@
 <body>
 
 <nav>
-  <!-- EDIT: Replace "Henry" with your name -->
   <a class="nav-brand" href="#" onclick="show('home'); return false;">Henry</a>
   <ul class="nav-links">
     <li><a href="#" onclick="show('projects'); return false;" id="nav-projects">Projects</a></li>
     <li><a href="#" onclick="show('resume'); return false;" id="nav-resume">Résumé</a></li>
     <li><a href="#" onclick="show('blog'); return false;" id="nav-blog">Blog</a></li>
+    <li><a href="#" onclick="show('photography'); return false;" id="nav-photography">Photography</a></li>
   </ul>
 </nav>
 
@@ -398,15 +402,13 @@
 ════════════════════════════════════════════════════ -->
 <section class="section hero visible" id="home">
 
-  <!-- EDIT: Short status line e.g. "Available for work" or "London-based" -->
   <p class="hero-eyebrow">— Henry</p>
 
-  <!-- EDIT: Your name on the first line, your title on the second -->
   <h1 class="hero-name">Henry<br><em>Growth, Strategy, and Research</em></h1>
 
   <div class="hero-divider"></div>
 
-  <!-- EDIT: Replace with your bio (2–4 sentences works well) -->
+  <!-- EDIT: Replace with your bio -->
   <p class="hero-bio">I help teams understand what to build, how it will create mutual customer and commercial value, and how to develop an experimentation strategy.</p>
 
 </section>
@@ -415,12 +417,10 @@
 <!-- ═══════════════════════════════════════════════════
      PROJECTS
      EDIT: Add project items inside .project-list
-     See the CSS comment above for the copy-paste block
 ════════════════════════════════════════════════════ -->
 <section class="section" id="projects">
   <div class="section-header">
     <span class="section-title">Selected projects</span>
-    <!-- EDIT: Update the count to match how many projects you add -->
     <span class="section-count"></span>
   </div>
   <div class="project-list">
@@ -433,8 +433,6 @@
 
 <!-- ═══════════════════════════════════════════════════
      RESUME
-     EDIT: Add rows inside each .resume-section
-     See the CSS comment above for the copy-paste block
 ════════════════════════════════════════════════════ -->
 <section class="section" id="resume">
   <div class="section-header">
@@ -453,12 +451,10 @@
         <span class="resume-role">Senior Data Scientist</span>
         <span class="resume-dates">Oct 2025 — Present</span>
       </div>
-
       <div class="resume-role-row">
         <span class="resume-role">Data Scientist</span>
         <span class="resume-dates">Oct 2023 — Sep 2025</span>
       </div>
-
     </div>
 
     <div class="resume-company" style="margin-top: 28px;">
@@ -470,12 +466,10 @@
         <span class="resume-role">Analyst II, Strategy &amp; Analytics</span>
         <span class="resume-dates">May 2022 — Apr 2023</span>
       </div>
-
       <div class="resume-role-row">
         <span class="resume-role">Analyst I, Strategy &amp; Analytics</span>
         <span class="resume-dates">Nov 2021 — May 2022</span>
       </div>
-
     </div>
 
   </div>
@@ -501,12 +495,10 @@
 <!-- ═══════════════════════════════════════════════════
      BLOG
      EDIT: Add blog items inside .blog-list
-     See the CSS comment above for the copy-paste block
 ════════════════════════════════════════════════════ -->
 <section class="section" id="blog">
   <div class="section-header">
     <span class="section-title">Writing</span>
-    <!-- EDIT: Update the count to match how many posts you add -->
     <span class="section-count"></span>
   </div>
   <div class="blog-list">
@@ -517,7 +509,34 @@
 </section>
 
 
-<!-- EDIT: Update the footer line -->
+<!-- ═══════════════════════════════════════════════════
+     PHOTOGRAPHY
+     HOW TO ADD A PHOTO:
+     1. Add your image file to your GitHub repository
+     2. Copy the block below and paste inside .photo-stack
+     3. Replace "your-photo.jpg" with your actual filename
+
+     <div class="photo-item">
+       <img src="your-photo.jpg" alt="Brief description" />
+     </div>
+════════════════════════════════════════════════════ -->
+<section class="section" id="photography">
+  <div class="section-header">
+    <span class="section-title">Photography</span>
+  </div>
+  <div class="photo-stack">
+
+    <div class="photo-item">
+      <img src="DSC04190.JPG" alt="Cyclist in Taipei." />
+    </div>
+    <div class="photo-item">
+      <img src="DSC01647.JPG" alt="Venturing to Kowloon." />
+    </div>
+
+  </div>
+</section>
+
+
 <footer>Henry &mdash; Growth, Strategy, and Research</footer>
 
 
