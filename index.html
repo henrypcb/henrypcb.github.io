@@ -590,6 +590,11 @@
     const path = window.location.pathname.replace('/', '').replace('/', '') || 'home';
     const valid = ['home', 'projects', 'experience', 'blog', 'photography'];
     show(valid.includes(path) ? path : 'home');
+    if (path === 'photography') {
+      document.querySelectorAll('.carousel-slide img').forEach(img => {
+        const s = img.src; img.src = ''; img.src = s;
+      });
+    }
   }
 
   window.addEventListener('popstate', loadFromURL);
