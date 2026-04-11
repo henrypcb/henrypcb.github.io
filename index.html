@@ -237,29 +237,81 @@
     border-bottom: 1px solid var(--border);
   }
 
-  .resume-row {
-    display: grid;
-    grid-template-columns: 140px 1fr;
-    gap: 24px;
-    padding: 16px 0;
-    border-bottom: 1px solid var(--border);
+  .resume-company {
+    padding: 20px 0 0;
+    border-top: 1px solid var(--border);
   }
 
-  .resume-year {
-    font-size: 12px;
+  .resume-company-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+  }
+
+  .resume-company-name {
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .resume-company-location {
+    font-size: 11px;
     color: var(--gray);
-    padding-top: 2px;
+    letter-spacing: 0.06em;
+  }
+
+  .resume-role-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+    border-top: 1px solid var(--border);
   }
 
   .resume-role {
     font-family: Georgia, serif;
-    font-size: 18px;
-    margin-bottom: 4px;
+    font-size: 17px;
+    font-weight: 400;
   }
 
-  .resume-org {
-    font-size: 12px;
+  .resume-dates {
+    font-size: 11px;
     color: var(--gray);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .resume-bullets {
+    list-style: none;
+    padding: 8px 0 12px;
+  }
+
+  .resume-bullets li {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #444;
+    font-weight: 300;
+    padding: 4px 0 4px 16px;
+    position: relative;
+  }
+
+  .resume-bullets li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--gray);
+    font-size: 11px;
+    top: 6px;
+  }
+
+  .resume-para {
+    font-size: 13px;
+    line-height: 1.8;
+    color: #444;
+    font-weight: 300;
+    padding: 10px 0 14px;
   }
 
   /* ─── BLOG ────────────────────────────────────────── */
@@ -392,14 +444,55 @@
   <div class="resume-section">
     <p class="resume-section-label">Experience</p>
 
-    <!-- PASTE YOUR EXPERIENCE ROWS HERE -->
+    <div class="resume-company" style="border-top: none; padding-top: 0;">
+      <div class="resume-company-header">
+        <span class="resume-company-name">Monzo</span>
+        <span class="resume-company-location">London, UK</span>
+      </div>
+      <div class="resume-role-row">
+        <span class="resume-role">Senior Data Scientist</span>
+        <span class="resume-dates">Oct 2025 — Present</span>
+      </div>
+
+      <div class="resume-role-row">
+        <span class="resume-role">Data Scientist</span>
+        <span class="resume-dates">Oct 2023 — Sep 2025</span>
+      </div>
+
+    </div>
+
+    <div class="resume-company" style="margin-top: 28px;">
+      <div class="resume-company-header">
+        <span class="resume-company-name">Klarna</span>
+        <span class="resume-company-location">London, UK</span>
+      </div>
+      <div class="resume-role-row">
+        <span class="resume-role">Analyst II, Strategy &amp; Analytics</span>
+        <span class="resume-dates">May 2022 — Apr 2023</span>
+      </div>
+
+      <div class="resume-role-row">
+        <span class="resume-role">Analyst I, Strategy &amp; Analytics</span>
+        <span class="resume-dates">Nov 2021 — May 2022</span>
+      </div>
+
+    </div>
 
   </div>
 
   <div class="resume-section">
     <p class="resume-section-label">Education</p>
 
-    <!-- PASTE YOUR EDUCATION ROWS HERE -->
+    <div class="resume-company" style="border-top: none; padding-top: 0;">
+      <div class="resume-company-header">
+        <span class="resume-company-name">University College London (UCL)</span>
+        <span class="resume-company-location">London, UK</span>
+      </div>
+      <div class="resume-role-row">
+        <span class="resume-role">BS, Economics, First Class Honours</span>
+        <span class="resume-dates">Sep 2018 — Oct 2021</span>
+      </div>
+    </div>
 
   </div>
 </section>
