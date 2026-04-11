@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Henry — Generalist</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --white: #fafafa;
+    --gray: #999;
+    --border: #e0e0e0;
+  }
+
+  html { font-size: 15px; }
+
+  body {
+    background: var(--white);
+    color: var(--black);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.01em;
+    min-height: 100vh;
+  }
+
+  /* ─── NAV ─────────────────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 48px;
+    height: 56px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+
+  .nav-brand {
+    font-weight: 400;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--black);
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover,
+  .nav-links a.active { color: var(--black); }
+
+  /* ─── SECTIONS ────────────────────────────────────── */
+  .section {
+    display: none;
+    padding: 120px 48px 80px;
+    max-width: 960px;
+    margin: 0 auto;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .section.visible { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── HOME ────────────────────────────────────────── */
+  .hero {
+    padding-top: 160px;
+    padding-bottom: 100px;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 28px;
+  }
+
+  .hero-name {
+    font-family: Georgia, serif;
+    font-size: clamp(52px, 8vw, 88px);
+    font-weight: 400;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 40px;
+  }
+
+  .hero-name em {
+    font-style: italic;
+    color: var(--gray);
+  }
+
+  .hero-divider {
+    width: 40px;
+    height: 1px;
+    background: var(--black);
+    margin: 36px 0;
+  }
+
+  .hero-bio {
+    max-width: 480px;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #444;
+    font-weight: 300;
+  }
+
+  /* ─── SECTION HEADER ──────────────────────────────── */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    margin-bottom: 64px;
+  }
+
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+
+  .section-count {
+    font-size: 11px;
+    color: var(--gray);
+    letter-spacing: 0.06em;
+  }
+
+  /* ─── PROJECTS ────────────────────────────────────── */
+  /*
+    HOW TO ADD A PROJECT:
+    Copy the block below and paste it inside .project-list.
+    Edit the number, title, description, and tag.
+
+    <div class="project-item">
+      <span class="project-num">01</span>
+      <div class="project-info">
+        <p class="project-name">Your Project Title</p>
+        <p class="project-desc">A short description of the project</p>
+      </div>
+      <span class="project-tag">Tag</span>
+    </div>
+  */
+
+  .project-list { display: flex; flex-direction: column; }
+
+  .project-item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: baseline;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .project-item:hover { opacity: 0.6; }
+
+  .project-num {
+    font-size: 11px;
+    color: var(--gray);
+    letter-spacing: 0.08em;
+  }
+
+  .project-name {
+    font-family: Georgia, serif;
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+
+  .project-desc {
+    font-size: 12px;
+    color: var(--gray);
+    letter-spacing: 0.04em;
+  }
+
+  .project-tag {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+
+  /* ─── RESUME ──────────────────────────────────────── */
+  /*
+    HOW TO ADD A RESUME ENTRY:
+    Copy the block below and paste it inside .resume-section > after the label.
+    Edit the year, role, and organisation.
+
+    <div class="resume-row">
+      <span class="resume-year">2020 — 2023</span>
+      <div>
+        <p class="resume-role">Your Role</p>
+        <p class="resume-org">Organisation Name</p>
+      </div>
+    </div>
+
+    To add a new group (e.g. Education), copy the entire .resume-section block.
+  */
+
+  .resume-section { margin-bottom: 56px; }
+
+  .resume-section-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .resume-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .resume-year {
+    font-size: 12px;
+    color: var(--gray);
+    padding-top: 2px;
+  }
+
+  .resume-role {
+    font-family: Georgia, serif;
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .resume-org {
+    font-size: 12px;
+    color: var(--gray);
+  }
+
+  /* ─── BLOG ────────────────────────────────────────── */
+  /*
+    HOW TO ADD A BLOG POST:
+    Copy the block below and paste it inside .blog-list.
+    Edit the title, excerpt, and date.
+
+    <div class="blog-item">
+      <div>
+        <p class="blog-title">Your Post Title</p>
+        <p class="blog-excerpt">A one or two sentence summary of what the post is about.</p>
+      </div>
+      <span class="blog-date">Jan 2025</span>
+    </div>
+  */
+
+  .blog-list { display: flex; flex-direction: column; }
+
+  .blog-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .blog-item:hover { opacity: 0.6; }
+
+  .blog-title {
+    font-family: Georgia, serif;
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+
+  .blog-excerpt {
+    font-size: 12px;
+    color: var(--gray);
+    max-width: 520px;
+    line-height: 1.6;
+  }
+
+  .blog-date {
+    font-size: 11px;
+    color: var(--gray);
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  /* ─── FOOTER ──────────────────────────────────────── */
+  footer {
+    text-align: center;
+    padding: 48px;
+    font-size: 11px;
+    color: var(--gray);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-top: 1px solid var(--border);
+    max-width: 960px;
+    margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <!-- EDIT: Replace "Henry" with your name -->
+  <a class="nav-brand" href="#" onclick="show('home'); return false;">Henry</a>
+  <ul class="nav-links">
+    <li><a href="#" onclick="show('projects'); return false;" id="nav-projects">Projects</a></li>
+    <li><a href="#" onclick="show('resume'); return false;" id="nav-resume">Résumé</a></li>
+    <li><a href="#" onclick="show('blog'); return false;" id="nav-blog">Blog</a></li>
+  </ul>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════════
+     HOME
+     EDIT: Update the eyebrow, name, and bio below
+════════════════════════════════════════════════════ -->
+<section class="section hero visible" id="home">
+
+  <!-- EDIT: Short status line e.g. "Available for work" or "London-based" -->
+  <p class="hero-eyebrow">— Henry</p>
+
+  <!-- EDIT: Your name on the first line, your title on the second -->
+  <h1 class="hero-name">Henry<br><em>Generalist</em></h1>
+
+  <div class="hero-divider"></div>
+
+  <!-- EDIT: Replace with your bio (2–4 sentences works well) -->
+  <p class="hero-bio">Add your bio here.</p>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     PROJECTS
+     EDIT: Add project items inside .project-list
+     See the CSS comment above for the copy-paste block
+════════════════════════════════════════════════════ -->
+<section class="section" id="projects">
+  <div class="section-header">
+    <span class="section-title">Selected projects</span>
+    <!-- EDIT: Update the count to match how many projects you add -->
+    <span class="section-count"></span>
+  </div>
+  <div class="project-list">
+
+    <!-- PASTE YOUR PROJECTS HERE -->
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     RESUME
+     EDIT: Add rows inside each .resume-section
+     See the CSS comment above for the copy-paste block
+════════════════════════════════════════════════════ -->
+<section class="section" id="resume">
+  <div class="section-header">
+    <span class="section-title">Résumé</span>
+  </div>
+
+  <div class="resume-section">
+    <p class="resume-section-label">Experience</p>
+
+    <!-- PASTE YOUR EXPERIENCE ROWS HERE -->
+
+  </div>
+
+  <div class="resume-section">
+    <p class="resume-section-label">Education</p>
+
+    <!-- PASTE YOUR EDUCATION ROWS HERE -->
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     BLOG
+     EDIT: Add blog items inside .blog-list
+     See the CSS comment above for the copy-paste block
+════════════════════════════════════════════════════ -->
+<section class="section" id="blog">
+  <div class="section-header">
+    <span class="section-title">Writing</span>
+    <!-- EDIT: Update the count to match how many posts you add -->
+    <span class="section-count"></span>
+  </div>
+  <div class="blog-list">
+
+    <!-- PASTE YOUR BLOG POSTS HERE -->
+
+  </div>
+</section>
+
+
+<!-- EDIT: Update the footer line -->
+<footer>Henry &mdash; Generalist</footer>
+
+
+<script>
+  function show(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    document.getElementById(id).classList.add('visible');
+    const navEl = document.getElementById('nav-' + id);
+    if (navEl) navEl.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
