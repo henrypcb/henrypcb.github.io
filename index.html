@@ -158,20 +158,6 @@
   }
 
   /* ─── PROJECTS ────────────────────────────────────── */
-  /*
-    HOW TO ADD A PROJECT:
-    Copy the block below and paste it inside .project-list.
-
-    <div class="project-item">
-      <span class="project-num">01</span>
-      <div class="project-info">
-        <p class="project-name">Your Project Title</p>
-        <p class="project-desc">A short description of the project</p>
-      </div>
-      <span class="project-tag">Tag</span>
-    </div>
-  */
-
   .project-list { display: flex; flex-direction: column; }
 
   .project-item {
@@ -217,22 +203,6 @@
   }
 
   /* ─── EXPERIENCE ──────────────────────────────────── */
-  /*
-    HOW TO ADD AN EXPERIENCE ENTRY:
-    Copy the block below and paste inside the relevant .experience-section.
-
-    <div class="experience-company" style="margin-top: 28px;">
-      <div class="experience-company-header">
-        <span class="experience-company-name">Company Name</span>
-        <span class="experience-company-location">City, Country</span>
-      </div>
-      <div class="experience-role-row">
-        <span class="experience-role">Your Role</span>
-        <span class="experience-dates">Jan 2020 — Jan 2023</span>
-      </div>
-    </div>
-  */
-
   .experience-section { margin-bottom: 56px; }
 
   .experience-section-label {
@@ -292,19 +262,6 @@
   }
 
   /* ─── BLOG ────────────────────────────────────────── */
-  /*
-    HOW TO ADD A BLOG POST:
-    Copy the block below and paste it inside .blog-list.
-
-    <div class="blog-item">
-      <div>
-        <p class="blog-title">Your Post Title</p>
-        <p class="blog-excerpt">A one or two sentence summary of what the post is about.</p>
-      </div>
-      <span class="blog-date">Jan 2025</span>
-    </div>
-  */
-
   .blog-list { display: flex; flex-direction: column; }
 
   .blog-item {
@@ -342,19 +299,6 @@
   }
 
   /* ─── PHOTOGRAPHY ─────────────────────────────────── */
-  /*
-    HOW TO ADD A PHOTO:
-    1. Add your image file to your GitHub repository
-    2. Copy the block below and paste it inside .carousel-track
-    3. Replace "your-photo.jpg" with your actual filename
-
-    <div class="carousel-slide">
-      <img src="your-photo.jpg" alt="Brief description" />
-    </div>
-
-    If your photos are in a subfolder, use src="images/your-photo.jpg"
-  */
-
   .carousel-wrap { overflow: hidden; }
 
   .carousel-track {
@@ -461,80 +405,26 @@
   /* ─── MOBILE ──────────────────────────────────────── */
   @media (max-width: 640px) {
 
-    nav {
-      padding: 0 20px;
-      height: 48px;
-    }
-
-    .nav-links {
-      gap: 20px;
-    }
-
-    .nav-links a {
-      font-size: 10px;
-      letter-spacing: 0.06em;
-    }
-
-    .section {
-      padding: 88px 20px 60px;
-    }
-
-    .hero {
-      padding-top: 100px;
-      padding-bottom: 60px;
-    }
-
-    .hero-name {
-      font-size: clamp(40px, 12vw, 64px);
-    }
-
-    .hero-bio {
-      font-size: 14px;
-    }
-
-    .section-header {
-      margin-bottom: 36px;
-    }
-
-    .project-item {
-      grid-template-columns: 40px 1fr;
-      gap: 12px;
-    }
-
+    nav { padding: 0 20px; height: 48px; }
+    .nav-links { gap: 20px; }
+    .nav-links a { font-size: 10px; letter-spacing: 0.06em; }
+    .section { padding: 88px 20px 60px; }
+    .hero { padding-top: 100px; padding-bottom: 60px; }
+    .hero-name { font-size: clamp(40px, 12vw, 64px); }
+    .hero-bio { font-size: 14px; }
+    .section-header { margin-bottom: 36px; }
+    .project-item { grid-template-columns: 40px 1fr; gap: 12px; }
     .project-tag { display: none; }
-
     .project-name { font-size: 18px; }
-
-    .experience-company-header {
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .experience-role-row {
-      flex-direction: column;
-      gap: 2px;
-      padding: 10px 0;
-    }
-
+    .experience-company-header { flex-direction: column; gap: 2px; }
+    .experience-role-row { flex-direction: column; gap: 2px; padding: 10px 0; }
     .experience-role { font-size: 15px; }
-
-    .blog-item {
-      grid-template-columns: 1fr;
-      gap: 8px;
-    }
-
+    .blog-item { grid-template-columns: 1fr; gap: 8px; }
     .blog-title { font-size: 18px; }
-
     .blog-date { order: -1; }
-
     .carousel-slide { flex: 0 0 92%; }
-
     .carousel-btn { font-size: 10px; }
-
-    footer {
-      padding: 32px 20px;
-      font-size: 10px;
-    }
+    footer { padding: 32px 20px; font-size: 10px; }
   }
 </style>
 </head>
@@ -551,44 +441,25 @@
 </nav>
 
 
-<!-- ═══════════════════════════════════════════════════
-     HOME
-     EDIT: Update the eyebrow, name, and bio below
-════════════════════════════════════════════════════ -->
 <section class="section hero visible" id="home">
-
   <p class="hero-eyebrow">— Henry</p>
-
   <h1 class="hero-name">Henry<br><em>Growth, Strategy, and Research</em></h1>
-
   <div class="hero-divider"></div>
-
-  <!-- EDIT: Replace with your bio -->
   <p class="hero-bio">I help teams understand what to build, how it will create mutual customer and commercial value, and how to develop an experimentation strategy.</p>
-
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════
-     PROJECTS
-     EDIT: Add project items inside .project-list
-════════════════════════════════════════════════════ -->
 <section class="section" id="projects">
   <div class="section-header">
     <span class="section-title">Selected projects</span>
     <span class="section-count"></span>
   </div>
   <div class="project-list">
-
     <!-- PASTE YOUR PROJECTS HERE -->
-
   </div>
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════
-     EXPERIENCE
-════════════════════════════════════════════════════ -->
 <section class="section" id="experience">
   <div class="section-header">
     <span class="section-title">Experience</span>
@@ -626,7 +497,6 @@
         <span class="experience-dates">Nov 2021 — May 2022</span>
       </div>
     </div>
-
   </div>
 
   <div class="experience-section">
@@ -642,39 +512,21 @@
         <span class="experience-dates">Sep 2018 — Oct 2021</span>
       </div>
     </div>
-
   </div>
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════
-     BLOG
-     EDIT: Add blog items inside .blog-list
-════════════════════════════════════════════════════ -->
 <section class="section" id="blog">
   <div class="section-header">
     <span class="section-title">Writing</span>
     <span class="section-count"></span>
   </div>
   <div class="blog-list">
-
     <!-- PASTE YOUR BLOG POSTS HERE -->
-
   </div>
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════
-     PHOTOGRAPHY
-     HOW TO ADD A PHOTO:
-     1. Add your image file to your GitHub repository
-     2. Copy the block below and paste inside .carousel-track
-     3. Replace "your-photo.jpg" with your actual filename
-
-     <div class="carousel-slide">
-       <img src="your-photo.jpg" alt="Brief description" />
-     </div>
-════════════════════════════════════════════════════ -->
 <section class="section" id="photography">
   <div class="section-header">
     <span class="section-title">Photography</span>
@@ -743,7 +595,6 @@
   window.addEventListener('popstate', loadFromURL);
   loadFromURL();
 
-  // ── Carousel ──────────────────────────────────────
   const slides = Array.from(document.querySelectorAll('.carousel-slide'));
   const track = document.getElementById('carousel-track');
   const counter = document.getElementById('carousel-counter');
@@ -767,7 +618,6 @@
     if (e.key === 'ArrowRight') goTo(idx + 1);
   });
 
-  // ── Touch swipe for carousel ──────────────────────
   let touchStartX = 0;
   track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
   track.addEventListener('touchend', e => {
@@ -775,7 +625,6 @@
     if (Math.abs(diff) > 40) goTo(diff > 0 ? idx + 1 : idx - 1);
   });
 
-  // ── Lightbox ──────────────────────────────────────
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
 
