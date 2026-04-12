@@ -402,6 +402,57 @@
     margin: 0 auto;
   }
 
+  /* ─── DARK MODE ───────────────────────────────────── */
+  body.dark {
+    --black: #f0f0f0;
+    --white: #0e0e0e;
+    --gray: #666;
+    --border: #2a2a2a;
+    background: #0e0e0e;
+    color: #f0f0f0;
+  }
+
+  body.dark .hero-bio { color: #aaa; }
+  body.dark nav { background: #0e0e0e; }
+  body.dark footer { background: #0e0e0e; }
+  body.dark .lightbox { background: rgba(0,0,0,0.98); }
+
+  .dark-toggle {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+    margin-left: 32px;
+    transition: color 0.2s;
+  }
+
+  .dark-toggle:hover { color: var(--black); }
+
+  /* ─── TRANSITIONS ─────────────────────────────────── */
+  .section {
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  .section.fade-out {
+    opacity: 0;
+    transform: translateY(16px);
+    pointer-events: none;
+  }
+
+  .section.fade-in {
+    animation: fadeDown 0.45s ease both;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   /* ─── MOBILE ──────────────────────────────────────── */
   @media (max-width: 640px) {
 
@@ -438,6 +489,7 @@
     <li><a href="#" onclick="show('writing'); return false;" id="nav-writing">Writing</a></li>
     <li><a href="#" onclick="show('photography'); return false;" id="nav-photography">Photography</a></li>
   </ul>
+  <button class="dark-toggle" id="dark-toggle" onclick="toggleDark()">Light</button>
 </nav>
 
 
@@ -578,12 +630,35 @@
 
 <script>
   function show(id) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
-    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-    document.getElementById(id).classList.add('visible');
-    const navEl = document.getElementById('nav-' + id);
-    if (navEl) navEl.classList.add('active');
-    history.pushState(null, '', id === 'home' ? '/' : '/' + id);
+    const current = document.querySelector('.section.visible');
+    if (current) {
+      current.classList.add('fade-out');
+      setTimeout(() => {
+        current.classList.remove('visible', 'fade-out', 'fade-in');
+        const next = document.getElementById(id);
+        next.classList.add('visible', 'fade-in');
+        document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+        const navEl = document.getElementById('nav-' + id);
+        if (navEl) navEl.classList.add('active');
+        history.pushState(null, '', id === 'home' ? '/' : '/' + id);
+        if (id === 'photography') {
+          document.querySelectorAll('.carousel-slide img').forEach(img => {
+            const s = img.src; img.src = ''; img.src = s;
+          });
+        }
+      }, 300);
+    }
+  }
+
+  function toggleDark() {
+    const isDark = document.body.classList.toggle('dark');
+    document.getElementById('dark-toggle').textContent = isDark ? 'Dark' : 'Light';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }
+
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+    document.getElementById('dark-toggle').textContent = 'Dark';
   }
 
   function loadFromURL() {
