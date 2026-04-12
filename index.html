@@ -435,7 +435,7 @@
   <ul class="nav-links">
     <li><a href="#" onclick="show('projects'); return false;" id="nav-projects">Projects</a></li>
     <li><a href="#" onclick="show('experience'); return false;" id="nav-experience">Experience</a></li>
-    <li><a href="#" onclick="show('blog'); return false;" id="nav-blog">Blog</a></li>
+    <li><a href="#" onclick="show('writing'); return false;" id="nav-writing">Writing</a></li>
     <li><a href="#" onclick="show('photography'); return false;" id="nav-photography">Photography</a></li>
   </ul>
 </nav>
@@ -516,7 +516,7 @@
 </section>
 
 
-<section class="section" id="blog">
+<section class="section" id="writing">
   <div class="section-header">
     <span class="section-title">Writing</span>
     <span class="section-count"></span>
@@ -588,7 +588,7 @@
 
   function loadFromURL() {
     const path = window.location.pathname.replace('/', '').replace('/', '') || 'home';
-    const valid = ['home', 'projects', 'experience', 'blog', 'photography'];
+    const valid = ['home', 'projects', 'experience', 'writing', 'photography'];
     show(valid.includes(path) ? path : 'home');
     if (path === 'photography') {
       document.querySelectorAll('.carousel-slide img').forEach(img => {
