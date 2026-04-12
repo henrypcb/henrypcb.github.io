@@ -610,7 +610,8 @@
     slides[idx].classList.remove('active');
     idx = (n + total) % total;
     slides[idx].classList.add('active');
-    track.style.transform = `translateX(calc(-${idx} * (80% + 8px)))`;
+    const slideWidth = slides[0].getBoundingClientRect().width;
+    track.style.transform = `translateX(-${idx * (slideWidth + 8)}px)`;
     counter.textContent = (idx + 1) + ' / ' + total;
   }
 
