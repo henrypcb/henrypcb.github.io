@@ -614,6 +614,7 @@
 
   /* A single piece */
   .post { max-width: 640px; }
+  #writing.reading .section-header { display: none; }
 
   .post-back {
     display: inline-block;
@@ -622,7 +623,7 @@
     text-transform: uppercase;
     color: var(--gray);
     text-decoration: none;
-    margin-bottom: 40px;
+    margin-bottom: 28px;
     transition: color 0.2s;
   }
 
@@ -636,7 +637,7 @@
     letter-spacing: -0.01em;
   }
 
-  .post-meta { margin-bottom: 48px; }
+  .post-meta { margin-bottom: 36px; }
 
   .post-body { font-size: 16px; line-height: 1.8; color: #333; }
   .post-body p { margin-bottom: 1.3em; }
@@ -1356,6 +1357,7 @@
       article.style.display = 'none';
       index.hidden = false;
       index.style.display = '';
+      document.getElementById('writing').classList.remove('reading');
       renderIndex(posts);
       enter(index);
       document.title = baseTitle;
@@ -1366,6 +1368,8 @@
     index.style.display = 'none';
     article.hidden = false;
     article.style.display = '';
+    document.getElementById('writing').classList.add('reading');
+    window.scrollTo(0, 0);
     document.getElementById('writing-count').textContent = '';
     document.getElementById('post-kicker').textContent = post.topic + ' · ' + post.format;
     document.getElementById('post-title').textContent = post.title;
