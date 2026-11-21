@@ -317,6 +317,9 @@
 
   .carousel-slide:not(.active) { opacity: 0.4; }
 
+  .carousel-track.no-anim,
+  .carousel-track.no-anim .carousel-slide { transition: none !important; }
+
   .carousel-slide img {
     width: 100%;
     height: 100%;
@@ -494,7 +497,7 @@
 
 
 <section class="section hero visible" id="home">
-  <p class="hero-eyebrow">— Henry</p>
+  <p class="hero-eyebrow" id="living-detail">London</p>
   <h1 class="hero-name">Henry<br><em>Growth, Strategy, and Research</em></h1>
   <div class="hero-divider"></div>
   <p class="hero-bio">I help teams understand what to build, how it will create mutual customer and commercial value, and how to develop an experimentation strategy.</p>
@@ -518,7 +521,7 @@
   </div>
 
   <div class="experience-section">
-    <p class="experience-section-label">Work</p>
+    <p class="experience-section-label">Craft</p>
 
     <div class="experience-company" style="border-top: none; padding-top: 0;">
       <div class="experience-company-header">
@@ -560,7 +563,7 @@
         <span class="experience-company-location">London, UK</span>
       </div>
       <div class="experience-role-row">
-        <span class="experience-role">BS, Economics, First Class Honours</span>
+        <span class="experience-role">BSc, Economics, First Class Honours</span>
         <span class="experience-dates">Sep 2018 — Oct 2021</span>
       </div>
     </div>
@@ -586,29 +589,29 @@
   <div class="carousel-wrap">
     <div class="carousel-track" id="carousel-track">
       <div class="carousel-slide active"><img src="photography/DSC00083.JPG" alt="" loading="eager"/></div>
-      <div class="carousel-slide"><img src="photography/DSC00371.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC00609.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC00766.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC00772.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC01107.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC01388.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC01580.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC01647.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC01754.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC01757.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC01793.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC01921.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC01938.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC01960.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC02410.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC02411.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC02415.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC02453.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC02460.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC02472.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC03492.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC04190.JPG" alt="" /></div>
-      <div class="carousel-slide"><img src="photography/DSC04265.JPG" alt="" /></div>
+      <div class="carousel-slide"><img src="photography/DSC00371.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC00609.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC00766.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC00772.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01107.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01388.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01580.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01647.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01754.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01757.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01793.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01921.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01938.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC01960.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC02410.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC02411.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC02415.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC02453.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC02460.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC02472.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC03492.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC04190.JPG" alt="" loading="lazy" decoding="async" /></div>
+      <div class="carousel-slide"><img src="photography/DSC04265.JPG" alt="" loading="lazy" decoding="async" /></div>
     </div>
   </div>
   <div class="carousel-nav">
@@ -629,25 +632,43 @@
 
 
 <script>
-  function show(id) {
-    const current = document.querySelector('.section.visible');
-    if (current) {
-      current.classList.add('fade-out');
-      setTimeout(() => {
-        current.classList.remove('visible', 'fade-out', 'fade-in');
-        const next = document.getElementById(id);
-        next.classList.add('visible', 'fade-in');
-        document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-        const navEl = document.getElementById('nav-' + id);
-        if (navEl) navEl.classList.add('active');
-        history.pushState(null, '', id === 'home' ? '/' : '/' + id);
-        if (id === 'photography') {
-          document.querySelectorAll('.carousel-slide img').forEach(img => {
-            const s = img.src; img.src = ''; img.src = s;
-          });
-        }
-      }, 300);
+  // ── Navigation ────────────────────────────────────
+  const VALID = ['home', 'projects', 'experience', 'writing', 'photography'];
+  let navTimer = null;
+
+  function activate(id, animated) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('visible', 'fade-out', 'fade-in'));
+    const next = document.getElementById(id);
+    next.classList.add('visible');
+    if (animated) next.classList.add('fade-in');
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    const navEl = document.getElementById('nav-' + id);
+    if (navEl) navEl.classList.add('active');
+    if (id === 'photography') onPhotographyShown();
+  }
+
+  function show(id, opts = {}) {
+    const push = opts.push !== false;
+    const animate = opts.animate !== false;
+    if (!VALID.includes(id)) id = 'home';
+
+    if (push) {
+      const url = id === 'home' ? '/' : '/' + id;
+      if (location.pathname !== url) history.pushState(null, '', url);
     }
+
+    clearTimeout(navTimer);
+    const current = document.querySelector('.section.visible');
+    if (!animate || !current) { activate(id, false); return; }
+    if (current.id === id && !current.classList.contains('fade-out')) return;
+
+    current.classList.add('fade-out');
+    navTimer = setTimeout(() => activate(id, true), 300);
+  }
+
+  function pathToSection() {
+    const path = location.pathname.replace(/^\/+|\/+$/g, '') || 'home';
+    return VALID.includes(path) ? path : 'home';
   }
 
   function toggleDark() {
@@ -661,34 +682,85 @@
     document.getElementById('dark-toggle').textContent = 'Dark';
   }
 
-  function loadFromURL() {
-    const path = window.location.pathname.replace('/', '').replace('/', '') || 'home';
-    const valid = ['home', 'projects', 'experience', 'writing', 'photography'];
-    show(valid.includes(path) ? path : 'home');
-    if (path === 'photography') {
-      document.querySelectorAll('.carousel-slide img').forEach(img => {
-        const s = img.src; img.src = ''; img.src = s;
-      });
-    }
-  }
-
-  window.addEventListener('popstate', loadFromURL);
-  loadFromURL();
-
-  const slides = Array.from(document.querySelectorAll('.carousel-slide'));
+  // ── Carousel (seamless loop) ──────────────────────
   const track = document.getElementById('carousel-track');
   const counter = document.getElementById('carousel-counter');
+  const slides = Array.from(track.querySelectorAll('.carousel-slide'));
   const total = slides.length;
-  let idx = 0;
+
+  // Copies at each end so the loop never visibly runs out:
+  // the last photo before the first, and the first two after the last.
+  function makeClone(slide) {
+    const c = slide.cloneNode(true);
+    c.classList.remove('active');
+    c.classList.add('clone');
+    c.setAttribute('aria-hidden', 'true');
+    const img = c.querySelector('img');
+    img.loading = 'lazy';
+    return c;
+  }
+  track.insertBefore(makeClone(slides[total - 1]), slides[0]);
+  track.appendChild(makeClone(slides[0]));
+  track.appendChild(makeClone(slides[1 % total]));
+  const allSlides = Array.from(track.querySelectorAll('.carousel-slide'));
+
+  let idx = 0;   // which photo (0–23)
+  let pos = 1;   // where the track is, counting the copy at the start
+
+  function setActive() {
+    allSlides.forEach(s => s.classList.remove('active'));
+    allSlides[pos].classList.add('active');
+  }
+
+  function positionTrack(animated = true) {
+    const slideWidth = slides[0].getBoundingClientRect().width;
+    if (!slideWidth) return;
+    if (!animated) track.classList.add('no-anim');
+    track.style.transform = `translateX(-${pos * (slideWidth + 8)}px)`;
+    if (!animated) { track.offsetHeight; track.classList.remove('no-anim'); }
+  }
+
+  // After landing on a copy, swap invisibly to the real photo
+  function settle() {
+    if (pos === 0) pos = total;
+    else if (pos === total + 1) pos = 1;
+    else return;
+    track.classList.add('no-anim');
+    setActive();
+    positionTrack(false);
+    track.offsetHeight;
+    track.classList.remove('no-anim');
+  }
+
+  track.addEventListener('transitionend', e => {
+    if (e.target === track && e.propertyName === 'transform') settle();
+  });
 
   function goTo(n) {
-    slides[idx].classList.remove('active');
+    settle();
+    pos = n + 1;
     idx = (n + total) % total;
-    slides[idx].classList.add('active');
-    const slideWidth = slides[0].getBoundingClientRect().width;
-    track.style.transform = `translateX(-${idx * (slideWidth + 8)}px)`;
+    setActive();
+    positionTrack();
     counter.textContent = (idx + 1) + ' / ' + total;
+    const nextImg = slides[(idx + 1) % total].querySelector('img');
+    if (nextImg) nextImg.loading = 'eager';
   }
+
+  function onPhotographyShown() {
+    settle();
+    positionTrack(false);
+    slides.forEach(slide => {
+      const img = slide.querySelector('img');
+      if (img.complete && img.naturalWidth === 0) { const s = img.src; img.src = ''; img.src = s; }
+    });
+  }
+
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => positionTrack(false), 100);
+  });
 
   document.getElementById('carousel-prev').addEventListener('click', () => goTo(idx - 1));
   document.getElementById('carousel-next').addEventListener('click', () => goTo(idx + 1));
@@ -737,6 +809,52 @@
       closeLightbox();
     }
   });
+  // ── Living detail: London time + weather ──────────
+  const livingEl = document.getElementById('living-detail');
+  let weatherText = '';
+
+  function londonTime() {
+    return new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London'
+    }).format(new Date());
+  }
+
+  function describeWeather(code) {
+    if (code === 0) return 'clear';
+    if (code <= 2) return 'partly cloudy';
+    if (code === 3) return 'overcast';
+    if (code <= 48) return 'foggy';
+    if (code <= 57) return 'drizzle';
+    if (code <= 67) return 'rain';
+    if (code <= 77) return 'snow';
+    if (code <= 82) return 'showers';
+    if (code <= 86) return 'snow showers';
+    return 'thunderstorms';
+  }
+
+  function renderLiving() {
+    livingEl.textContent = 'London — ' + londonTime() + (weatherText ? ' · ' + weatherText : '');
+  }
+
+  function fetchWeather() {
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=51.5074&longitude=-0.1278&current=temperature_2m,weather_code&timezone=Europe%2FLondon')
+      .then(res => res.json())
+      .then(data => {
+        const temp = Math.round(data.current.temperature_2m);
+        weatherText = temp + '°C, ' + describeWeather(data.current.weather_code);
+        renderLiving();
+      })
+      .catch(() => {});
+  }
+
+  renderLiving();
+  fetchWeather();
+  setInterval(renderLiving, 60000);
+  setInterval(fetchWeather, 15 * 60000);
+
+  // ── Initial section + back/forward ────────────────
+  window.addEventListener('popstate', () => show(pathToSection(), { push: false }));
+  show(pathToSection(), { push: false, animate: false });
 </script>
 
 </body>
