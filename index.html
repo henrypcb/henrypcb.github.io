@@ -4,8 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Henry — Growth, Strategy, and Research</title>
+<meta name="description" content="I help products grow by finding what&rsquo;s good for customers and good for business.">
+<link rel="canonical" href="https://henrypcb.github.io/">
+<meta property="og:site_name" content="Henry">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Henry — Growth, Strategy, and Research">
+<meta property="og:description" content="I help products grow by finding what&rsquo;s good for customers and good for business.">
+<meta property="og:url" content="https://henrypcb.github.io/">
+<meta name="twitter:card" content="summary">
 
 <script>
+  try { if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}
   const redirect = sessionStorage.getItem('redirect');
   if (redirect) {
     sessionStorage.removeItem('redirect');
@@ -19,7 +28,7 @@
   :root {
     --black: #0a0a0a;
     --white: #fafafa;
-    --gray: #999;
+    --gray: #707070;
     --border: #e0e0e0;
   }
 
@@ -282,7 +291,7 @@
     color: var(--gray);
   }
 
-  body.dark .experience-points li { color: #aaa; }
+  html.dark body .experience-points li { color: #aaa; }
 
   /* ─── BLOG ────────────────────────────────────────── */
   .blog-list { display: flex; flex-direction: column; }
@@ -429,19 +438,19 @@
   }
 
   /* ─── DARK MODE ───────────────────────────────────── */
-  body.dark {
+  html.dark body {
     --black: #f0f0f0;
     --white: #0e0e0e;
-    --gray: #666;
+    --gray: #8a8a8a;
     --border: #2a2a2a;
     background: #0e0e0e;
     color: #f0f0f0;
   }
 
-  body.dark .hero-bio { color: #aaa; }
-  body.dark nav { background: #0e0e0e; }
-  body.dark footer { background: #0e0e0e; }
-  body.dark .lightbox { background: rgba(0,0,0,0.98); }
+  html.dark body .hero-bio { color: #aaa; }
+  html.dark body nav { background: #0e0e0e; }
+  html.dark body footer { background: #0e0e0e; }
+  html.dark body .lightbox { background: rgba(0,0,0,0.98); }
 
   .dark-toggle {
     font-size: 10px;
@@ -645,7 +654,7 @@
     --f-wash: #efefed; --f-rule: var(--border); --f-bg: var(--white);
     margin: 2.8em 0 3em;
   }
-  body.dark .post-body .fig { --f-mid: #7a7a7a; --f-soft: #9a9a9a; --f-wash: #1c1c1c; }
+  html.dark body .post-body .fig { --f-mid: #7a7a7a; --f-soft: #9a9a9a; --f-wash: #1c1c1c; }
   .post-body .fig p { margin: 0; }
   .fig-k { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--f-soft); margin-bottom: 6px !important; }
   .fig-t { font-family: Georgia, serif; font-size: 22px; line-height: 1.25; color: var(--f-ink); margin-bottom: 16px !important; }
@@ -687,8 +696,8 @@
 
   .w-enter { animation: fadeDown 0.45s ease both; }
 
-  body.dark .wl-feat p.wl-sum { color: #aaa; }
-  body.dark .post-body { color: #cfcfcf; }
+  html.dark body .wl-feat p.wl-sum { color: #aaa; }
+  html.dark body .post-body { color: #cfcfcf; }
 
   @media (max-width: 640px) {
     .writing-layout { grid-template-columns: 1fr; gap: 24px; }
@@ -849,6 +858,8 @@
      2. Add one entry to writing/posts.json with the same slug:
         { "slug": "my-piece", "title": "...", "summary": "...",
           "topic": "...", "format": "Essay", "date": "2026-12-01" }
+     3. Run  python3 build_pages.py  in this folder, so shared links to the
+        piece show its title and summary.
      The page, filters and counts update on their own.
      Figures (loop diagrams, line and bar charts, single numbers): see the
      piece writing/visual-style.md for the exact format to copy.
@@ -883,7 +894,7 @@
   </div>
   <div class="carousel-wrap">
     <div class="carousel-track" id="carousel-track">
-      <div class="carousel-slide active"><img src="/photography/DSC00083.JPG" alt="" loading="eager"/></div>
+      <div class="carousel-slide active"><img src="/photography/DSC00083.JPG" alt="" loading="lazy" decoding="async" /></div>
       <div class="carousel-slide"><img src="/photography/DSC00371.JPG" alt="" loading="lazy" decoding="async" /></div>
       <div class="carousel-slide"><img src="/photography/DSC00609.JPG" alt="" loading="lazy" decoding="async" /></div>
       <div class="carousel-slide"><img src="/photography/DSC00766.JPG" alt="" loading="lazy" decoding="async" /></div>
@@ -939,6 +950,7 @@
     document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
     const navEl = document.getElementById('nav-' + id);
     if (navEl) navEl.classList.add('active');
+    window.scrollTo(0, 0);
     if (id === 'photography') onPhotographyShown();
     if (id !== 'writing') document.title = baseTitle;
     if (id === 'writing') drawFigures(document.getElementById('post-body'));
@@ -1362,16 +1374,22 @@
     window.scrollTo(0, 0);
   });
 
-  function toggleDark() {
-    const isDark = document.body.classList.toggle('dark');
-    document.getElementById('dark-toggle').textContent = isDark ? 'Dark' : 'Light';
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  // The button names the mode it switches to
+  function labelDarkToggle() {
+    const isDark = document.documentElement.classList.contains('dark');
+    const btn = document.getElementById('dark-toggle');
+    btn.textContent = isDark ? 'Light' : 'Dark';
+    btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    btn.title = btn.getAttribute('aria-label');
   }
 
-  if (localStorage.getItem('theme') === 'dark') {
-    document.body.classList.add('dark');
-    document.getElementById('dark-toggle').textContent = 'Dark';
+  function toggleDark() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch (e) {}
+    labelDarkToggle();
   }
+
+  labelDarkToggle();
 
   // ── Carousel (seamless loop) ──────────────────────
   const track = document.getElementById('carousel-track');
