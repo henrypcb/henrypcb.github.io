@@ -1353,7 +1353,9 @@
     if (!post) {
       if (slug) history.replaceState(null, '', '/writing');
       article.hidden = true;
+      article.style.display = 'none';
       index.hidden = false;
+      index.style.display = '';
       renderIndex(posts);
       enter(index);
       document.title = baseTitle;
@@ -1361,7 +1363,9 @@
     }
 
     index.hidden = true;
+    index.style.display = 'none';
     article.hidden = false;
+    article.style.display = '';
     document.getElementById('writing-count').textContent = '';
     document.getElementById('post-kicker').textContent = post.topic + ' · ' + post.format;
     document.getElementById('post-title').textContent = post.title;
