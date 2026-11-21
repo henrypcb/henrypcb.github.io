@@ -1,5 +1,13 @@
 [
   {
+    "slug": "visual-style",
+    "title": "How things look here",
+    "summary": "A reference for the figures, diagrams and type used across this site. Placeholder content throughout.",
+    "topic": "Craft",
+    "format": "Essay",
+    "date": "2026-11-21"
+  },
+  {
     "slug": "walking-without-a-destination",
     "title": "On walking without a destination",
     "summary": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.",

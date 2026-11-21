@@ -639,6 +639,52 @@
   .post-body code { font-size: 0.9em; background: var(--border); padding: 1px 5px; }
   .post-body hr { border: none; border-top: 1px solid var(--border); margin: 2.5em 0; }
 
+  /* Figures inside a piece */
+  .post-body .fig {
+    --f-ink: var(--black); --f-mid: #8a8a8a; --f-soft: #6b6b6b;
+    --f-wash: #efefed; --f-rule: var(--border); --f-bg: var(--white);
+    margin: 2.8em 0 3em;
+  }
+  body.dark .post-body .fig { --f-mid: #7a7a7a; --f-soft: #9a9a9a; --f-wash: #1c1c1c; }
+  .post-body .fig p { margin: 0; }
+  .fig-k { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--f-soft); margin-bottom: 6px !important; }
+  .fig-t { font-family: Georgia, serif; font-size: 22px; line-height: 1.25; color: var(--f-ink); margin-bottom: 16px !important; }
+  .fig-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 11px; color: var(--f-soft); margin-bottom: 8px; }
+  .fig-sw { display: inline-block; width: 18px; border-top: 2px solid var(--f-ink); vertical-align: middle; margin-right: 6px; }
+  .fig-sw.s1 { border-top: 2px dashed var(--f-mid); }
+  .fig-sw.s2 { border-top: 2px dotted var(--f-mid); }
+  .fig-wrap { position: relative; }
+  .fig-chart svg { display: block; overflow: visible; }
+  .fig-chart text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  .f-ax { font-size: 10px; letter-spacing: 0.08em; fill: var(--f-soft); }
+  .f-up { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; fill: var(--f-ink); }
+  .f-num { font-size: 10px; letter-spacing: 0.1em; fill: var(--f-soft); }
+  .f-it { font-family: Georgia, serif !important; font-style: italic; font-size: 13px; fill: var(--f-soft); }
+  .f-ctr { font-family: Georgia, serif !important; fill: var(--f-ink); }
+  .fig-tip {
+    position: absolute; pointer-events: none; opacity: 0; transition: opacity 0.15s;
+    background: var(--f-bg); border: 1px solid var(--f-ink); color: var(--f-ink);
+    padding: 6px 9px; font-size: 11px; line-height: 1.5; white-space: nowrap; z-index: 2;
+  }
+  .post-body .fig figcaption {
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    font-size: 12px; line-height: 1.6; color: var(--f-soft);
+    border-top: 1px solid var(--f-rule); padding-top: 10px; margin-top: 12px;
+  }
+  .post-body .fig figcaption em { font-family: Georgia, serif; }
+  .fig-hero { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: end; border-top: 1px solid var(--f-ink); padding-top: 18px; }
+  .fig-n { font-family: Georgia, serif; font-size: 72px; line-height: 0.9; letter-spacing: -0.02em; color: var(--f-ink); }
+  .post-body .fig-hero p { font-size: 13px; line-height: 1.6; color: var(--f-soft); max-width: 300px; }
+  .post-body pre {
+    background: var(--border); padding: 14px 16px; margin: 1.5em 0; overflow-x: auto;
+    font-size: 12px; line-height: 1.6;
+  }
+  .post-body pre code { background: none; padding: 0; font-size: inherit; }
+  @media (max-width: 640px) {
+    .fig-n { font-size: 52px; }
+    .fig-hero { grid-template-columns: 1fr; gap: 10px; }
+  }
+
   .w-enter { animation: fadeDown 0.45s ease both; }
 
   body.dark .wl-feat p.wl-sum { color: #aaa; }
@@ -804,6 +850,8 @@
         { "slug": "my-piece", "title": "...", "summary": "...",
           "topic": "...", "format": "Essay", "date": "2026-12-01" }
      The page, filters and counts update on their own.
+     Figures (loop diagrams, line and bar charts, single numbers): see the
+     piece writing/visual-style.md for the exact format to copy.
 ════════════════════════════════════════════════════ -->
 <section class="section" id="writing">
   <div class="section-header">
@@ -893,6 +941,7 @@
     if (navEl) navEl.classList.add('active');
     if (id === 'photography') onPhotographyShown();
     if (id !== 'writing') document.title = baseTitle;
+    if (id === 'writing') drawFigures(document.getElementById('post-body'));
   }
 
   function show(route, opts = {}) {
@@ -959,8 +1008,48 @@
       .replace(/\*([^*]+)\*/g, '<em>$1</em>');
   }
 
+  function parseSpec(src) {
+    const spec = { series: [], bar: [] };
+    src.split('\n').forEach(line => {
+      const m = line.match(/^\s*([a-z]+)\s*:\s*(.*)$/i);
+      if (!m) return;
+      const k = m[1].toLowerCase(), v = m[2].trim();
+      if (k === 'series' || k === 'bar') spec[k].push(v); else spec[k] = v;
+    });
+    return spec;
+  }
+
+  function figureHtml(spec, n) {
+    const type = (spec.type || '').toLowerCase();
+    const kind = { loop: 'Diagram', line: 'Change over time', bars: 'Comparison', number: 'Single number' }[type];
+    if (!kind) return '';
+    spec.type = type;
+    const cap = (spec.caption || spec.source)
+      ? `<figcaption><span><em>Fig. ${n}</em> &mdash; ${inlineMd(spec.caption || '')}</span>${spec.source ? `<span>Source: ${inlineMd(spec.source)}</span>` : ''}</figcaption>`
+      : '';
+    const head = `<p class="fig-k">Fig. ${n} &middot; ${kind}</p>` + (spec.title ? `<p class="fig-t">${inlineMd(spec.title)}</p>` : '');
+    if (type === 'number')
+      return `<figure class="fig">${head}<div class="fig-hero"><span class="fig-n">${esc(spec.value || '')}</span><p>${inlineMd(spec.text || '')}</p></div>${cap}</figure>`;
+    let legend = '';
+    if (type === 'line' && spec.series.length > 1)
+      legend = '<div class="fig-legend">' + spec.series.slice(0, 3).map((s, i) =>
+        `<span><i class="fig-sw s${i}"></i>${esc(s.split('|')[0].trim())}</span>`).join('') + '</div>';
+    return `<figure class="fig">${head}${legend}<div class="fig-wrap"><div class="fig-chart" data-spec="${esc(JSON.stringify(spec))}"></div><div class="fig-tip"></div></div>${cap}</figure>`;
+  }
+
   function markdown(md) {
-    return md.replace(/\r/g, '').trim().split(/\n{2,}/).map(block => {
+    const fences = [];
+    md = md.replace(/\r/g, '').replace(/```(\w*)[ \t]*\n([\s\S]*?)\n```/g, (m, lang, body) => {
+      fences.push({ lang: lang.toLowerCase(), body });
+      return `\n\n@@FENCE${fences.length - 1}@@\n\n`;
+    });
+    let figN = 0;
+    return md.trim().split(/\n{2,}/).map(block => {
+      const f = block.trim().match(/^@@FENCE(\d+)@@$/);
+      if (f) {
+        const { lang, body } = fences[+f[1]];
+        return lang === 'figure' ? figureHtml(parseSpec(body), ++figN) : `<pre><code>${esc(body)}</code></pre>`;
+      }
       const lines = block.split('\n');
       const h = block.match(/^(#{1,3})\s+([^\n]*)$/);
       if (h) { const n = h[1].length >= 3 ? 3 : 2; return `<h${n}>${inlineMd(h[2])}</h${n}>`; }
@@ -974,6 +1063,203 @@
       return `<p>${inlineMd(lines.join(' '))}</p>`;
     }).join('\n');
   }
+
+  // ── Figures: drawn to the width they have ──────────
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  let figUid = 0;
+  function sv(tag, attrs, parent) {
+    const e = document.createElementNS(SVGNS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function svText(parent, cls, x, y, txt, anchor, style) {
+    const t = sv('text', { class: cls, x, y, 'text-anchor': anchor || 'start' }, parent);
+    if (style) t.setAttribute('style', style);
+    t.textContent = txt;
+    return t;
+  }
+  function wrapWords(str, max) {
+    const out = []; let cur = '';
+    str.split(/\s+/).forEach(w => {
+      if (cur && (cur + ' ' + w).length > max) { out.push(cur); cur = w; } else cur = cur ? cur + ' ' + w : w;
+    });
+    if (cur) out.push(cur);
+    return out;
+  }
+  function niceStep(v) {
+    const p = Math.pow(10, Math.floor(Math.log10(v))), f = v / p;
+    return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+  }
+  function showTip(wrap, html, x, y) {
+    const tip = wrap.querySelector('.fig-tip');
+    tip.innerHTML = html;
+    tip.style.opacity = 1;
+    const w = wrap.clientWidth, tw = tip.offsetWidth || 120;
+    tip.style.left = Math.max(0, Math.min(x + 12, w - tw)) + 'px';
+    tip.style.top = Math.max(0, y) + 'px';
+  }
+  function hideTip(wrap) { wrap.querySelector('.fig-tip').style.opacity = 0; }
+
+  function drawLoop(box, spec, W) {
+    const steps = (spec.steps || '').split('|').map(x => x.trim()).filter(Boolean);
+    const n = steps.length;
+    if (n < 2) return;
+    const narrow = W < 520, maxC = narrow ? 10 : 18;
+    const r = narrow ? Math.max(62, Math.min(118, W / 2 - 92)) : 118;
+    const cx = W / 2, cy = 64 + r, H = cy + r + 64;
+    const svg = sv('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img',
+      'aria-label': (spec.title ? spec.title + ': ' : '') + steps.join(', then ') + ', and back to the start' }, box);
+    const id = 'fa' + (++figUid);
+    const mk = sv('marker', { id, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse' }, sv('defs', {}, svg));
+    sv('path', { d: 'M0,1 L9,5 L0,9', fill: 'none', stroke: 'context-stroke', 'stroke-width': 1.2 }, mk);
+    sv('circle', { cx, cy, r, fill: 'none', stroke: 'var(--f-rule)', 'stroke-width': 1 }, svg);
+    const ang = i => (-90 + i * 360 / n) * Math.PI / 180;
+    const pt = a => [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+    const gap = Math.min(14, 120 / n) * Math.PI / 180;
+    const weak = parseInt(spec.weak, 10);
+    for (let i = 0; i < n; i++) {
+      const a0 = ang(i) + gap, a1 = ang(i + 1) - gap;
+      const [x0, y0] = pt(a0), [x1, y1] = pt(a1);
+      const isWeak = weak === i + 1;
+      sv('path', { d: `M ${x0} ${y0} A ${r} ${r} 0 0 1 ${x1} ${y1}`, fill: 'none',
+        stroke: isWeak ? 'var(--f-mid)' : 'var(--f-ink)', 'stroke-width': 1.4,
+        'stroke-dasharray': isWeak ? '4 4' : 'none', 'marker-end': `url(#${id})` }, svg);
+    }
+    steps.forEach((label, i) => {
+      const a = ang(i), c = Math.cos(a), s = Math.sin(a);
+      const [nx, ny] = pt(a);
+      sv('circle', { cx: nx, cy: ny, r: 5, fill: 'var(--f-ink)' }, svg);
+      const lines = [String(i + 1).padStart(2, '0'), ...wrapWords(label, maxC)];
+      const anchor = Math.abs(c) < 0.3 ? 'middle' : c > 0 ? 'start' : 'end';
+      const x = anchor === 'middle' ? nx : nx + c * 16;
+      let y0;
+      if (s < -0.3) y0 = ny - 16 - (lines.length - 1) * 14;
+      else if (s > 0.3) y0 = ny + 24;
+      else y0 = ny - ((lines.length - 1) * 14) / 2 + 4;
+      lines.forEach((ln, j) => svText(svg, j ? 'f-up' : 'f-num', x, y0 + j * 14, ln, anchor));
+    });
+    svText(svg, 'f-ctr', cx, cy + (spec.note ? -2 : 8), spec.centre || spec.center || 'The loop', 'middle', `font-size:${narrow ? 20 : 26}px`);
+    if (spec.note) svText(svg, 'f-it', cx, cy + 20, spec.note, 'middle');
+  }
+
+  function drawLine(box, spec, W) {
+    const xs = (spec.x || '').split('|').map(x => x.trim());
+    const series = spec.series.slice(0, 3).map(s => {
+      const [name, vals] = s.split('|');
+      return { name: (name || '').trim(), v: (vals || '').split(',').map(Number) };
+    }).filter(s => s.v.length && s.v.every(isFinite));
+    if (!series.length || xs.length < 2) return;
+    const narrow = W < 520, H = narrow ? 230 : 270;
+    const m = { l: 40, r: narrow ? 78 : 104, t: 34, b: 30 };
+    const N = xs.length, unit = spec.unit || '';
+    const maxV = Math.max(...series.flatMap(s => s.v));
+    const step = niceStep(maxV / 3), top = step * Math.ceil(maxV / step);
+    const x = i => m.l + i * (W - m.l - m.r) / (N - 1);
+    const y = v => H - m.b - (v / top) * (H - m.t - m.b);
+    const svg = sv('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img',
+      'aria-label': (spec.title || 'Line chart') + '. ' + series.map(s => `${s.name}: ${s.v[0]}${unit} to ${s.v[s.v.length - 1]}${unit}`).join('; ') }, box);
+    for (let v = 0; v <= top + 1e-9; v += step) {
+      sv('line', { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), stroke: v ? 'var(--f-rule)' : 'var(--f-ink)', 'stroke-width': 1 }, svg);
+      svText(svg, 'f-ax', m.l - 8, y(v) + 3, +v.toFixed(2), 'end');
+    }
+    const every = Math.ceil(N / (narrow ? 4 : 6));
+    xs.forEach((lab, i) => { if (i % every === 0 || i === N - 1) svText(svg, 'f-ax', x(i), H - 10, lab.toUpperCase(), 'middle'); });
+    const styles = [
+      { stroke: 'var(--f-ink)', dash: 'none' },
+      { stroke: 'var(--f-mid)', dash: '5 4' },
+      { stroke: 'var(--f-mid)', dash: '1.5 4' }];
+    series.slice().reverse().forEach((s, ri) => {
+      const st = styles[series.length - 1 - ri];
+      sv('path', { d: s.v.map((v, i) => (i ? 'L' : 'M') + x(i) + ',' + y(v)).join(' '), fill: 'none',
+        stroke: st.stroke, 'stroke-width': 2, 'stroke-dasharray': st.dash, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, svg);
+    });
+    const ends = series.map((s, i) => ({ i, y: y(s.v[s.v.length - 1]) + 4 })).sort((a, b) => a.y - b.y);
+    for (let k = 1; k < ends.length; k++) if (ends[k].y - ends[k - 1].y < 14) ends[k].y = ends[k - 1].y + 14;
+    ends.forEach(e => svText(svg, 'f-up', x(N - 1) + 10, e.y, series[e.i].name, 'start', e.i ? 'fill:var(--f-soft)' : ''));
+    if (spec.note) {
+      const [at, ...rest] = spec.note.split('|');
+      const txt = rest.join('|').trim();
+      let idx = xs.findIndex(l => l.toLowerCase() === at.trim().toLowerCase());
+      if (idx < 0) idx = Math.max(0, Math.min(N - 1, parseInt(at, 10) - 1 || 0));
+      const px = x(idx), py = y(series[0].v[idx]);
+      sv('line', { x1: px, x2: px, y1: py - 8, y2: py - 40, stroke: 'var(--f-soft)', 'stroke-width': 1 }, svg);
+      svText(svg, 'f-it', px + (px > W / 2 ? -6 : 6), py - 44, txt, px > W / 2 ? 'end' : 'start');
+    }
+    const cross = sv('line', { y1: m.t, y2: H - m.b, stroke: 'var(--f-soft)', 'stroke-width': 1, opacity: 0 }, svg);
+    const dots = series.map((s, i) => sv('circle', { r: 4, fill: i ? 'var(--f-mid)' : 'var(--f-ink)', stroke: 'var(--f-bg)', 'stroke-width': 2, opacity: 0 }, svg));
+    const wrap = box.parentNode;
+    const hit = sv('rect', { x: m.l - 10, y: m.t, width: W - m.l - m.r + 20, height: H - m.t - m.b, fill: 'transparent' }, svg);
+    const move = cx => {
+      let i = Math.round((cx - m.l) / ((W - m.l - m.r) / (N - 1)));
+      i = Math.max(0, Math.min(N - 1, i));
+      cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('opacity', 1);
+      dots.forEach((d, k) => { d.setAttribute('cx', x(i)); d.setAttribute('cy', y(series[k].v[i])); d.setAttribute('opacity', 1); });
+      showTip(wrap, `<b style="font-weight:400">${esc(xs[i])}</b>` + series.map(s => `<br>${esc(s.name)} ${s.v[i]}${esc(unit)}`).join(''), x(i), 4);
+    };
+    hit.addEventListener('mousemove', e => move(e.clientX - svg.getBoundingClientRect().left));
+    hit.addEventListener('touchstart', e => move(e.touches[0].clientX - svg.getBoundingClientRect().left), { passive: true });
+    hit.addEventListener('mouseleave', () => { cross.setAttribute('opacity', 0); dots.forEach(d => d.setAttribute('opacity', 0)); hideTip(wrap); });
+  }
+
+  function drawBars(box, spec, W) {
+    const bars = spec.bar.map(b => { const [n, v] = b.split('|'); return { n: (n || '').trim(), v: parseFloat(v) }; }).filter(b => isFinite(b.v));
+    if (!bars.length) return;
+    const narrow = W < 520, unit = spec.unit || '';
+    let hi = bars.findIndex(b => spec.highlight && b.n.toLowerCase() === spec.highlight.toLowerCase());
+    if (hi < 0) hi = bars.reduce((best, b, i) => b.v > bars[best].v ? i : best, 0);
+    const lw = narrow ? 0 : 160, bh = narrow ? 22 : 30, gap = narrow ? 30 : 14, padT = narrow ? 18 : 6;
+    const maxV = Math.max(...bars.map(b => b.v));
+    const avail = W - lw - (narrow ? 50 : 70);
+    const bw = v => Math.max(2, v / maxV * avail);
+    const H = padT + bars.length * (bh + gap) - gap + 8;
+    const svg = sv('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img',
+      'aria-label': (spec.title || 'Bar chart') + '. ' + bars.map(b => `${b.n} ${b.v}${unit}`).join(', ') }, box);
+    const pid = 'fh' + (++figUid);
+    const pat = sv('pattern', { id: pid, width: 6, height: 6, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, sv('defs', {}, svg));
+    sv('line', { x1: 0, y1: 0, x2: 0, y2: 6, stroke: 'var(--f-mid)', 'stroke-width': 1.5 }, pat);
+    const wrap = box.parentNode;
+    bars.forEach((b, i) => {
+      const yy = padT + i * (bh + gap), on = i === hi;
+      if (narrow) svText(svg, 'f-up', lw, yy - 7, b.n, 'start', on ? '' : 'fill:var(--f-soft)');
+      else svText(svg, 'f-up', lw - 14, yy + bh / 2 + 4, b.n, 'end', on ? '' : 'fill:var(--f-soft)');
+      const rect = sv('rect', { x: lw, y: yy, width: bw(b.v), height: bh, fill: on ? 'var(--f-ink)' : 'var(--f-wash)',
+        stroke: on ? 'none' : 'var(--f-mid)', 'stroke-width': on ? 0 : 0.8 }, svg);
+      if (!on) sv('rect', { x: lw, y: yy, width: bw(b.v), height: bh, fill: `url(#${pid})`, opacity: 0.35, 'pointer-events': 'none' }, svg);
+      if (on) {
+        const ex = lw + bw(b.v) + 10;
+        svText(svg, 'f-num', ex, yy + bh / 2 + 4, b.v + unit, 'start', 'fill:var(--f-ink)');
+        if (spec.note && ex + 40 + spec.note.length * 6.5 < W) svText(svg, 'f-it', ex + 40, yy + bh / 2 + 4, spec.note);
+      }
+      const h = sv('rect', { x: 0, y: yy - gap / 2 - (narrow ? 8 : 0), width: W, height: bh + gap, fill: 'transparent' }, svg);
+      h.addEventListener('mousemove', e => {
+        showTip(wrap, `<b style="font-weight:400">${esc(b.n)}</b><br>${b.v}${esc(unit)}`, e.clientX - svg.getBoundingClientRect().left, yy);
+        rect.setAttribute('opacity', 0.8);
+      });
+      h.addEventListener('mouseleave', () => { hideTip(wrap); rect.setAttribute('opacity', 1); });
+    });
+    sv('line', { x1: lw, x2: lw, y1: padT - 4, y2: H - 2, stroke: 'var(--f-ink)', 'stroke-width': 1 }, svg);
+  }
+
+  function drawFigures(root) {
+    if (!root) return;
+    root.querySelectorAll('.fig-chart').forEach(box => {
+      const W = Math.round(box.clientWidth);
+      if (!W || +box.dataset.w === W) return;
+      box.dataset.w = W;
+      box.innerHTML = '';
+      let spec;
+      try { spec = JSON.parse(box.dataset.spec); } catch (e) { return; }
+      const draw = { loop: drawLoop, line: drawLine, bars: drawBars }[spec.type];
+      if (draw) draw(box, spec, W);
+    });
+  }
+
+  let figTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(figTimer);
+    figTimer = setTimeout(() => drawFigures(document.getElementById('post-body')), 150);
+  });
 
   function enter(el) {
     el.classList.remove('w-enter');
@@ -1061,6 +1347,7 @@
       if (!res.ok) throw new Error();
       const md = await res.text();
       body.innerHTML = markdown(md);
+      drawFigures(body);
       const mins = Math.max(1, Math.round(md.split(/\s+/).length / 220));
       meta.textContent = fmtDate(post.date) + ' · ' + mins + ' min read';
     } catch (err) {
