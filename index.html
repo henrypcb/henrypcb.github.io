@@ -1319,7 +1319,7 @@
       (wState.topic === 'All' || p.topic === wState.topic) &&
       (wState.format === 'All' || p.format === wState.format));
     document.getElementById('writing-count').textContent =
-      String(list.length).padStart(2, '0') + (list.length === 1 ? ' piece' : ' pieces');
+      String(list.length).padStart(3, '0') + (list.length === 1 ? ' piece' : ' pieces');
 
     const box = document.getElementById('writing-list');
     if (!list.length) { box.innerHTML = '<p class="wl-empty">Nothing here yet</p>'; return; }
