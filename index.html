@@ -25,6 +25,8 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  [hidden] { display: none !important; }
+
   :root {
     --black: #0a0a0a;
     --white: #fafafa;
@@ -990,6 +992,16 @@
   const baseTitle = document.title;
   const wState = { topic: 'All', format: 'All' };
   let postsPromise = null;
+  const pieceCache = {};
+
+  function loadPiece(slug) {
+    if (!pieceCache[slug]) {
+      pieceCache[slug] = fetch('/writing/' + encodeURIComponent(slug) + '.md')
+        .then(r => { if (!r.ok) throw new Error(); return r.text(); })
+        .catch(err => { delete pieceCache[slug]; throw err; });
+    }
+    return pieceCache[slug];
+  }
 
   function loadPosts() {
     if (!postsPromise) {
@@ -1323,7 +1335,13 @@
          <div><h4>${esc(p.title)}</h4><p>${esc(p.summary)}</p></div>
          <span class="wl-tag">${esc(p.format)}</span>
        </a>`).join('');
-    box.querySelectorAll('a[data-slug]').forEach(a => a.addEventListener('click', e => openPiece(e, a.dataset.slug)));
+    box.querySelectorAll('a[data-slug]').forEach(a => {
+      const warm = () => loadPiece(a.dataset.slug).catch(() => {});
+      a.addEventListener('mouseenter', warm);
+      a.addEventListener('touchstart', warm, { passive: true });
+      a.addEventListener('focus', warm);
+      a.addEventListener('click', e => openPiece(e, a.dataset.slug));
+    });
   }
 
   async function renderWriting(slug) {
@@ -1355,9 +1373,7 @@
     enter(article);
 
     try {
-      const res = await fetch('/writing/' + encodeURIComponent(post.slug) + '.md');
-      if (!res.ok) throw new Error();
-      const md = await res.text();
+      const md = await loadPiece(post.slug);
       body.innerHTML = markdown(md);
       drawFigures(body);
       const mins = Math.max(1, Math.round(md.split(/\s+/).length / 220));
