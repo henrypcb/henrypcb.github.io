@@ -1,0 +1,39 @@
+[
+  {
+    "slug": "sample-size",
+    "title": "Sample size calculator",
+    "summary": "How many people an experiment needs to detect the change you care about, and how long it will take to run.",
+    "tag": "Tool",
+    "size": "xl",
+    "art": "curves",
+    "live": true
+  },
+  {
+    "slug": "placeholder-one",
+    "title": "Lorem ipsum dolor",
+    "summary": "Sed do eiusmod tempor incididunt ut labore et dolore.",
+    "tag": "In progress",
+    "size": "s"
+  },
+  {
+    "slug": "placeholder-two",
+    "title": "Consectetur adipiscing",
+    "summary": "Ut enim ad minim veniam, quis nostrud exercitation.",
+    "tag": "In progress",
+    "size": "s"
+  },
+  {
+    "slug": "placeholder-three",
+    "title": "Duis aute irure",
+    "summary": "Excepteur sint occaecat cupidatat non proident.",
+    "tag": "In progress",
+    "size": "s"
+  },
+  {
+    "slug": "placeholder-four",
+    "title": "Nemo enim ipsam voluptatem",
+    "summary": "Quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores.",
+    "tag": "In progress",
+    "size": "l"
+  }
+]

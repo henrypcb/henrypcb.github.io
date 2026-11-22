@@ -169,49 +169,195 @@
   }
 
   /* ─── PROJECTS ────────────────────────────────────── */
-  .project-list { display: flex; flex-direction: column; }
-
-  .project-item {
+  .proj-grid {
     display: grid;
-    grid-template-columns: 80px 1fr auto;
-    align-items: baseline;
-    gap: 24px;
-    padding: 24px 0;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-    transition: opacity 0.2s;
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: minmax(210px, auto);
+    grid-auto-flow: dense;
+    gap: 16px;
   }
 
-  .project-item:hover { opacity: 0.6; }
-
-  .project-num {
-    font-size: 11px;
-    color: var(--gray);
-    letter-spacing: 0.08em;
+  .pcard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    padding: 20px 22px 22px;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.3s;
   }
 
-  .project-name {
-    font-family: Georgia, serif;
-    font-size: 22px;
-    font-weight: 400;
-    margin-bottom: 4px;
-  }
+  .pcard.size-xl { grid-column: span 4; grid-row: span 2; }
+  .pcard.size-l  { grid-column: span 4; }
+  .pcard.size-m  { grid-column: span 3; }
+  .pcard.size-s  { grid-column: span 2; }
 
-  .project-desc {
-    font-size: 12px;
-    color: var(--gray);
-    letter-spacing: 0.04em;
-  }
-
-  .project-tag {
+  .pcard-top {
+    display: flex;
+    justify-content: space-between;
     font-size: 10px;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--gray);
-    border: 1px solid var(--border);
-    padding: 4px 10px;
-    white-space: nowrap;
   }
+
+  .pcard-art { flex: 1; min-height: 40px; margin: 18px 0; position: relative; }
+  .pcard-art svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .pcard.idle .pcard-art {
+    background: repeating-linear-gradient(45deg, var(--border) 0 1px, transparent 1px 7px);
+    opacity: 0.7;
+  }
+
+  .pcard h3 {
+    font-family: Georgia, serif;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.15;
+    margin-bottom: 6px;
+  }
+
+  .pcard.size-xl h3 { font-size: 36px; letter-spacing: -0.01em; margin-bottom: 10px; }
+  .pcard p { font-size: 12px; line-height: 1.6; color: var(--gray); max-width: 440px; }
+  .pcard.size-xl p { font-size: 14px; }
+
+  .pcard-open {
+    position: absolute;
+    right: 22px;
+    bottom: 22px;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+
+  a.pcard:hover { border-color: var(--black); }
+  a.pcard:hover .pcard-open { opacity: 1; transform: none; }
+  .pcard.idle { cursor: default; }
+
+  #projects.reading .section-header { display: none; }
+
+  /* The calculator */
+  .calc { max-width: 760px; }
+
+  .calc-intro {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #444;
+    max-width: 600px;
+    margin-top: 20px;
+  }
+
+  .seg { display: flex; gap: 22px; flex-wrap: wrap; }
+
+  .seg button {
+    background: none;
+    border: none;
+    border-bottom: 1px solid transparent;
+    font: inherit;
+    font-size: 13px;
+    color: var(--gray);
+    padding: 3px 0;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .seg button:hover { color: var(--black); }
+  .seg button.on { color: var(--black); border-bottom-color: var(--black); }
+
+  .calc-metric { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+  .calc-label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 10px;
+  }
+
+  .calc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px 44px;
+    margin: 30px 0 44px;
+  }
+
+  .calc-field { min-width: 0; }
+  .calc-field.wide { grid-column: 1 / -1; }
+
+  .calc-input { display: flex; align-items: baseline; gap: 6px; border-bottom: 1px solid var(--border); transition: border-color 0.2s; }
+  .calc-input:focus-within { border-bottom-color: var(--black); }
+
+  .calc-input input {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--black);
+    font-family: Georgia, serif;
+    font-size: 28px;
+    padding: 4px 0 6px;
+    -moz-appearance: textfield;
+  }
+
+  .calc-input input::-webkit-outer-spin-button,
+  .calc-input input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .calc-unit { font-size: 12px; color: var(--gray); letter-spacing: 0.06em; }
+  .calc-help { font-size: 12px; line-height: 1.5; color: var(--gray); margin-top: 8px; }
+
+  .calc-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 18px 0 4px;
+    outline: none;
+  }
+
+  .calc-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--black); cursor: pointer; border: none;
+  }
+
+  .calc-range::-moz-range-thumb {
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--black); cursor: pointer; border: none;
+  }
+
+  .calc-result {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px 56px;
+    align-items: end;
+    border-top: 1px solid var(--black);
+    padding-top: 22px;
+  }
+
+  .calc-n {
+    font-family: Georgia, serif;
+    font-size: 80px;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+  }
+
+  .calc-sub { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gray); margin-top: 10px; }
+  .calc-stats { display: flex; gap: 44px; flex-wrap: wrap; }
+  .calc-stat b { display: block; font-family: Georgia, serif; font-weight: 400; font-size: 28px; line-height: 1.1; }
+
+  .calc-sentence { font-size: 15px; line-height: 1.8; color: #444; margin-top: 26px; max-width: 640px; }
+  .calc-note { font-family: Georgia, serif; font-style: italic; font-size: 14px; color: var(--gray); margin-top: 10px; }
+  .calc-how { margin-top: 8px; padding-top: 18px; border-top: 1px solid var(--border); font-size: 13px; line-height: 1.7; color: var(--gray); max-width: 640px; }
+  .calc-how p + p { margin-top: 10px; }
+
+  html.dark body .calc-intro,
+  html.dark body .calc-sentence { color: #cfcfcf; }
 
   /* ─── EXPERIENCE ──────────────────────────────────── */
   .experience-section { margin-bottom: 56px; }
@@ -740,23 +886,37 @@
     .post-body { font-size: 15px; }
   }
 
+  @media (max-width: 900px) {
+    .proj-grid { grid-template-columns: repeat(2, 1fr); }
+    .pcard.size-xl, .pcard.size-l { grid-column: span 2; }
+    .pcard.size-m, .pcard.size-s { grid-column: span 1; }
+    .pcard.size-xl { grid-row: span 1; min-height: 340px; }
+  }
+
   /* ─── MOBILE ──────────────────────────────────────── */
   @media (max-width: 640px) {
 
-    nav { padding: 0 20px; height: 48px; }
-    .nav-links { gap: 20px; }
-    .nav-links a { font-size: 10px; letter-spacing: 0.06em; }
-    .section { padding: 88px 20px 60px; }
-    .hero { padding-top: 100px; padding-bottom: 60px; }
+    nav { padding: 14px 20px 12px; height: auto; flex-wrap: wrap; row-gap: 14px; }
+    .nav-links { order: 3; width: 100%; justify-content: space-between; gap: 0; }
+    .nav-links a { font-size: 10px; letter-spacing: 0.08em; }
+    .dark-toggle { margin-left: auto; }
+    .section { padding: 112px 20px 60px; }
+    .hero { padding-top: 124px; padding-bottom: 60px; }
     .hero-name { font-size: clamp(40px, 12vw, 64px); }
     .hero-bio { font-size: 14px; }
     .section-header { margin-bottom: 36px; }
-    .project-item { grid-template-columns: 40px 1fr; gap: 12px; }
-    .project-tag { display: none; }
-    .project-name { font-size: 18px; }
     .experience-company-header { flex-direction: column; gap: 2px; }
     .experience-role-row { flex-direction: column; gap: 2px; padding: 10px 0; }
     .experience-role { font-size: 15px; }
+    .proj-grid { grid-template-columns: 1fr; grid-auto-rows: auto; }
+    .pcard.size-xl, .pcard.size-l, .pcard.size-m, .pcard.size-s { grid-column: span 1; }
+    .pcard { min-height: 200px; }
+    .pcard.size-xl { min-height: 300px; }
+    .pcard.size-xl h3 { font-size: 28px; }
+    .pcard-open { opacity: 1; transform: none; }
+    .calc-grid { grid-template-columns: 1fr; gap: 26px; }
+    .calc-result { grid-template-columns: 1fr; gap: 22px; }
+    .calc-n { font-size: 60px; }
     .blog-item { grid-template-columns: 1fr; gap: 8px; }
     .blog-title { font-size: 18px; }
     .blog-date { order: -1; }
@@ -788,14 +948,26 @@
 </section>
 
 
+<!-- ═══════════════════════════════════════════════════
+     PROJECTS
+     The boxes come from projects/projects.json. Each entry takes:
+       slug, title, summary, tag, size (xl, l, m or s), and
+       "live": true for projects that open when clicked.
+     A live project also needs a view in PROJECT_VIEWS in the script below.
+     After changing the list, run  python3 build_pages.py
+════════════════════════════════════════════════════ -->
 <section class="section" id="projects">
   <div class="section-header">
-    <span class="section-title">Selected projects</span>
-    <span class="section-count"></span>
+    <span class="section-title">Projects</span>
+    <span class="section-count" id="projects-count"></span>
   </div>
-  <div class="project-list">
-    <!-- PASTE YOUR PROJECTS HERE -->
-  </div>
+
+  <div class="proj-grid" id="projects-index"></div>
+
+  <article class="proj-view" id="project-view" hidden>
+    <a class="post-back" href="/projects" id="project-back">&larr; All projects</a>
+    <div id="project-body"></div>
+  </article>
 </section>
 
 
@@ -810,7 +982,6 @@
     <div class="experience-company" style="border-top: none; padding-top: 0;">
       <div class="experience-company-header">
         <span class="experience-company-name">Monzo</span>
-        <span class="experience-company-location">London, UK (Hybrid)</span>
       </div>
       <div class="experience-role-row">
         <span class="experience-role">Senior Data Scientist</span>
@@ -835,7 +1006,6 @@
     <div class="experience-company" style="margin-top: 28px;">
       <div class="experience-company-header">
         <span class="experience-company-name">Klarna</span>
-        <span class="experience-company-location">London, UK (Hybrid)</span>
       </div>
       <div class="experience-role-row">
         <span class="experience-role">Analyst II, Strategy &amp; Analytics</span>
@@ -963,6 +1133,7 @@
   // ── Navigation ────────────────────────────────────
   const VALID = ['home', 'projects', 'experience', 'writing', 'photography'];
   let navTimer = null;
+  let projectRedraw = null;
 
   function activate(id, animated) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('visible', 'fade-out', 'fade-in'));
@@ -974,7 +1145,8 @@
     if (navEl) navEl.classList.add('active');
     window.scrollTo(0, 0);
     if (id === 'photography') onPhotographyShown();
-    if (id !== 'writing') document.title = baseTitle;
+    if (id !== 'writing' && id !== 'projects') document.title = baseTitle;
+    if (id === 'projects' && projectRedraw) projectRedraw();
     if (id === 'writing') drawFigures(document.getElementById('post-body'));
   }
 
@@ -983,7 +1155,7 @@
     const animate = opts.animate !== false;
     let [id, slug] = String(route).split('/');
     if (!VALID.includes(id)) { id = 'home'; slug = undefined; }
-    if (id !== 'writing') slug = undefined;
+    if (id !== 'writing' && id !== 'projects') slug = undefined;
 
     if (push) {
       const url = id === 'home' ? '/' : '/' + id + (slug ? '/' + slug : '');
@@ -991,6 +1163,7 @@
     }
 
     if (id === 'writing') renderWriting(slug);
+    if (id === 'projects') renderProjects(slug);
 
     clearTimeout(navTimer);
     const current = document.querySelector('.section.visible');
@@ -1005,7 +1178,7 @@
     const path = location.pathname.replace(/^\/+|\/+$/g, '') || 'home';
     const [id, slug] = path.split('/');
     if (!VALID.includes(id)) return 'home';
-    return id === 'writing' && slug ? 'writing/' + slug : id;
+    return (id === 'writing' || id === 'projects') && slug ? id + '/' + slug : id;
   }
 
   // ── Writing ───────────────────────────────────────
@@ -1302,7 +1475,10 @@
   let figTimer = null;
   window.addEventListener('resize', () => {
     clearTimeout(figTimer);
-    figTimer = setTimeout(() => drawFigures(document.getElementById('post-body')), 150);
+    figTimer = setTimeout(() => {
+      drawFigures(document.getElementById('post-body'));
+      if (projectRedraw && document.getElementById('projects').classList.contains('visible')) projectRedraw();
+    }, 150);
   });
 
   function enter(el) {
@@ -1416,6 +1592,327 @@
     show('writing');
     window.scrollTo(0, 0);
   });
+
+
+  // ── Projects ──────────────────────────────────────
+  let projectsPromise = null;
+
+  function loadProjects() {
+    if (!projectsPromise) {
+      projectsPromise = fetch('/projects/projects.json').then(r => r.json()).catch(() => []);
+    }
+    return projectsPromise;
+  }
+
+  function cardArt(kind) {
+    if (kind !== 'curves') return '';
+    const curve = (mu, sd) => {
+      let d = '';
+      for (let x = 0; x <= 400; x += 5) {
+        const y = 150 - 128 * Math.exp(-Math.pow((x - mu) / sd, 2) / 2);
+        d += (x ? 'L' : 'M') + x + ',' + y.toFixed(1);
+      }
+      return d;
+    };
+    return `<svg viewBox="0 0 400 160" preserveAspectRatio="none" aria-hidden="true">
+      <line x1="0" x2="400" y1="150" y2="150" stroke="var(--black)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+      <path d="${curve(170, 46)}" fill="none" stroke="var(--gray)" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"/>
+      <path d="${curve(230, 46)}" fill="none" stroke="var(--black)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+    </svg>`;
+  }
+
+  function renderProjectGrid(list) {
+    document.getElementById('projects-count').textContent =
+      String(list.length).padStart(3, '0') + (list.length === 1 ? ' project' : ' projects');
+    const grid = document.getElementById('projects-index');
+    grid.innerHTML = list.map((p, i) => {
+      const live = p.live && PROJECT_VIEWS[p.slug];
+      const size = ['xl', 'l', 'm', 's'].includes(p.size) ? p.size : 's';
+      const inner = `
+        <div class="pcard-top"><span>${String(i + 1).padStart(3, '0')}</span><span>${esc(p.tag || '')}</span></div>
+        <div class="pcard-art">${live ? cardArt(p.art) : ''}</div>
+        <h3>${esc(p.title)}</h3>
+        <p>${esc(p.summary || '')}</p>
+        ${live ? '<span class="pcard-open">Open &rarr;</span>' : ''}`;
+      return live
+        ? `<a class="pcard size-${size}" href="/projects/${esc(p.slug)}" data-slug="${esc(p.slug)}">${inner}</a>`
+        : `<div class="pcard size-${size} idle">${inner}</div>`;
+    }).join('');
+    grid.querySelectorAll('a[data-slug]').forEach(a => a.addEventListener('click', e => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+      e.preventDefault();
+      show('projects/' + a.dataset.slug);
+    }));
+  }
+
+  async function renderProjects(slug) {
+    const list = await loadProjects();
+    const index = document.getElementById('projects-index');
+    const view = document.getElementById('project-view');
+    const sec = document.getElementById('projects');
+    const p = slug && list.find(x => x.slug === slug && x.live && PROJECT_VIEWS[x.slug]);
+
+    if (!p) {
+      if (slug) history.replaceState(null, '', '/projects');
+      view.hidden = true; view.style.display = 'none';
+      index.hidden = false; index.style.display = '';
+      sec.classList.remove('reading');
+      projectRedraw = null;
+      renderProjectGrid(list);
+      enter(index);
+      document.title = baseTitle;
+      return;
+    }
+
+    index.hidden = true; index.style.display = 'none';
+    view.hidden = false; view.style.display = '';
+    sec.classList.add('reading');
+    const body = document.getElementById('project-body');
+    body.innerHTML = '';
+    projectRedraw = null;
+    PROJECT_VIEWS[p.slug](body, p);
+    document.title = p.title + ' — Henry';
+    enter(view);
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById('project-back').addEventListener('click', e => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    show('projects');
+  });
+
+  // ── Sample size calculator ────────────────────────
+  // Inverse of the standard normal distribution (Acklam's approximation)
+  function invNorm(p) {
+    const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+    const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+    const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+    const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+    const lo = 0.02425, hi = 1 - lo;
+    let q, r;
+    if (p < lo) {
+      q = Math.sqrt(-2 * Math.log(p));
+      return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+    }
+    if (p <= hi) {
+      q = p - 0.5; r = q * q;
+      return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q / (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+    }
+    q = Math.sqrt(-2 * Math.log(1 - p));
+    return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+  }
+
+  // People per group for a two-sided test with equal groups
+  function nForRate(p1, lift, za, zb) {
+    const p2 = p1 * (1 + lift);
+    if (!(p1 > 0 && p1 < 1 && p2 > 0 && p2 < 1 && lift > 0)) return NaN;
+    const pbar = (p1 + p2) / 2;
+    const top = za * Math.sqrt(2 * pbar * (1 - pbar)) + zb * Math.sqrt(p1 * (1 - p1) + p2 * (1 - p2));
+    return Math.ceil(top * top / Math.pow(p2 - p1, 2));
+  }
+
+  function nForMean(mean, sd, lift, za, zb) {
+    const delta = Math.abs(mean * lift);
+    if (!(delta > 0 && sd > 0)) return NaN;
+    return Math.ceil(2 * Math.pow(za + zb, 2) * sd * sd / (delta * delta));
+  }
+
+  const fmtInt = n => Math.round(n).toLocaleString('en-GB');
+  const fmtNum = n => (+n.toFixed(2)).toLocaleString('en-GB', { maximumFractionDigits: 2 });
+  function fmtCompact(n) {
+    if (n >= 1e6) return (n / 1e6).toFixed(n < 1e7 ? 1 : 0).replace(/\.0$/, '') + 'm';
+    if (n >= 1e3) return (n / 1e3).toFixed(n < 1e4 ? 1 : 0).replace(/\.0$/, '') + 'k';
+    return String(Math.round(n));
+  }
+
+  function renderSampleSize(root, project) {
+    const st = { metric: 'rate', rate: 10, lift: 5, mean: 50, sd: 40, conf: 95, power: 80, groups: 2, traffic: 5000 };
+    const seg = (key, opts, fmt) => `<div class="seg" data-key="${key}">` +
+      opts.map(o => `<button type="button" data-v="${o}" class="${st[key] === o ? 'on' : ''}">${fmt ? fmt(o) : o}</button>`).join('') + '</div>';
+    const field = (key, label, unit, help, wide) => `
+      <div class="calc-field${wide ? ' wide' : ''}" data-for="${key}">
+        <label class="calc-label" for="calc-${key}">${label}</label>
+        <div class="calc-input"><input id="calc-${key}" type="number" inputmode="decimal" min="0" step="any" value="${st[key]}" data-key="${key}">${unit ? `<span class="calc-unit">${unit}</span>` : ''}</div>
+        ${help ? `<p class="calc-help">${help}</p>` : ''}
+      </div>`;
+
+    root.innerHTML = `
+      <div class="calc">
+        <p class="post-kicker">${esc(project.tag || 'Tool')} &middot; Experimentation</p>
+        <h1 class="post-title">${esc(project.title)}</h1>
+        <p class="calc-intro">Before running an A/B test, check it can actually detect the change you care about. Set your numbers to see how many people each group needs, and how long the test will take.</p>
+
+        <div class="calc-metric">
+          <span class="calc-label">What are you measuring?</span>
+          ${seg('metric', ['rate', 'mean'], v => v === 'rate' ? 'A conversion rate' : 'An average, like spend per customer')}
+        </div>
+
+        <div class="calc-grid">
+          ${field('rate', 'Current conversion rate', '%', 'The share of people who convert today.')}
+          ${field('mean', 'Current average', '', 'For example, average spend per customer.')}
+          ${field('sd', 'Standard deviation', '', 'How spread out the values are. Take it from recent data.')}
+          <div class="calc-field">
+            <label class="calc-label" for="calc-lift">Smallest lift worth detecting</label>
+            <div class="calc-input"><input id="calc-lift" type="number" inputmode="decimal" min="0.1" step="any" value="${st.lift}" data-key="lift"><span class="calc-unit">% relative</span></div>
+            <input class="calc-range" type="range" min="0.5" max="50" step="0.5" value="${st.lift}" aria-label="Smallest lift worth detecting">
+          </div>
+          <div class="calc-field"><span class="calc-label">Confidence</span>${seg('conf', [90, 95, 99], v => v + '%')}</div>
+          <div class="calc-field"><span class="calc-label">Power</span>${seg('power', [80, 90], v => v + '%')}</div>
+          <div class="calc-field"><span class="calc-label">Groups, including control</span>${seg('groups', [2, 3, 4])}</div>
+          ${field('traffic', 'People entering the test per day', 'a day', '')}
+        </div>
+
+        <div class="calc-result">
+          <div><div class="calc-n" id="calc-n">&ndash;</div><p class="calc-sub">People per group</p></div>
+          <div class="calc-stats">
+            <div class="calc-stat"><b id="calc-total">&ndash;</b><p class="calc-sub">In total</p></div>
+            <div class="calc-stat"><b id="calc-days">&ndash;</b><p class="calc-sub">To run</p></div>
+          </div>
+        </div>
+        <p class="calc-sentence" id="calc-sentence"></p>
+        <p class="calc-note" id="calc-note"></p>
+
+        <div class="post-body">
+          <figure class="fig">
+            <p class="fig-k">Fig. 1 &middot; Change over lift</p>
+            <p class="fig-t">Smaller lifts need far more people</p>
+            <div class="fig-wrap"><div class="fig-chart" id="calc-chart"></div><div class="fig-tip"></div></div>
+            <figcaption><span><em>Fig. 1</em> &mdash; People needed per group across a range of lifts, with your current settings marked.</span></figcaption>
+          </figure>
+        </div>
+
+        <div class="calc-how">
+          <p>How it&rsquo;s worked out: a standard two-sided test with equal-sized groups. For conversion rates it compares two proportions; for averages it assumes the metric is roughly normally distributed and uses your standard deviation for both groups.</p>
+          <p>With more than two groups, each variant is compared with the control and no correction for multiple comparisons is applied, so treat the result as a minimum.</p>
+        </div>
+      </div>`;
+
+    const $ = id => root.querySelector('#' + id);
+    const range = root.querySelector('.calc-range');
+
+    function compute(lift) {
+      const za = invNorm(1 - (1 - st.conf / 100) / 2), zb = invNorm(st.power / 100);
+      return st.metric === 'rate'
+        ? nForRate(st.rate / 100, lift / 100, za, zb)
+        : nForMean(st.mean, st.sd, lift / 100, za, zb);
+    }
+
+    function drawChart() {
+      const box = $('calc-chart');
+      const W = Math.round(box.clientWidth);
+      box.innerHTML = '';
+      const n0 = compute(st.lift);
+      if (!W || !isFinite(n0)) return;
+      const lo = Math.max(0.5, st.lift * 0.5), hi = Math.max(lo + 1, st.lift * 2.5);
+      const pts = [];
+      for (let i = 0; i <= 60; i++) {
+        const L = lo + (hi - lo) * i / 60, n = compute(L);
+        if (isFinite(n)) pts.push([L, n]);
+      }
+      if (pts.length < 2) return;
+      const narrow = W < 520, H = narrow ? 230 : 270;
+      const m = { l: 48, r: 20, t: 30, b: 30 };
+      const maxN = Math.max(...pts.map(p => p[1]));
+      const step = niceStep(maxN / 3), top = step * Math.ceil(maxN / step);
+      const x = L => m.l + (L - lo) / (hi - lo) * (W - m.l - m.r);
+      const y = n => H - m.b - n / top * (H - m.t - m.b);
+      const svg = sv('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img',
+        'aria-label': `People needed per group, from ${fmtInt(pts[0][1])} at a ${fmtNum(pts[0][0])}% lift to ${fmtInt(pts[pts.length - 1][1])} at ${fmtNum(pts[pts.length - 1][0])}%` }, box);
+      for (let v = 0; v <= top + 1e-9; v += step) {
+        sv('line', { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), stroke: v ? 'var(--f-rule)' : 'var(--f-ink)', 'stroke-width': 1 }, svg);
+        svText(svg, 'f-ax', m.l - 8, y(v) + 3, fmtCompact(v), 'end');
+      }
+      const xStep = niceStep((hi - lo) / (narrow ? 4 : 5));
+      for (let L = Math.ceil(lo / xStep) * xStep; L <= hi + 1e-9; L += xStep) {
+        svText(svg, 'f-ax', x(L), H - 10, fmtNum(L) + '%', 'middle');
+      }
+      sv('path', { d: pts.map((p, i) => (i ? 'L' : 'M') + x(p[0]).toFixed(1) + ',' + y(p[1]).toFixed(1)).join(' '),
+        fill: 'none', stroke: 'var(--f-ink)', 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, svg);
+      const cx = x(st.lift), cy = y(n0);
+      sv('line', { x1: cx, x2: cx, y1: cy, y2: H - m.b, stroke: 'var(--f-mid)', 'stroke-width': 1, 'stroke-dasharray': '3 3' }, svg);
+      sv('circle', { cx, cy, r: 5, fill: 'var(--f-ink)', stroke: 'var(--f-bg)', 'stroke-width': 2 }, svg);
+      const right = cx < W * 0.6;
+      svText(svg, 'f-it', cx + (right ? 12 : -12), cy - 10, `your test: ${fmtInt(n0)} per group`, right ? 'start' : 'end');
+
+      const wrap = box.parentNode;
+      const cross = sv('line', { y1: m.t, y2: H - m.b, stroke: 'var(--f-soft)', 'stroke-width': 1, opacity: 0 }, svg);
+      const dot = sv('circle', { r: 4, fill: 'var(--f-ink)', stroke: 'var(--f-bg)', 'stroke-width': 2, opacity: 0 }, svg);
+      const hit = sv('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: 'transparent' }, svg);
+      const move = px => {
+        let best = pts[0];
+        pts.forEach(p => { if (Math.abs(x(p[0]) - px) < Math.abs(x(best[0]) - px)) best = p; });
+        cross.setAttribute('x1', x(best[0])); cross.setAttribute('x2', x(best[0])); cross.setAttribute('opacity', 1);
+        dot.setAttribute('cx', x(best[0])); dot.setAttribute('cy', y(best[1])); dot.setAttribute('opacity', 1);
+        showTip(wrap, `<b style="font-weight:400">${fmtNum(best[0])}% lift</b><br>${fmtInt(best[1])} per group`, x(best[0]), 4);
+      };
+      hit.addEventListener('mousemove', e => move(e.clientX - svg.getBoundingClientRect().left));
+      hit.addEventListener('touchstart', e => move(e.touches[0].clientX - svg.getBoundingClientRect().left), { passive: true });
+      hit.addEventListener('mouseleave', () => { cross.setAttribute('opacity', 0); dot.setAttribute('opacity', 0); hideTip(wrap); });
+    }
+
+    function update() {
+      root.querySelectorAll('[data-for="rate"]').forEach(e => e.hidden = st.metric !== 'rate');
+      root.querySelectorAll('[data-for="mean"], [data-for="sd"]').forEach(e => e.hidden = st.metric !== 'mean');
+      const n = compute(st.lift);
+      const sentence = $('calc-sentence'), note = $('calc-note');
+      if (!isFinite(n)) {
+        $('calc-n').textContent = '–'; $('calc-total').textContent = '–'; $('calc-days').textContent = '–';
+        sentence.textContent = '';
+        note.textContent = st.metric === 'rate'
+          ? 'Check the numbers: the rate needs to be between 0 and 100%, and stay below 100% after the lift.'
+          : 'Check the numbers: the average, standard deviation and lift all need to be above zero.';
+        drawChart();
+        return;
+      }
+      const total = n * st.groups;
+      const days = st.traffic > 0 ? Math.ceil(total / st.traffic) : NaN;
+      $('calc-n').textContent = fmtInt(n);
+      $('calc-total').textContent = fmtInt(total);
+      $('calc-days').textContent = isFinite(days) ? (days === 1 ? '1 day' : fmtInt(days) + ' days') : '–';
+
+      const base = st.metric === 'rate'
+        ? `To detect a ${fmtNum(st.lift)}% lift on a ${fmtNum(st.rate)}% conversion rate (${fmtNum(st.rate)}% to ${fmtNum(st.rate * (1 + st.lift / 100))}%)`
+        : `To detect a ${fmtNum(st.lift)}% lift on an average of ${fmtNum(st.mean)} (to ${fmtNum(st.mean * (1 + st.lift / 100))}), with a standard deviation of ${fmtNum(st.sd)}`;
+      let text = `${base}, with ${st.conf}% confidence and ${st.power}% power, each group needs ${fmtInt(n)} people.`;
+      if (isFinite(days)) {
+        const weeks = days >= 14 ? ` (about ${Math.round(days / 7)} weeks)` : '';
+        text += ` With ${fmtInt(st.traffic)} people a day split across ${st.groups} groups, that&rsquo;s ${days === 1 ? '1 day' : fmtInt(days) + ' days'}${weeks}.`;
+      }
+      sentence.innerHTML = text;
+      note.textContent = !isFinite(days) ? ''
+        : days < 7 ? 'Run it for at least a full week anyway, so every day of the week is covered.'
+        : days > 90 ? 'That&rsquo;s a long test. A bigger lift, more traffic or fewer groups would shorten it.'.replace('&rsquo;', '’')
+        : '';
+      drawChart();
+    }
+
+    root.querySelectorAll('.calc-input input').forEach(inp => inp.addEventListener('input', () => {
+      const v = parseFloat(inp.value);
+      st[inp.dataset.key] = isFinite(v) ? v : NaN;
+      if (inp.dataset.key === 'lift' && isFinite(v)) range.value = Math.min(50, Math.max(0.5, v));
+      update();
+    }));
+    range.addEventListener('input', () => {
+      st.lift = parseFloat(range.value);
+      $('calc-lift').value = st.lift;
+      update();
+    });
+    root.querySelectorAll('.seg').forEach(g => g.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+      const key = g.dataset.key, raw = btn.dataset.v;
+      st[key] = isNaN(+raw) ? raw : +raw;
+      g.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === btn));
+      update();
+    })));
+
+    projectRedraw = drawChart;
+    update();
+  }
+
+  // Live projects and the function that draws each one
+  const PROJECT_VIEWS = {
+    'sample-size': renderSampleSize,
+  };
 
   // The button names the mode it switches to
   function labelDarkToggle() {

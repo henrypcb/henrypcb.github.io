@@ -66,6 +66,14 @@ os.chdir(here)
 for slug, (label, desc) in SECTIONS.items():
     write(slug, page(f"{label} — {NAME}", desc, f"/{slug}"))
 
+projects = json.load(open("projects/projects.json"))
+live_projects = set()
+for p in projects:
+    if p.get("live"):
+        live_projects.add(p["slug"])
+        write(os.path.join("projects", p["slug"]),
+              page(f'{p["title"]} — {NAME}', p.get("summary", ""), f'/projects/{p["slug"]}'))
+
 posts = json.load(open("writing/posts.json"))
 slugs = set()
 for p in posts:
@@ -85,4 +93,14 @@ for entry in os.listdir("writing"):
             except OSError:
                 print(f"Couldn't remove old page for '{entry}'; delete the writing/{entry} folder yourself.")
 
-print(f"Made {len(SECTIONS)} section pages and {len(posts)} writing pages." + (f" Removed {removed} old." if removed else ""))
+for entry in os.listdir("projects"):
+    folder = os.path.join("projects", entry)
+    idx = os.path.join(folder, "index.html")
+    if os.path.isdir(folder) and entry not in live_projects and os.path.exists(idx):
+        if MARK in open(idx).read():
+            try:
+                shutil.rmtree(folder); removed += 1
+            except OSError:
+                print(f"Couldn't remove old page for '{entry}'; delete the projects/{entry} folder yourself.")
+
+print(f"Made {len(SECTIONS)} section pages, {len(live_projects)} project pages and {len(posts)} writing pages." + (f" Removed {removed} old." if removed else ""))
