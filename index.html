@@ -223,9 +223,8 @@
   .pcard.size-xl p { font-size: 14px; }
 
   .pcard-open {
-    position: absolute;
-    right: 22px;
-    bottom: 22px;
+    align-self: flex-end;
+    margin-top: 14px;
     font-size: 10px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -469,6 +468,48 @@
   .cs-stat span { display: block; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gray); margin-top: 8px; }
   .cs .post-body { margin-top: 10px; }
   .cs .post-body h2 { margin-top: 1.6em; }
+  .mk-rows { font-size: 13px; }
+  .mk-tr { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--f-rule); color: var(--f-soft); }
+  .mk-tr span:last-child { color: var(--f-ink); }
+  .mk-th { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--f-ink); padding-top: 0; }
+  .post-body .fig p.mk-becomes { font-family: Georgia, serif; font-style: italic; font-size: 14px; color: var(--f-soft); margin: 22px 0 14px; }
+  .mk-path { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 6px; }
+  .mk-chip { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; border: 1px solid var(--f-ink); color: var(--f-ink); padding: 7px 10px; white-space: nowrap; }
+  .mk-chip.soft { border-style: dashed; border-color: var(--f-mid); color: var(--f-soft); }
+  .mk-chip.ink { background: var(--f-ink); color: var(--f-bg); }
+  .mk-arr { color: var(--f-mid); font-size: 13px; }
+
+  .mk-mx { display: grid; grid-template-columns: minmax(96px, 1.5fr) repeat(7, minmax(0, 1fr)); gap: 2px; font-size: 12px; }
+  .mk-corner { display: flex; flex-direction: column; justify-content: flex-end; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--f-soft); padding-bottom: 6px; }
+  .mk-ch { display: flex; align-items: flex-end; justify-content: center; text-align: center; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--f-soft); line-height: 1.3; padding-bottom: 6px; }
+  .mk-short { display: none; }
+  .mk-rh { font: inherit; font-size: 12px; text-align: left; background: none; border: 0; padding: 0 8px 0 0; color: var(--f-soft); cursor: pointer; transition: color 0.2s; }
+  .mk-rh.on { color: var(--f-ink); }
+  .mk-rh:focus-visible { outline: 1px solid var(--f-ink); outline-offset: 2px; }
+  .mk-c { position: relative; height: 36px; display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; color: var(--f-ink); cursor: pointer; isolation: isolate; transition: opacity 0.2s; }
+  .mk-c::before { content: ''; position: absolute; inset: 0; background: var(--f-ink); opacity: var(--a, 0); z-index: -1; }
+  .mk-c.none { color: var(--f-mid); background: none; }
+  .mk-mx[data-sel] .mk-c:not(.on) { opacity: 0.45; }
+  .mk-flow { margin-top: 28px; }
+  .mk-flow svg, .mk-rm svg { display: block; width: 100%; max-width: 420px; height: auto; overflow: visible; }
+  .mk-flow text, .mk-rm text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  .mk-flow .f-ax, .mk-rm .f-num { font-size: 11px; }
+  .mk-flow .f-num { font-size: 11px; }
+
+  .mk-toggles { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; }
+  .mk-tog { font: inherit; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; background: none; color: var(--f-soft); border: 1px solid var(--f-rule); padding: 8px 11px; cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s; }
+  .mk-tog:hover { border-color: var(--f-ink); color: var(--f-ink); }
+  .mk-tog[aria-pressed="true"] { background: var(--f-ink); border-color: var(--f-ink); color: var(--f-bg); }
+  .post-body .fig p.mk-rm-line { font-size: 13px; line-height: 1.6; color: var(--f-ink); margin-top: 14px; }
+  @media (max-width: 640px) {
+    .mk-mx { grid-template-columns: 64px repeat(7, minmax(0, 1fr)); font-size: 11px; }
+    .mk-full { display: none; }
+    .mk-short { display: inline; }
+    .mk-ch { font-size: 8.5px; letter-spacing: 0.04em; }
+    .mk-rh { font-size: 11px; }
+    .mk-c { height: 32px; font-size: 11px; }
+    .mk-corner { font-size: 8px; letter-spacing: 0.04em; }
+  }
   .cs-links { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--border); font-size: 13px; }
   .cs-links a { color: var(--black); text-underline-offset: 3px; }
   @media (max-width: 640px) {
@@ -2800,136 +2841,179 @@
     const svg = (h, label, body, defs) => `<svg viewBox="0 0 440 ${h}" role="img" aria-label="${esc(label)}">${defs}${body}</svg>`;
     const fig = (n, kind, title, art, cap) => `<figure class="fig mdiag"><p class="fig-k">Fig. ${n} &middot; ${kind}</p><p class="fig-t">${title}</p>${art}<figcaption><span><em>Fig. ${n}</em> &mdash; ${cap}</span></figcaption></figure>`;
 
+    // Real model outputs (same data and method as the notebook)
+    const CH = ['Facebook', 'Instagram', 'Online Display', 'Online Video', 'Paid Search'];
+    const SHORT = { 'Facebook': 'FB', 'Instagram': 'IG', 'Online Display': 'Disp.', 'Online Video': 'Video', 'Paid Search': 'Search', 'Conversion': 'Conv.', 'Drop-off': 'Drop' };
+    const MX_ROWS = ['Start', ...CH];
+    const MX_COLS = [...CH, 'Conversion', 'Drop-off'];
+    const MX = [
+      [0.2784, 0.1192, 0.1426, 0.1424, 0.3174, 0, 0],
+      [0, 0.1731, 0.0244, 0.0256, 0.0507, 0.0532, 0.6731],
+      [0.2188, 0, 0.0235, 0.0241, 0.0458, 0.0580, 0.6298],
+      [0.0540, 0.0294, 0, 0.0173, 0.0924, 0.0503, 0.7566],
+      [0.0593, 0.0319, 0.0189, 0, 0.0479, 0.0781, 0.7638],
+      [0.0644, 0.0342, 0.0481, 0.0292, 0, 0.0533, 0.7708]
+    ];
+    const BASE = 0.07346;
+    const WITHOUT = { 'Facebook': 0.04740, 'Instagram': 0.05750, 'Online Display': 0.06212, 'Online Video': 0.05826, 'Paid Search': 0.04914 };
+    const pct = (p, d) => (p * 100).toFixed(d || 0) + '%';
+
     // Fig. 1: one journey, and what last-click does with it
     const f1 = (() => {
       const { T, L, Dot, defs } = kit();
       const xs = [25, 120, 215, 310, 405], names = ['START', 'INSTAGRAM', 'ONLINE DISPLAY', 'PAID SEARCH', 'CONVERSION'];
       let b = '';
-      for (let i = 0; i < 4; i++) b += L(xs[i] + 8, 55, xs[i + 1] - 10, 55, 'soft', 1.2, null, true);
+      for (let i = 0; i < 4; i++) b += L(xs[i] + 8, 60, xs[i + 1] - 10, 60, 'soft', 1.2, null, true);
       xs.forEach((x, i) => {
-        b += Dot(x, 55, i === 4 ? 7 : 5, i === 4 ? 'ink' : (i === 0 ? 'soft' : 'mid'));
+        b += Dot(x, 60, i === 4 ? 7 : 5, i === 4 ? 'ink' : (i === 0 ? 'soft' : 'mid'));
         const above = i % 2 === 1;
-        b += T(i === 4 ? 425 : (i === 0 ? 15 : x), above ? 36 : 82, names[i], 'f-up', i === 4 ? 'end' : (i === 0 ? 'start' : 'middle'), i === 4 ? '' : 'fill:var(--f-soft)');
+        b += T(i === 4 ? 425 : (i === 0 ? 15 : x), above ? 38 : 90, names[i], 'f-up', i === 4 ? 'end' : (i === 0 ? 'start' : 'middle'), i === 4 ? '' : 'fill:var(--f-soft)');
       });
-      b += T(15, 118, 'LAST-CLICK CREDIT', 'f-up');
+      b += T(15, 140, 'LAST-CLICK CREDIT', 'f-up', 'start', 'fill:var(--f-soft)');
       [[120, false], [215, false], [310, true]].forEach(([x, on]) => {
-        b += on ? `<rect x="${x - 34}" y="128" width="68" height="16" fill="var(--f-ink)"/>`
-                : `<rect x="${x - 34}" y="128" width="68" height="16" fill="var(--f-wash)" stroke="var(--f-mid)" stroke-width="0.8"/>`;
-        b += T(x, 160, on ? '100%' : '0%', 'f-num', 'middle', on ? 'fill:var(--f-ink)' : '');
+        b += on ? `<rect x="${x - 34}" y="152" width="68" height="14" fill="var(--f-ink)"/>`
+                : `<rect x="${x - 34}" y="152" width="68" height="14" fill="none" stroke="var(--f-mid)" stroke-width="0.8" stroke-dasharray="3 3"/>`;
+        b += T(x, 186, on ? '100%' : '0%', 'f-num', 'middle', on ? 'fill:var(--f-ink)' : '');
       });
-      b += T(15, 186, 'the channels that started the journey get nothing', 'f-it');
       return svg(196, 'An example journey: Instagram, Online Display, then Paid Search before converting. Last-click gives Paid Search all the credit.', b, defs);
     })();
 
-    // Fig. 2: from rows to a journey
-    const f2 = (() => {
-      const { T, L, Box, defs } = kit();
-      let b = T(15, 24, 'CUSTOMER', 'f-up') + T(112, 24, 'WHEN', 'f-up') + T(172, 24, 'CHANNEL', 'f-up');
-      [['A', 'Day 1', 'Instagram'], ['A', 'Day 3', 'Online Display'], ['A', 'Day 6', 'Paid Search']].forEach((r, i) => {
-        const y = 56 + i * 28;
-        b += L(15, y - 18, 270, y - 18, 'rule', 1) + T(15, y, r[0], 'f-ax') + T(112, y, r[1], 'f-ax') + T(172, y, r[2], 'f-ax', 'start', 'fill:var(--f-ink)');
-      });
-      b += L(15, 122, 270, 122, 'rule', 1) + T(172, 142, 'then converted', 'f-it');
-      b += L(274, 92, 296, 92, 'ink', 1.4, null, true);
-      ['START', 'INSTAGRAM', 'ONLINE DISPLAY', 'PAID SEARCH', 'CONVERSION'].forEach((t, i) => {
-        const y = 14 + i * 34;
-        b += Box(300, y, 136, 22, t, i === 4 ? 'ink' : (i === 0 ? 'soft' : null));
-        if (i < 4) b += L(368, y + 23, 368, y + 33, 'soft', 1, null, true);
-      });
-      b += T(15, 188, 'touchpoints, sorted by time, become one journey', 'f-it');
-      return svg(196, 'An example customer’s touchpoints, sorted by time, folded into a single journey from start to conversion.', b, defs);
-    })();
+    // Fig. 2: rows become a journey (HTML, so it reflows on phones)
+    const f2 = `
+      <div class="mk-rows" role="table" aria-label="One customer’s touchpoints">
+        <div class="mk-tr mk-th" role="row"><span role="columnheader">Customer</span><span role="columnheader">When</span><span role="columnheader">Channel</span></div>
+        ${[['A', 'Day 1', 'Instagram'], ['A', 'Day 3', 'Online Display'], ['A', 'Day 6', 'Paid Search']].map(r => `<div class="mk-tr" role="row"><span role="cell">${r[0]}</span><span role="cell">${r[1]}</span><span role="cell">${r[2]}</span></div>`).join('')}
+      </div>
+      <p class="mk-becomes">sorted by time, they become one journey</p>
+      <div class="mk-path">${['Start', 'Instagram', 'Online Display', 'Paid Search', 'Conversion'].map((t, i) => `<span class="mk-chip${i === 0 ? ' soft' : ''}${i === 4 ? ' ink' : ''}">${t}</span>`).join('<span class="mk-arr" aria-hidden="true">&rarr;</span>')}</div>`;
 
-    // Fig. 3: the chain
-    const f3 = (() => {
-      const { T, L, Box, defs } = kit();
-      const ch = ['FACEBOOK', 'INSTAGRAM', 'ONLINE DISPLAY', 'ONLINE VIDEO', 'PAID SEARCH'];
-      let b = '';
-      ch.forEach((t, i) => {
-        const cy = 33 + i * 48;
-        b += L(92, 130, 162, cy, 'soft', 1, null, true);
-        b += L(287, cy, 327, 93, 'ink', 1, null, true);
-        b += L(287, cy, 327, 167, 'soft', 1, '3 3', true);
+    // Fig. 3: the transition matrix, plus the selected row drawn as arrows
+    const head = c => `<span class="mk-full">${c}</span><span class="mk-short" aria-hidden="true">${SHORT[c]}</span>`;
+    const f3 = `
+      <div class="mk-mx" id="mk-mx" role="table" aria-label="Transition matrix: the chance of moving from each state to each next step">
+        <div class="mk-corner" role="columnheader"><span>From &darr; &nbsp;To &rarr;</span></div>
+        ${MX_COLS.map(c => `<div class="mk-ch" role="columnheader">${head(c)}</div>`).join('')}
+        ${MX_ROWS.map((r, i) => `
+          <button type="button" class="mk-rh" data-r="${i}" role="rowheader" aria-pressed="false">${r}</button>
+          ${MX[i].map((p, j) => {
+            const none = p === 0;
+            const style = none ? '' : `--a:${p.toFixed(3)};${p > 0.42 ? 'color:var(--f-bg)' : ''}`;
+            return `<div class="mk-c${none ? ' none' : ''}" data-r="${i}" role="cell" style="${style}" aria-label="${r} to ${MX_COLS[j]}: ${none ? 'not possible' : pct(p, 1)}">${none ? '&middot;' : Math.round(p * 100)}</div>`;
+          }).join('')}`).join('')}
+      </div>
+      <div class="mk-flow" id="mk-flow" aria-live="polite"></div>`;
+
+    function flowSvg(i) {
+      const { T, defs } = kit();
+      const dests = MX_COLS.map((c, j) => [c, MX[i][j]]).filter(d => d[1] > 0).sort((a, b) => b[1] - a[1]);
+      const gap = 30, top = 44, h = top + dests.length * gap;
+      const sy = top + (dests.length - 1) * gap / 2;
+      let b = T(15, 16, 'FROM ' + MX_ROWS[i].toUpperCase(), 'f-up');
+      dests.forEach(([c, p], k) => {
+        const y = top + k * gap;
+        const w = Math.max(1, p * 11);
+        const col = c === 'Conversion' ? 'var(--f-ink)' : 'var(--f-mid)';
+        b += `<path d="M 34 ${sy} C 120 ${sy}, 130 ${y}, 196 ${y}" fill="none" stroke="${col}" stroke-width="${w.toFixed(1)}" opacity="${c === 'Conversion' ? 1 : (c === 'Drop-off' ? 0.5 : 0.8)}"/>`;
+        b += `<circle cx="200" cy="${y}" r="${c === 'Conversion' ? 5 : 3.5}" fill="${c === 'Conversion' ? 'var(--f-ink)' : 'var(--f-mid)'}"/>`;
+        b += T(212, y + 4, c, 'f-ax', 'start', c === 'Conversion' ? 'fill:var(--f-ink)' : '');
+        b += T(350, y + 4, pct(p, p < 0.1 ? 1 : 0), 'f-num', 'end', c === 'Conversion' ? 'fill:var(--f-ink)' : '');
       });
-      ch.forEach((t, i) => { b += Box(165, 20 + i * 48, 120, 26, t); });
-      b += Box(20, 117, 70, 26, 'START', 'soft') + Box(330, 80, 100, 26, 'CONVERSION', 'ink') + Box(330, 154, 100, 26, 'DROP-OFF', 'soft');
-      b += T(15, 268, 'every arrow has a probability, counted from the data', 'f-it');
-      return svg(278, 'The chain: customers start, move through the five channels, and end in a conversion or a drop-off.', b, defs);
-    })();
+      b += `<circle cx="30" cy="${sy}" r="6" fill="var(--f-ink)"/>`;
+      return `<svg viewBox="0 0 360 ${h}" role="img" aria-label="Where customers go next from ${MX_ROWS[i]}">${defs}${b}</svg>`;
+    }
 
-    // Fig. 4: removing a channel
-    const f4 = (() => {
-      const { T, L, Dot, defs } = kit();
-      let b = '';
-      const panel = (x0, removed) => {
-        let p = T(x0, 22, removed ? 'WITHOUT FACEBOOK' : 'ALL FIVE CHANNELS', 'f-up', 'start', removed ? '' : 'fill:var(--f-soft)');
-        const cys = [48, 68, 88, 108, 128];
-        cys.forEach((cy, i) => {
-          const gone = removed && i === 0;
-          p += L(x0 + 15, 88, x0 + 84, cy, 'soft', 1);
-          p += gone ? L(x0 + 96, cy, x0 + 172, 120, 'mid', 1, '3 3') : L(x0 + 96, cy, x0 + 172, 70, 'ink', 1);
-        });
-        p += Dot(x0 + 10, 88, 5, 'soft');
-        cys.forEach((cy, i) => { p += (removed && i === 0) ? Dot(x0 + 90, cy, 5, 'hollow') + L(x0 + 85, cy - 5, x0 + 95, cy + 5, 'ink', 1.2) + L(x0 + 95, cy - 5, x0 + 85, cy + 5, 'ink', 1.2) : Dot(x0 + 90, cy, 5, 'mid'); });
-        p += Dot(x0 + 178, 70, 7, 'ink') + Dot(x0 + 178, 120, 6, 'hollow');
-        return p;
-      };
-      b += panel(15, false) + panel(235, true);
-      b += T(15, 162, 'CHANCE OF CONVERTING', 'f-up', 'start', 'fill:var(--f-soft)');
-      b += `<rect x="15" y="172" width="180" height="14" fill="var(--f-ink)"/>`;
-      b += `<rect x="235" y="172" width="130" height="14" fill="var(--f-ink)"/>`;
-      b += `<rect x="365" y="172" width="50" height="14" fill="none" stroke="var(--f-mid)" stroke-width="1" stroke-dasharray="3 3"/>`;
-      b += L(365, 194, 415, 194, 'ink', 1) + T(390, 212, 'removal effect', 'f-it', 'middle');
-      return svg(222, 'Illustrative: with Facebook removed, its customers drop off and the chance of converting falls. The fall is Facebook’s removal effect.', b, defs);
-    })();
+    // Fig. 4: switch a channel off
+    const f4 = `
+      <div class="mk-toggles" role="group" aria-label="Channel to remove">
+        ${CH.map(c => `<button type="button" class="mk-tog" data-c="${c}" aria-pressed="false">${c}</button>`).join('')}
+      </div>
+      <div class="mk-rm" id="mk-rm"></div>
+      <p class="mk-rm-line" id="mk-rm-line" aria-live="polite"></p>`;
 
-    const results = figureHtml({ type: 'bars', title: 'Share of conversion credit, by channel', series: [], bar: ['Facebook | 28', 'Paid Search | 26', 'Instagram | 17', 'Online Video | 16', 'Online Display | 12'], unit: '%', highlight: 'Facebook', note: 'the most credit', caption: 'Share of the 17,639 conversions credited to each channel by its removal effect. Rounded, so they add to 99%.', source: 'the analysis' }, 5);
-    const headline = figureHtml({ type: 'number', value: '54%', text: 'of all the credit goes to Facebook and Paid Search together, more than the other three channels combined.' }, 6);
+    function removalSvg(c) {
+      const { T, L } = kit();
+      const W = 330, x0 = 15, w2 = W * WITHOUT[c] / BASE, cut = x0 + w2;
+      let b = T(x0, 16, 'ALL FIVE CHANNELS', 'f-up', 'start', 'fill:var(--f-soft)') + T(x0 + W, 16, pct(BASE, 1), 'f-num', 'end');
+      b += `<rect x="${x0}" y="24" width="${W}" height="14" fill="var(--f-mid)"/>`;
+      b += T(x0, 72, 'WITHOUT ' + c.toUpperCase(), 'f-up') + T(cut, 72, pct(WITHOUT[c], 1), 'f-num', 'end', 'fill:var(--f-ink)');
+      b += `<rect x="${x0}" y="80" width="${W}" height="14" fill="none" stroke="var(--f-mid)" stroke-width="1" stroke-dasharray="3 3"/>`;
+      b += `<rect class="mk-bar" x="${x0}" y="80" width="${w2.toFixed(1)}" height="14" fill="var(--f-ink)"/>`;
+      b += L(cut, 104, x0 + W, 104, 'ink', 1) + L(cut, 100, cut, 108, 'ink', 1) + L(x0 + W, 100, x0 + W, 108, 'ink', 1);
+      b += T((cut + x0 + W) / 2, 124, 'removal effect', 'f-it', 'middle');
+      return `<svg viewBox="0 0 360 134" role="img" aria-label="Chance of converting: ${pct(BASE, 1)} with all channels, ${pct(WITHOUT[c], 1)} without ${c}.">${b}</svg>`;
+    }
+
+    const results = figureHtml({ type: 'bars', title: 'Share of conversion credit, by channel', series: [], bar: ['Facebook | 28', 'Paid Search | 26', 'Instagram | 17', 'Online Video | 16', 'Online Display | 12'], unit: '%', highlight: 'Facebook', note: 'the most credit', caption: 'Share of the 17,639 conversions credited to each channel. Rounded, so they add to 99%.', source: 'the analysis' }, 5);
 
     root.innerHTML = `
       <div class="cs">
         <p class="post-kicker">${esc(project.tag || 'Case study')} &middot; Marketing attribution &middot; 2023</p>
         <h1 class="post-title">Which channels really drive conversions?</h1>
-        <p class="calc-intro">Customers often see several ads before they buy, but standard reporting hands all the credit to the last one. I built a Markov chain model that instead credits each channel by how much the customer journey falls apart without it.</p>
+        <p class="calc-intro">Customers often see several ads before they buy, but standard reporting gives all the credit to the last one. I built a Markov chain model that credits each channel by how much the journey falls apart without it.</p>
         <p class="cs-tools">Python &middot; pandas &middot; NumPy</p>
         <div class="cs-stats">
-          <div class="cs-stat"><b>600k</b><span>Touchpoints</span></div>
-          <div class="cs-stat"><b>250k</b><span>Customers</span></div>
+          <div class="cs-stat"><b>587k</b><span>Touchpoints</span></div>
+          <div class="cs-stat"><b>240k</b><span>Customers</span></div>
           <div class="cs-stat"><b>5</b><span>Channels</span></div>
           <div class="cs-stat"><b>17,639</b><span>Conversions</span></div>
         </div>
         <div class="post-body" id="cs-body">
           <h2>The problem</h2>
-          <p>A customer might see an Instagram ad, then a display banner, then search for the brand and buy. Last-click reporting gives all the credit to search, which makes the channels that started the journey look worthless. Rules like &ldquo;split it evenly&rdquo; are no better: they&rsquo;re just a different guess.</p>
-          ${fig(1, 'Example', 'One journey, many touches', f1, 'An example journey. Last-click reporting gives all the credit to the final touch.')}
+          <p>A customer sees an Instagram ad, then a display banner, then searches and buys. Last-click reporting gives search all the credit, so the channels that started the journey look worthless.</p>
+          ${fig(1, 'Example', 'One journey, many touches', f1, 'An example journey. Last-click gives all the credit to the final touch.')}
 
           <h2>The data</h2>
-          <p>The analysis used a public eCommerce dataset: about 600,000 touchpoints from 250,000 customers, across five channels: Facebook, Instagram, Online Display, Online Video and Paid Search. Each touchpoint records who saw which channel, when, and whether it ended in a conversion.</p>
-          <p>I sorted each customer&rsquo;s touchpoints by time and folded them into a single journey, from a common start to either a conversion or a drop-off. Two real journeys from the data: Start, Instagram, Online Display, then a drop-off; and Start, Paid Search, then a drop-off.</p>
-          ${fig(2, 'Example', 'From rows to a journey', f2, 'An example customer. Journeys that never convert end in a drop-off instead.')}
+          <p>A public eCommerce dataset of ad touchpoints across five channels. I sorted each customer&rsquo;s touchpoints by time into one journey, ending in a conversion or a drop-off.</p>
+          ${fig(2, 'Example', 'From rows to a journey', f2, 'An example customer. Journeys that never convert end in a drop-off.')}
 
           <h2>Journeys as a chain</h2>
-          <p>A Markov chain treats each channel as a state and asks a simple question: from here, where do customers go next? Counting every move in the data gives the probability of each step, such as from Instagram to Paid Search, or from Paid Search to a conversion. The simplifying assumption is that the next step depends only on where a customer is now, not on the whole path behind them.</p>
-          ${fig(3, 'Diagram', 'Every journey, as one system', f3, 'The chain’s states and the moves between them. Customers can also move between channels, which isn’t drawn here.')}
+          <p>A Markov chain asks one question of every channel: from here, where do customers go next? Counting every move in the data gives the transition matrix.</p>
+          ${fig(3, 'From the data', 'The transition matrix', f3, 'Each row is where customers are; each column is where they go next, in %. Rows add up to 100. Choose a row to draw it.')}
 
           <h2>Taking a channel away</h2>
-          <p>To value a channel, take it out of the chain and send everyone who would have passed through it to a drop-off instead. Then work out how likely a customer is to reach a conversion from the start. The fall in that probability is the channel&rsquo;s removal effect: how much the whole system relies on it.</p>
-          <p>Doing this for every channel, then sharing out the 17,639 conversions in proportion to their removal effects, gives each channel its credit.</p>
-          ${fig(4, 'Example', 'The removal effect', f4, 'Illustrative. Take a channel out, send its customers to a drop-off, and see how far the chance of converting falls.')}
+          <p>To value a channel, remove it and send its customers to a drop-off. The fall in the chance of converting is its removal effect. Sharing the 17,639 conversions out in proportion to these effects gives each channel its credit.</p>
+          ${fig(4, 'From the data', 'Switch a channel off', f4, 'Removal effects from the model. Choose a channel to remove it.')}
 
           <h2>What it found</h2>
-          <p>Facebook earns the most credit, at 28% of conversions, closely followed by Paid Search at 26%. Instagram, Online Video and Online Display trail well behind.</p>
+          <p>Facebook earns the most credit, closely followed by Paid Search. Together they take more than half.</p>
           ${results}
-          <p>Together, Facebook and Paid Search account for more than half of all the credit. Facebook alone earns almost as much as Online Display and Online Video combined.</p>
-          ${headline}
 
           <h2>Why it matters</h2>
-          <p>Because the credit comes from how customers actually move between channels, rather than from a fixed rule, it gives marketing and growth teams firmer evidence for decisions about their channel mix.</p>
+          <p>The credit comes from how customers actually move between channels, not from a fixed rule, which gives marketing teams firmer evidence for their channel mix.</p>
         </div>
         <p class="cs-links"><a href="https://github.com/henrybellhouse/markovchains" target="_blank" rel="noopener">View the code on GitHub &rarr;</a></p>
       </div>`;
 
     const body = root.querySelector('#cs-body');
+
+    // Matrix: hover or choose a row
+    const mx = body.querySelector('#mk-mx'), flow = body.querySelector('#mk-flow');
+    let row = -1;
+    const pickRow = i => {
+      if (i === row) return;
+      row = i;
+      mx.dataset.sel = i;
+      mx.querySelectorAll('[data-r]').forEach(el => el.classList.toggle('on', +el.dataset.r === i));
+      mx.querySelectorAll('.mk-rh').forEach(el => el.setAttribute('aria-pressed', +el.dataset.r === i));
+      flow.innerHTML = flowSvg(i);
+    };
+    mx.querySelectorAll('[data-r]').forEach(el => {
+      el.addEventListener('mouseenter', () => pickRow(+el.dataset.r));
+      el.addEventListener('click', () => pickRow(+el.dataset.r));
+    });
+    pickRow(1);
+
+    // Removal: choose a channel
+    const rm = body.querySelector('#mk-rm'), rmLine = body.querySelector('#mk-rm-line');
+    const pickChannel = c => {
+      body.querySelectorAll('.mk-tog').forEach(b => b.setAttribute('aria-pressed', b.dataset.c === c));
+      rm.innerHTML = removalSvg(c);
+      const effect = 1 - WITHOUT[c] / BASE;
+      rmLine.innerHTML = `Without ${c}, the chance of converting falls from ${pct(BASE, 1)} to ${pct(WITHOUT[c], 1)}. That ${pct(effect)} fall is its removal effect.`;
+    };
+    body.querySelectorAll('.mk-tog').forEach(b => b.addEventListener('click', () => pickChannel(b.dataset.c)));
+    pickChannel('Facebook');
+
     projectRedraw = () => drawFigures(body);
     drawFigures(body);
   }
