@@ -30,10 +30,12 @@
     "size": "s"
   },
   {
-    "slug": "placeholder-four",
-    "title": "Nemo enim ipsam voluptatem",
-    "summary": "Quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores.",
-    "tag": "In progress",
-    "size": "l"
+    "slug": "causal-method-finder",
+    "title": "Causal method finder",
+    "summary": "Describe what you want to learn, answer a few questions, and get the method that fits, with the assumptions to check.",
+    "tag": "Tool",
+    "size": "l",
+    "art": "tree",
+    "live": true
   }
 ]

@@ -204,6 +204,7 @@
 
   .pcard-art { flex: 1; min-height: 40px; margin: 18px 0; position: relative; }
   .pcard-art svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .pcard.size-l .pcard-art { min-height: 96px; }
   .pcard.idle .pcard-art {
     background: repeating-linear-gradient(45deg, var(--border) 0 1px, transparent 1px 7px);
     opacity: 0.7;
@@ -371,6 +372,86 @@
   .calc-note { font-family: Georgia, serif; font-style: italic; font-size: 14px; color: var(--gray); margin-top: 10px; }
   .calc-how { margin-top: 8px; padding-top: 18px; border-top: 1px solid var(--border); font-size: 13px; line-height: 1.7; color: var(--gray); max-width: 640px; }
   .calc-how p + p { margin-top: 10px; }
+
+  /* The causal method finder */
+  .finder { max-width: 720px; }
+  .f-trail { margin-top: 36px; }
+  .f-trail-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 20px;
+    padding: 12px 0;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .f-trail-row:last-child { border-bottom: 1px solid var(--border); }
+  .f-trail-q { color: var(--gray); }
+  .f-trail-a { grid-column: 1; color: var(--black); }
+  .f-trail-row .calc-link { grid-row: 1 / span 2; grid-column: 2; align-self: center; font-size: 11px; color: var(--gray); }
+  .f-step, .f-result { margin-top: 40px; }
+  .f-num { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gray); margin-bottom: 10px; }
+  .f-q:focus, .f-method:focus { outline: none; }
+  .f-q { font-family: Georgia, serif; font-weight: 400; font-size: 30px; line-height: 1.2; letter-spacing: -0.01em; }
+  .f-help { font-size: 13px; line-height: 1.6; color: var(--gray); margin-top: 10px; max-width: 560px; }
+  .f-opts { display: flex; flex-direction: column; gap: 10px; margin: 26px 0 18px; }
+  .f-opt {
+    text-align: left;
+    background: none;
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    font: inherit;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--black);
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .f-opt:hover, .f-opt:focus-visible { border-color: var(--black); outline: none; }
+  .f-text {
+    width: 100%;
+    min-height: 110px;
+    margin-top: 6px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    outline: none;
+    resize: vertical;
+    color: var(--black);
+    font-family: Georgia, serif;
+    font-size: 20px;
+    line-height: 1.5;
+    padding: 6px 0 10px;
+    transition: border-color 0.2s;
+  }
+  .f-text:focus { border-bottom-color: var(--black); }
+  .f-text::placeholder { color: var(--gray); opacity: 0.7; }
+  .f-actions { display: flex; align-items: center; gap: 22px; margin-top: 24px; flex-wrap: wrap; }
+  .f-btn {
+    background: none;
+    border: 1px solid var(--black);
+    padding: 11px 20px;
+    font: inherit;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--black);
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .f-btn:hover { background: var(--black); color: var(--white); }
+  .f-method { font-family: Georgia, serif; font-weight: 400; font-size: clamp(34px, 5vw, 48px); line-height: 1.08; letter-spacing: -0.01em; margin-top: 4px; }
+  .f-sum { font-size: 17px; line-height: 1.7; color: #444; margin-top: 14px; max-width: 620px; }
+  .f-quote { font-family: Georgia, serif; font-style: italic; font-size: 16px; line-height: 1.6; color: var(--black); border-left: 1px solid var(--black); padding-left: 16px; margin-top: 4px; }
+  .f-sec { margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .f-sec .calc-label { margin-bottom: 8px; font-weight: 400; }
+  .f-body { font-size: 15px; line-height: 1.75; color: #444; max-width: 640px; }
+  .f-list { list-style: none; }
+  .f-list li { position: relative; padding: 4px 0 4px 20px; font-size: 15px; line-height: 1.65; color: #444; }
+  .f-list li::before { content: '—'; position: absolute; left: 0; color: var(--gray); }
+  .f-calc { color: var(--black); text-underline-offset: 3px; }
+  .f-caveat { font-family: Georgia, serif; font-style: italic; font-size: 14px; line-height: 1.6; color: var(--gray); margin-top: 32px; max-width: 600px; }
+  html.dark body .f-sum, html.dark body .f-body, html.dark body .f-list li { color: #cfcfcf; }
 
   html.dark body .calc-intro,
   html.dark body .calc-sentence { color: #cfcfcf; }
@@ -1621,6 +1702,17 @@
   }
 
   function cardArt(kind) {
+    if (kind === 'tree') {
+      const br = (x1, y1, x2, y2, ink) => `<path d="M${x1},${y1} C${(x1 + x2) / 2},${y1} ${(x1 + x2) / 2},${y2} ${x2},${y2}" fill="none" stroke="var(${ink ? '--black' : '--gray'})" stroke-width="1.5"${ink ? '' : ' stroke-dasharray="4 4"'} vector-effect="non-scaling-stroke"/>`;
+      const dot = (x, y, ink, r) => `<circle cx="${x}" cy="${y}" r="${r || 4}" fill="var(${ink ? '--black' : '--gray'})"/>`;
+      return `<svg viewBox="0 0 400 140" preserveAspectRatio="xMinYMid meet" aria-hidden="true">
+        ${br(20, 70, 150, 25)}${br(20, 70, 150, 70, 1)}${br(20, 70, 150, 115)}
+        ${br(150, 25, 280, 10)}${br(150, 25, 280, 40)}${br(150, 70, 280, 55)}${br(150, 70, 280, 88, 1)}${br(150, 115, 280, 106)}${br(150, 115, 280, 130)}
+        ${br(280, 88, 380, 88, 1)}
+        ${dot(20, 70, 1)}${dot(150, 25)}${dot(150, 70, 1)}${dot(150, 115)}
+        ${dot(280, 10)}${dot(280, 40)}${dot(280, 55)}${dot(280, 88, 1)}${dot(280, 106)}${dot(280, 130)}${dot(380, 88, 1, 6)}
+      </svg>`;
+    }
     if (kind !== 'curves') return '';
     const curve = (mu, sd) => {
       let d = '';
@@ -2086,9 +2178,286 @@
     update();
   }
 
+  // ── Causal method finder ──────────────────────────
+  const FINDER_METHODS = {
+    ab: {
+      name: 'A/B test',
+      summary: 'Randomly split people into groups that see different versions, and compare their outcomes.',
+      why: 'You can decide who sees the change, and one person’s experience doesn’t affect another’s. Randomising makes the groups alike in every way except the change, so any difference in outcomes is caused by it.',
+      assumptions: ['Groups don’t influence each other.', 'People stay in the group they were given, for example across devices.', 'The outcome is measured the same way in every group.'],
+      data: ['Which group each person was in, and their outcome.', 'Enough people to detect the smallest lift you care about.'],
+      watch: ['Don’t stop the moment a result looks significant. Checking repeatedly inflates false wins.', 'Check the split came out as planned. A mismatch usually means a bug in who was counted.', 'Run whole weeks, so every day of the week is covered.'],
+      fallback: 'If groups would affect each other, use a switchback or geo experiment instead.',
+      calc: true
+    },
+    holdout: {
+      name: 'Holdout group',
+      summary: 'Keep a small, random group away from a change, or a series of changes, for months, and compare them with everyone else.',
+      why: 'You need the long-run or combined effect, which short tests miss. Novelty wears off, habits form, and many small changes add up or cancel out in ways no single test shows.',
+      assumptions: ['The holdout is chosen at random and stays untouched.', 'Nothing leaks to the holdout, such as marketing or support that mentions the change.', 'The business accepts the cost of not giving some people the change.'],
+      data: ['Outcomes for the holdout and everyone else across the whole period.'],
+      watch: ['Keep it small but not tiny; 5–10% of people is typical.', 'Don’t refresh who’s in the holdout part-way through.', 'Agree up front, across teams, that the holdout is off-limits.'],
+      fallback: 'If a long holdout isn’t acceptable, run A/B tests for longer and compare early and later weeks to see how the effect changes.',
+      calc: true
+    },
+    switchback: {
+      name: 'Switchback experiment',
+      summary: 'Switch the whole system between versions over time, for example every hour or day, in a random order, and compare the periods.',
+      why: 'The change acts on something shared, like pricing, supply or a matching algorithm. Splitting people would let the groups affect each other, but randomising time periods keeps the comparison clean.',
+      assumptions: ['Effects don’t carry over from one period to the next, or you leave a gap between them.', 'Each period is long enough for the system to settle.', 'There are enough periods to average out daily and weekly patterns.'],
+      data: ['The outcome for each period, and which version ran when.'],
+      watch: ['Randomise the order rather than simply alternating.', 'Balance versions across times of day and days of the week.', 'Analyse by period, not by person.'],
+      fallback: 'If effects carry over strongly, use longer periods or switch to a geo experiment.'
+    },
+    geo: {
+      name: 'Geo experiment',
+      summary: 'Randomly choose whole regions, markets or stores to get the change, and compare them with the rest.',
+      why: 'You can only switch the change on for whole areas, or people in the same area would influence each other. The area becomes the unit you randomise, which keeps groups apart.',
+      assumptions: ['Regions are separate enough that effects don’t spill over.', 'There are enough regions to randomise meaningfully, ideally 20 or more.', 'Regions are broadly comparable, or matched in pairs before randomising.'],
+      data: ['The outcome for each region over time, ideally with history from before the test.'],
+      watch: ['With few regions, chance differences can swamp the effect. Pair similar regions and randomise within each pair.', 'Use the history from before the test to sharpen the estimate.'],
+      fallback: 'With only a handful of regions, analyse it as a synthetic control.'
+    },
+    did: {
+      name: 'Difference-in-differences',
+      summary: 'Compare how the outcome changed for those who got the change with how it changed, over the same period, for those who didn’t.',
+      why: 'The change reached some groups on a known date, and there are comparable groups that didn’t get it. Their trend shows what would most likely have happened anyway.',
+      assumptions: ['Before the change, both groups were moving in parallel. Check this with past data.', 'Nothing else changed for only one of the groups at the same time.', 'Who got the change wasn’t decided by how their outcomes were expected to move.'],
+      data: ['Outcomes for both groups for a good stretch before and after the change.'],
+      watch: ['Plot the trends before trusting the number.', 'If different groups got the change at different times, use a method built for staggered timing rather than a simple before-and-after comparison.'],
+      fallback: 'If the trends weren’t parallel, use synthetic control to build a closer comparison.'
+    },
+    synth: {
+      name: 'Synthetic control',
+      summary: 'Build a weighted blend of unaffected places or products that closely tracks the affected one before the change, and use it as the comparison afterwards.',
+      why: 'Only one, or a few, units got the change, and no single unaffected unit is a good match on its own. A blend of several often is.',
+      assumptions: ['The blend tracks the affected unit closely for a long period before the change.', 'None of the units in the blend were affected by the change.', 'No other one-off event hit only the affected unit.'],
+      data: ['A long history, ideally many months, for the affected unit and a pool of similar unaffected ones.'],
+      watch: ['Check how well the blend fits before the change. A poor fit means a poor comparison.', 'Run placebo tests: pretend each comparison unit got the change, and see whether your real effect stands out.'],
+      fallback: 'If no blend fits well, fall back to an interrupted time series and treat the result with caution.'
+    },
+    rdd: {
+      name: 'Regression discontinuity',
+      summary: 'Compare people just above a cutoff with people just below it, who are otherwise nearly identical.',
+      why: 'The change was decided by a score or threshold, so people either side of the line make a natural comparison.',
+      assumptions: ['People can’t precisely control which side of the cutoff they land on.', 'Nothing else changes at the same cutoff.', 'Outcomes change smoothly with the score, apart from the jump caused by the change.'],
+      data: ['The score and outcome for many people close to the cutoff.'],
+      watch: ['The result applies to people near the cutoff, not to everyone.', 'Look for bunching just above or below the line, a sign that people are gaming it.'],
+      fallback: 'If people can game the score, compare before and after the rule was introduced using difference-in-differences.'
+    },
+    its: {
+      name: 'Interrupted time series',
+      summary: 'Model the trend before the change, project it forward, and compare that projection with what actually happened.',
+      why: 'Everyone got the change at once and there’s no unaffected group, so the past is the only comparison available.',
+      assumptions: ['The trend before the change would have continued without it.', 'Nothing else happened at the same time.', 'There’s enough history to capture seasonal patterns.'],
+      data: ['A long, regular series, such as daily or weekly, before and after. Cover a full year if seasonality matters.'],
+      watch: ['This is the weakest design here. Look hard for other events around the same date.', 'Test fake change dates. If they also show “effects”, the real one isn’t convincing.'],
+      fallback: 'Find any unaffected comparison, such as another product, market or metric, and upgrade to synthetic control.'
+    },
+    matching: {
+      name: 'Matching',
+      summary: 'Pair people who chose to use it with similar people who didn’t, based on what they looked like beforehand, and compare outcomes.',
+      why: 'People chose whether to use it, so users and non-users differ. Matching on detailed data from before they chose makes the comparison fairer.',
+      assumptions: ['You’ve measured everything that drives both the choice and the outcome. This can’t be tested, and is the big risk.', 'Every user has comparable non-users to match with.', 'You only match on things measured before the choice.'],
+      data: ['Detailed data on people from before they chose, and their outcomes afterwards.'],
+      watch: ['Treat the result as suggestive, not proof.', 'Ask how strong an unmeasured factor would need to be to explain the result away.'],
+      fallback: 'Next time, randomise who gets invited. This “encouragement design” turns the problem into instrumental variables.'
+    },
+    iv: {
+      name: 'Instrumental variables',
+      summary: 'Use something that nudged some people to take it up, but doesn’t affect the outcome directly, to isolate the effect of using it.',
+      why: 'People chose whether to use it, but a random or as-good-as-random nudge changed who did. That gives a clean source of variation to learn from.',
+      assumptions: ['The nudge genuinely changes take-up. Check it’s strong.', 'The nudge affects the outcome only through take-up.', 'Who got the nudge was as good as random.'],
+      data: ['Who got the nudge, who took it up, and their outcomes.'],
+      watch: ['The result applies to people who used it because of the nudge, not to everyone.', 'A weak nudge gives unstable and misleading results.'],
+      fallback: 'If there’s no valid nudge, use matching with caution, or create a nudge by randomising invitations.'
+    }
+  };
+
+  const FINDER_QUESTIONS = {
+    randomise: {
+      text: 'Can you decide who gets the change?',
+      help: 'For example, by choosing at random which customers see a new feature.',
+      opts: [['people', 'Yes, person by person', 'interfere'], ['areas', 'Yes, but only for whole regions, markets or stores', 'geo'], ['no', 'No: it’s already happened, or I can’t choose', 'how']]
+    },
+    interfere: {
+      text: 'Could one group’s experience affect another’s?',
+      help: 'For example, a pricing change in a marketplace shifts supply for everyone, or friends in different groups share an offer.',
+      opts: [['no', 'No, each person’s experience is separate', 'horizon'], ['system', 'Yes, it changes a shared system, like pricing, supply or matching', 'switchback'], ['social', 'Yes, people in different groups talk to or influence each other', 'geo']]
+    },
+    horizon: {
+      text: 'What do you need to learn?',
+      opts: [['short', 'The effect of one change over days or weeks', 'ab'], ['long', 'The long-run effect, or the combined effect of many changes', 'holdout']]
+    },
+    how: {
+      text: 'How did the change reach people?',
+      opts: [['cutoff', 'Through a cutoff or score, like a credit score or spending threshold', 'rdd'], ['some', 'On a specific date, but only for some people or places', 'units'], ['all', 'On a specific date, for everyone at once', 'comparison'], ['choice', 'People chose whether to use it', 'nudge']]
+    },
+    units: {
+      text: 'How many groups or places got it?',
+      opts: [['many', 'Many, and there are comparable ones that didn’t', 'did'], ['few', 'Just one, or a handful, like a single country or city', 'synth']]
+    },
+    comparison: {
+      text: 'Is there anything comparable that wasn’t affected?',
+      help: 'For example, a similar product, market or metric the change couldn’t have touched.',
+      opts: [['yes', 'Yes, several comparable things weren’t affected', 'synth'], ['no', 'No, only before-and-after data for what changed', 'its']]
+    },
+    nudge: {
+      text: 'Did something nudge some people to use it, apart from their own choice?',
+      help: 'For example, invitations sent at random, a prompt rolled out gradually, or an app update that reached some phones first.',
+      opts: [['yes', 'Yes, a random or as-good-as-random nudge', 'iv'], ['rich', 'No, but I have detailed data on people from before they chose', 'matching'], ['thin', 'No, and I have limited data', 'matching']]
+    }
+  };
+
+  function renderMethodFinder(root, project) {
+    const M = FINDER_METHODS, Q = FINDER_QUESTIONS;
+    let started = false, problem = '', path = [];
+
+    root.innerHTML = `
+      <div class="finder">
+        <p class="post-kicker">${esc(project.tag || 'Tool')} &middot; Causal inference</p>
+        <h1 class="post-title">${esc(project.title)}</h1>
+        <p class="calc-intro">Say what you&rsquo;re trying to learn, answer a few questions about how the change reaches people, and get a method that fits, with the assumptions to check and what to watch out for.</p>
+        <div id="f-stage"></div>
+      </div>`;
+    const stage = root.querySelector('#f-stage');
+
+    const optOf = step => Q[step.q].opts.find(o => o[0] === step.v);
+    function currentNode() {
+      let node = 'randomise';
+      for (const step of path) node = optOf(step)[2];
+      return node;
+    }
+
+    function trail() {
+      const rows = [];
+      if (started && problem) rows.push(`<div class="f-trail-row"><span class="f-trail-q">What you&rsquo;re trying to learn</span><span class="f-trail-a">${esc(problem)}</span><button type="button" class="calc-link" data-edit="-1">Change</button></div>`);
+      path.forEach((step, i) => rows.push(`<div class="f-trail-row"><span class="f-trail-q">${Q[step.q].text}</span><span class="f-trail-a">${optOf(step)[1]}</span><button type="button" class="calc-link" data-edit="${i}">Change</button></div>`));
+      return rows.length ? `<div class="f-trail">${rows.join('')}</div>` : '';
+    }
+
+    function keepInView() {
+      const r = stage.getBoundingClientRect();
+      if (r.top < 0) window.scrollTo({ top: window.scrollY + r.top - 100 });
+    }
+
+    function render() {
+      if (!started) {
+        stage.innerHTML = `
+          <div class="f-step w-enter">
+            <label class="calc-label" for="f-text">What are you trying to learn? (optional)</label>
+            <textarea class="f-text" id="f-text" placeholder="For example: did our new onboarding flow increase the number of people who make a first payment?">${esc(problem)}</textarea>
+            <p class="f-help">This stays in your browser. It&rsquo;s only used to label your plan.</p>
+            <div class="f-actions"><button type="button" class="f-btn" id="f-start">Start</button></div>
+          </div>`;
+        stage.querySelector('#f-start').addEventListener('click', () => {
+          problem = stage.querySelector('#f-text').value.trim();
+          started = true;
+          render();
+        });
+        return;
+      }
+
+      const node = currentNode();
+      if (M[node]) { renderResult(node); return; }
+
+      const q = Q[node];
+      stage.innerHTML = trail() + `
+        <div class="f-step w-enter">
+          <p class="f-num">Question ${path.length + 1}</p>
+          <h2 class="f-q" tabindex="-1">${q.text}</h2>
+          ${q.help ? `<p class="f-help">${q.help}</p>` : ''}
+          <div class="f-opts">${q.opts.map(o => `<button type="button" class="f-opt" data-v="${o[0]}">${o[1]}</button>`).join('')}</div>
+          <button type="button" class="calc-link" id="f-back">&larr; Back</button>
+        </div>`;
+      stage.querySelectorAll('.f-opt').forEach(b => b.addEventListener('click', () => {
+        path.push({ q: node, v: b.dataset.v });
+        render();
+        keepInView();
+      }));
+      stage.querySelector('#f-back').addEventListener('click', () => {
+        if (path.length) path.pop(); else started = false;
+        render();
+      });
+      wireTrail();
+      const h = stage.querySelector('.f-q');
+      if (path.length && h) h.focus({ preventScroll: true });
+    }
+
+    function wireTrail() {
+      stage.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => {
+        const i = +b.dataset.edit;
+        if (i < 0) { started = false; path = []; } else path = path.slice(0, i);
+        render();
+        keepInView();
+      }));
+    }
+
+    function renderResult(key) {
+      const m = M[key];
+      const weak = path.some(s => s.q === 'nudge' && s.v === 'thin');
+      const list = items => `<ul class="f-list">${items.map(t => `<li>${t}</li>`).join('')}</ul>`;
+      stage.innerHTML = trail() + `
+        <div class="f-result w-enter">
+          <p class="post-kicker">Recommended approach</p>
+          <h2 class="f-method" tabindex="-1">${m.name}</h2>
+          <p class="f-sum">${m.summary}</p>
+          ${weak ? '<p class="calc-note">With limited data, any estimate here will be fragile. If you can, randomise who gets invited instead.</p>' : ''}
+          <div class="f-sec"><h3 class="calc-label">Why it fits</h3><p class="f-body">${m.why}</p></div>
+          <div class="f-sec"><h3 class="calc-label">Assumptions to check</h3>${list(m.assumptions)}</div>
+          <div class="f-sec"><h3 class="calc-label">Data you&rsquo;ll need</h3>${list(m.data)}</div>
+          <div class="f-sec"><h3 class="calc-label">Watch out for</h3>${list(m.watch)}</div>
+          <div class="f-sec"><h3 class="calc-label">If it doesn&rsquo;t fit</h3><p class="f-body">${m.fallback}</p></div>
+          ${m.calc ? '<div class="f-sec"><p class="f-body"><a class="f-calc" href="/projects/sample-size" id="f-calc">Size it with the sample size calculator &rarr;</a></p></div>' : ''}
+          <p class="f-caveat">A starting point, not a verdict. Real problems often need more than one method, and the assumptions matter more than the name.</p>
+          <div class="f-actions">
+            <button type="button" class="f-btn" id="f-copy">Copy as a plan</button>
+            <button type="button" class="calc-link" id="f-restart">Start again</button>
+          </div>
+        </div>`;
+      wireTrail();
+
+      stage.querySelector('#f-restart').addEventListener('click', () => {
+        started = false; problem = ''; path = [];
+        render();
+        keepInView();
+      });
+      const calcLink = stage.querySelector('#f-calc');
+      if (calcLink) calcLink.addEventListener('click', e => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        show('projects/sample-size');
+      });
+      stage.querySelector('#f-copy').addEventListener('click', async e => {
+        const lines = ['Causal method finder: plan', ''];
+        if (problem) lines.push('What we’re trying to learn: ' + problem, '');
+        lines.push('How the change reaches people:');
+        path.forEach(step => lines.push('- ' + Q[step.q].text + ' ' + optOf(step)[1]));
+        lines.push('', 'Recommended approach: ' + m.name, m.summary, '', 'Why it fits: ' + m.why, '');
+        lines.push('Assumptions to check:', ...m.assumptions.map(t => '- ' + t), '');
+        lines.push('Data needed:', ...m.data.map(t => '- ' + t), '');
+        lines.push('Watch out for:', ...m.watch.map(t => '- ' + t), '');
+        lines.push('If it doesn’t fit: ' + m.fallback, '', 'From henrypcb.github.io/projects/causal-method-finder');
+        const btn = e.currentTarget;
+        try {
+          await navigator.clipboard.writeText(lines.join('\n'));
+          btn.textContent = 'Copied';
+        } catch (err) {
+          btn.textContent = 'Couldn’t copy';
+        }
+        setTimeout(() => { btn.textContent = 'Copy as a plan'; }, 2000);
+      });
+      const h = stage.querySelector('.f-method');
+      if (h) h.focus({ preventScroll: true });
+    }
+
+    render();
+  }
+
   // Live projects and the function that draws each one
   const PROJECT_VIEWS = {
     'sample-size': renderSampleSize,
+    'causal-method-finder': renderMethodFinder,
   };
 
   // The button names the mode it switches to
