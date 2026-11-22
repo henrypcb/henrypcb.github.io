@@ -4202,7 +4202,7 @@
       <div class="calc cp">
         <p class="post-kicker">${esc(project.tag || 'Tool')} &middot; User research</p>
         <h1 class="post-title">${esc(project.title)}</h1>
-        <p class="calc-intro">Jot down the problems customers tell you about, in their words. As you add them, they group into themes, ranked by how many people each one affects and how much it hurts. Everything stays in your browser.</p>
+        <p class="calc-intro">Jot down the problems customers tell you about, in their words. As you add them, they group into themes, ranked by how many customers each one affects and how much it hurts. Everything stays in your browser.</p>
 
         <div class="cp-add">
           <label class="calc-label" for="cp-text">What&rsquo;s the problem, in the customer&rsquo;s words?</label>
@@ -4243,7 +4243,7 @@
             <p class="fig-k">Fig. 1 &middot; Where to start</p>
             <p class="fig-t">Which problems to fix first</p>
             <div class="fig-wrap"><div class="fig-chart" id="cp-chart"></div><div class="fig-tip"></div></div>
-            <figcaption><span><em>Fig. 1</em> &mdash; Each circle is a theme. Further right means more people have it; higher means it hurts more; bigger means more notes. Start top right.</span></figcaption>
+            <figcaption><span><em>Fig. 1</em> &mdash; Each circle is a theme. Further right means more customers have it; higher means it hurts more; bigger means more notes. Start top right.</span></figcaption>
           </figure>
         </div>
 
@@ -4318,7 +4318,7 @@
       if (modelState === 'ready') embedPending(); else prepareModel();
     }
 
-    // ── Chart: people affected against how much it hurts ──
+    // ── Chart: customers affected against how much it hurts ──
     function drawChart() {
       const box = $('cp-chart');
       box.innerHTML = '';
@@ -4331,14 +4331,14 @@
       const y = s => H - m.b - ((s - 1) / 2) * (H - m.t - m.b);
       const maxN = Math.max(...lastThemes.map(t => t.notes.length));
       const svg = sv('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img',
-        'aria-label': 'Themes by people affected and how much they hurt. ' + lastThemes.map((t, i) => `${i + 1}. ${label(t)}: ${t.people} ${t.people === 1 ? 'person' : 'people'}, ${hurtWord(t.sev)}`).join('; ') }, box);
+        'aria-label': 'Themes by customers affected and how much they hurt. ' + lastThemes.map((t, i) => `${i + 1}. ${label(t)}: ${t.people} ${t.people === 1 ? 'customer' : 'customers'}, ${hurtWord(t.sev)}`).join('; ') }, box);
       [1, 2, 3].forEach(s => {
         sv('line', { x1: m.l, x2: W - m.r, y1: y(s), y2: y(s), stroke: s === 1 ? 'var(--f-ink)' : 'var(--f-rule)', 'stroke-width': 1 }, svg);
         svText(svg, 'f-ax', m.l - 8, y(s) + 3, narrow ? ['', 'Annoys', 'In the way', 'Stops'][s] : SEV[s].replace('Gets in the way', 'In the way'), 'end');
       });
       const step = maxP > 10 ? Math.ceil(maxP / 5) : 1;
       for (let p = 0; p <= maxP; p += step) svText(svg, 'f-ax', x(p), H - 18, String(p), 'middle');
-      svText(svg, 'f-ax', W - m.r, H - 4, 'PEOPLE AFFECTED →', 'end');
+      svText(svg, 'f-ax', W - m.r, H - 4, 'CUSTOMERS AFFECTED →', 'end');
       const wrap = box.parentNode;
       // Themes with the same reach and hurt would sit on top of each other, so nudge them apart sideways
       const spots = lastThemes.map(t => ({ t, cx: x(t.people), cy: y(t.sev), r: 7 + 10 * Math.sqrt(t.notes.length / maxN) }));
@@ -4354,7 +4354,7 @@
         const i = lastThemes.indexOf(t);
         const c = sv('circle', { cx, cy, r, fill: i === 0 ? 'var(--f-ink)' : 'var(--f-wash)', stroke: 'var(--f-ink)', 'stroke-width': 1, opacity: 0.92 }, svg);
         svText(svg, 'f-num', cx, cy + 4, String(i + 1), 'middle', `font-size:11px;fill:${i === 0 ? 'var(--f-bg)' : 'var(--f-ink)'};pointer-events:none`);
-        c.addEventListener('mousemove', e => showTip(wrap, `<b style="font-weight:400">${i + 1}. ${esc(label(t))}</b><br>${t.notes.length} ${t.notes.length === 1 ? 'note' : 'notes'} · ${t.people} ${t.people === 1 ? 'person' : 'people'}`, e.clientX - svg.getBoundingClientRect().left, Math.max(0, cy - 60)));
+        c.addEventListener('mousemove', e => showTip(wrap, `<b style="font-weight:400">${i + 1}. ${esc(label(t))}</b><br>${t.notes.length} ${t.notes.length === 1 ? 'note' : 'notes'} · ${t.people} ${t.people === 1 ? 'customer' : 'customers'}`, e.clientX - svg.getBoundingClientRect().left, Math.max(0, cy - 60)));
         c.addEventListener('mouseleave', () => hideTip(wrap));
         c.style.cursor = 'pointer';
         c.addEventListener('click', () => { const el = root.querySelector(`[data-theme="${i}"]`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
@@ -4376,7 +4376,7 @@
       const waiting = notes.filter(n => mode !== 'words' && !n.v);
       const people = new Set(notes.map(n => (n.who || '').trim().toLowerCase() || 'anon-' + n.id)).size;
       $('cp-count').textContent = notes.length
-        ? `${fmtInt(notes.length)} ${notes.length === 1 ? 'note' : 'notes'} from ${fmtInt(people)} ${people === 1 ? 'person' : 'people'} · ${lastThemes.length} ${lastThemes.length === 1 ? 'theme' : 'themes'}`
+        ? `${fmtInt(notes.length)} ${notes.length === 1 ? 'note' : 'notes'} from ${fmtInt(people)} ${people === 1 ? 'customer' : 'customers'} · ${lastThemes.length} ${lastThemes.length === 1 ? 'theme' : 'themes'}`
         : 'No notes yet. Add one above to start.';
       root.querySelectorAll('#cp-detail button').forEach(b => { const on = +b.dataset.d === Math.sign(detail); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
       $('cp-copy').disabled = !lastThemes.length;
@@ -4401,7 +4401,7 @@
               <p class="cp-rank">${String(i + 1).padStart(2, '0')}${t.keywords.length ? ` &middot; ${t.keywords.map(esc).join(', ')}` : ''}</p>
               <h3 class="cp-name" data-name="${i}">${esc(label(t))}</h3>
               ${t.summary ? `<p class="cp-sum">${esc(t.summary)}</p>` : ''}
-              <p class="cp-stats">${t.notes.length} ${t.notes.length === 1 ? 'note' : 'notes'} &middot; ${t.people} ${t.people === 1 ? 'person' : 'people'} &middot; ${hurtWord(t.sev)}
+              <p class="cp-stats">${t.notes.length} ${t.notes.length === 1 ? 'note' : 'notes'} &middot; ${t.people} ${t.people === 1 ? 'customer' : 'customers'} &middot; ${hurtWord(t.sev)}
                 <button type="button" class="calc-link cp-rename" data-rename="${i}">Rename</button></p>
             </div>
             <ul>${t.notes.slice().sort((a, b) => (a === t.medoid ? -1 : b === t.medoid ? 1 : b.sev - a.sev)).map(n => noteHtml(n, t)).join('')}</ul>
@@ -4472,9 +4472,9 @@
     function findings() {
       const people = new Set(notes.map(n => (n.who || '').trim().toLowerCase() || 'anon-' + n.id)).size;
       const lines = ['Customer problems: findings', '',
-        `${fmtInt(notes.length)} notes from ${fmtInt(people)} people, grouped into ${lastThemes.length} themes. Ranked by people affected and how much it hurts.`, ''];
+        `${fmtInt(notes.length)} notes from ${fmtInt(people)} customers, grouped into ${lastThemes.length} themes. Ranked by customers affected and how much it hurts.`, ''];
       lastThemes.forEach((t, i) => {
-        lines.push(`${i + 1}. ${label(t)} (${t.people} ${t.people === 1 ? 'person' : 'people'}, ${hurtWord(t.sev)})`);
+        lines.push(`${i + 1}. ${label(t)} (${t.people} ${t.people === 1 ? 'customer' : 'customers'}, ${hurtWord(t.sev)})`);
         if (t.summary) lines.push('   ' + t.summary);
         t.notes.slice().sort((a, b) => (a === t.medoid ? -1 : b === t.medoid ? 1 : b.sev - a.sev)).slice(0, 3)
           .forEach(n => lines.push(`   “${n.text}”${n.who ? ' — ' + n.who : ''}`));
