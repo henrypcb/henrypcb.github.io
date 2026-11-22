@@ -453,6 +453,29 @@
   .f-caveat { font-family: Georgia, serif; font-style: italic; font-size: 14px; line-height: 1.6; color: var(--gray); margin-top: 32px; max-width: 600px; }
   html.dark body .f-sum, html.dark body .f-body, html.dark body .f-list li { color: #cfcfcf; }
 
+  /* Case studies */
+  .cs { max-width: 720px; }
+  .cs-tools { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); margin-top: 18px; }
+  .cs-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin: 34px 0 10px;
+    padding: 20px 0;
+    border-top: 1px solid var(--black);
+    border-bottom: 1px solid var(--border);
+  }
+  .cs-stat b { display: block; font-family: Georgia, serif; font-weight: 400; font-size: 30px; line-height: 1.1; }
+  .cs-stat span { display: block; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gray); margin-top: 8px; }
+  .cs .post-body { margin-top: 10px; }
+  .cs .post-body h2 { margin-top: 1.6em; }
+  .cs-links { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--border); font-size: 13px; }
+  .cs-links a { color: var(--black); text-underline-offset: 3px; }
+  @media (max-width: 640px) {
+    .cs-stats { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    .cs-stat b { font-size: 26px; }
+  }
+
   .mdiag svg { display: block; width: 100%; max-width: 480px; height: auto; overflow: visible; }
   .mdiag text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
   .mdiag .f-up { font-size: 11.5px; }
@@ -1366,9 +1389,14 @@
 
   function figureHtml(spec, n) {
     const type = (spec.type || '').toLowerCase();
-    const kind = { loop: 'Diagram', line: 'Change over time', bars: 'Comparison', number: 'Single number' }[type];
+    const kind = { loop: 'Diagram', line: 'Change over time', bars: 'Comparison', number: 'Single number', method: 'How it works' }[type];
     if (!kind) return '';
     spec.type = type;
+    if (type === 'method') {
+      const mk = (spec.key || '').trim(), mm = FINDER_METHODS[mk];
+      if (!mm) return '';
+      return `<figure class="fig mdiag"><p class="fig-k">Fig. ${n} &middot; ${kind}</p><p class="fig-t">${spec.title ? inlineMd(spec.title) : mm.figTitle}</p>${methodDiagram(mk)}<figcaption><span><em>Fig. ${n}</em> &mdash; ${spec.caption ? inlineMd(spec.caption) : mm.caption}</span></figcaption></figure>`;
+    }
     const cap = (spec.caption || spec.source)
       ? `<figcaption><span><em>Fig. ${n}</em> &mdash; ${inlineMd(spec.caption || '')}</span>${spec.source ? `<span>Source: ${inlineMd(spec.source)}</span>` : ''}</figcaption>`
       : '';
@@ -1707,6 +1735,12 @@
       const md = await loadPiece(post.slug);
       body.innerHTML = markdown(md);
       drawFigures(body);
+      body.querySelectorAll('a[href^="/"]').forEach(a => a.addEventListener('click', e => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        show(a.getAttribute('href').replace(/^\/+|\/+$/g, '') || 'home');
+        window.scrollTo(0, 0);
+      }));
       const mins = Math.max(1, Math.round(md.split(/\s+/).length / 220));
       meta.textContent = fmtDate(post.date) + ' · ' + mins + ' min read';
     } catch (err) {
@@ -1742,6 +1776,15 @@
         ${br(280, 88, 380, 88, 1)}
         ${dot(20, 70, 1)}${dot(150, 25)}${dot(150, 70, 1)}${dot(150, 115)}
         ${dot(280, 10)}${dot(280, 40)}${dot(280, 55)}${dot(280, 88, 1)}${dot(280, 106)}${dot(280, 130)}${dot(380, 88, 1, 6)}
+      </svg>`;
+    }
+    if (kind === 'chain') {
+      const n = (x, y, r, ink) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${ink ? 'var(--black)' : 'var(--white)'}" stroke="var(--black)" stroke-width="1.2"/>`;
+      const e = (d, ink) => `<path d="${d}" fill="none" stroke="var(${ink ? '--black' : '--gray'})" stroke-width="1.4"${ink ? '' : ' stroke-dasharray="4 4"'} vector-effect="non-scaling-stroke"/>`;
+      return `<svg viewBox="0 0 400 120" preserveAspectRatio="xMinYMid meet" aria-hidden="true">
+        ${e('M20,60 C60,60 80,30 120,30')}${e('M20,60 C60,60 80,90 120,90')}${e('M120,30 C170,30 190,60 240,60', 1)}${e('M120,90 C170,90 190,60 240,60')}
+        ${e('M120,30 C140,50 140,70 120,90')}${e('M240,60 L360,60', 1)}${e('M240,60 C280,60 300,100 340,104')}
+        ${n(20, 60, 5)}${n(120, 30, 7)}${n(120, 90, 7)}${n(240, 60, 7)}${n(360, 60, 9, 1)}${n(340, 104, 5)}
       </svg>`;
     }
     if (kind !== 'curves') return '';
@@ -2731,10 +2774,171 @@
     render();
   }
 
+  // ── Case study: Markov chain attribution ──────────
+  function renderMarkov(root, project) {
+    let uid = 0;
+    const kit = () => {
+      const id = 'mk' + (++uid);
+      const T = (x, y, t, cls, anchor, style) => `<text class="${cls}" x="${x}" y="${y}" text-anchor="${anchor || 'start'}"${style ? ` style="${style}"` : ''}>${t}</text>`;
+      const L = (x1, y1, x2, y2, c, w, dash, arrow) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--f-${c || 'ink'})" stroke-width="${w || 1}"${dash ? ` stroke-dasharray="${dash}"` : ''}${arrow ? ` marker-end="url(#${id}${c === 'ink' ? 'i' : 's'})"` : ''}/>`;
+      const Box = (x, y, w, h, label, kind) => {
+        const fill = kind === 'ink' ? 'var(--f-ink)' : 'none';
+        const stroke = kind === 'soft' ? 'var(--f-mid)' : 'var(--f-ink)';
+        const dash = kind === 'soft' ? ' stroke-dasharray="4 3"' : '';
+        const tStyle = kind === 'ink' ? 'fill:var(--f-bg)' : (kind === 'soft' ? 'fill:var(--f-soft)' : '');
+        return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" stroke="${stroke}" stroke-width="1"${dash}/>` + T(x + w / 2, y + h / 2 + 4, label, 'f-up', 'middle', tStyle);
+      };
+      const Dot = (x, y, r, kind) => kind === 'hollow'
+        ? `<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="var(--f-mid)" stroke-width="1" stroke-dasharray="2 2"/>`
+        : `<circle cx="${x}" cy="${y}" r="${r}" fill="var(--f-${kind || 'ink'})"/>`;
+      const defs = `<defs>
+        <marker id="${id}i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9" fill="none" stroke="var(--f-ink)" stroke-width="1.2"/></marker>
+        <marker id="${id}s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9" fill="none" stroke="var(--f-soft)" stroke-width="1.2"/></marker>
+      </defs>`;
+      return { T, L, Box, Dot, defs };
+    };
+    const svg = (h, label, body, defs) => `<svg viewBox="0 0 440 ${h}" role="img" aria-label="${esc(label)}">${defs}${body}</svg>`;
+    const fig = (n, kind, title, art, cap) => `<figure class="fig mdiag"><p class="fig-k">Fig. ${n} &middot; ${kind}</p><p class="fig-t">${title}</p>${art}<figcaption><span><em>Fig. ${n}</em> &mdash; ${cap}</span></figcaption></figure>`;
+
+    // Fig. 1: one journey, and what last-click does with it
+    const f1 = (() => {
+      const { T, L, Dot, defs } = kit();
+      const xs = [25, 120, 215, 310, 405], names = ['START', 'INSTAGRAM', 'ONLINE DISPLAY', 'PAID SEARCH', 'CONVERSION'];
+      let b = '';
+      for (let i = 0; i < 4; i++) b += L(xs[i] + 8, 55, xs[i + 1] - 10, 55, 'soft', 1.2, null, true);
+      xs.forEach((x, i) => {
+        b += Dot(x, 55, i === 4 ? 7 : 5, i === 4 ? 'ink' : (i === 0 ? 'soft' : 'mid'));
+        const above = i % 2 === 1;
+        b += T(i === 4 ? 425 : (i === 0 ? 15 : x), above ? 36 : 82, names[i], 'f-up', i === 4 ? 'end' : (i === 0 ? 'start' : 'middle'), i === 4 ? '' : 'fill:var(--f-soft)');
+      });
+      b += T(15, 118, 'LAST-CLICK CREDIT', 'f-up');
+      [[120, false], [215, false], [310, true]].forEach(([x, on]) => {
+        b += on ? `<rect x="${x - 34}" y="128" width="68" height="16" fill="var(--f-ink)"/>`
+                : `<rect x="${x - 34}" y="128" width="68" height="16" fill="var(--f-wash)" stroke="var(--f-mid)" stroke-width="0.8"/>`;
+        b += T(x, 160, on ? '100%' : '0%', 'f-num', 'middle', on ? 'fill:var(--f-ink)' : '');
+      });
+      b += T(15, 186, 'the channels that started the journey get nothing', 'f-it');
+      return svg(196, 'An example journey: Instagram, Online Display, then Paid Search before converting. Last-click gives Paid Search all the credit.', b, defs);
+    })();
+
+    // Fig. 2: from rows to a journey
+    const f2 = (() => {
+      const { T, L, Box, defs } = kit();
+      let b = T(15, 24, 'CUSTOMER', 'f-up') + T(112, 24, 'WHEN', 'f-up') + T(172, 24, 'CHANNEL', 'f-up');
+      [['A', 'Day 1', 'Instagram'], ['A', 'Day 3', 'Online Display'], ['A', 'Day 6', 'Paid Search']].forEach((r, i) => {
+        const y = 56 + i * 28;
+        b += L(15, y - 18, 270, y - 18, 'rule', 1) + T(15, y, r[0], 'f-ax') + T(112, y, r[1], 'f-ax') + T(172, y, r[2], 'f-ax', 'start', 'fill:var(--f-ink)');
+      });
+      b += L(15, 122, 270, 122, 'rule', 1) + T(172, 142, 'then converted', 'f-it');
+      b += L(274, 92, 296, 92, 'ink', 1.4, null, true);
+      ['START', 'INSTAGRAM', 'ONLINE DISPLAY', 'PAID SEARCH', 'CONVERSION'].forEach((t, i) => {
+        const y = 14 + i * 34;
+        b += Box(300, y, 136, 22, t, i === 4 ? 'ink' : (i === 0 ? 'soft' : null));
+        if (i < 4) b += L(368, y + 23, 368, y + 33, 'soft', 1, null, true);
+      });
+      b += T(15, 188, 'touchpoints, sorted by time, become one journey', 'f-it');
+      return svg(196, 'An example customer’s touchpoints, sorted by time, folded into a single journey from start to conversion.', b, defs);
+    })();
+
+    // Fig. 3: the chain
+    const f3 = (() => {
+      const { T, L, Box, defs } = kit();
+      const ch = ['FACEBOOK', 'INSTAGRAM', 'ONLINE DISPLAY', 'ONLINE VIDEO', 'PAID SEARCH'];
+      let b = '';
+      ch.forEach((t, i) => {
+        const cy = 33 + i * 48;
+        b += L(92, 130, 162, cy, 'soft', 1, null, true);
+        b += L(287, cy, 327, 93, 'ink', 1, null, true);
+        b += L(287, cy, 327, 167, 'soft', 1, '3 3', true);
+      });
+      ch.forEach((t, i) => { b += Box(165, 20 + i * 48, 120, 26, t); });
+      b += Box(20, 117, 70, 26, 'START', 'soft') + Box(330, 80, 100, 26, 'CONVERSION', 'ink') + Box(330, 154, 100, 26, 'DROP-OFF', 'soft');
+      b += T(15, 268, 'every arrow has a probability, counted from the data', 'f-it');
+      return svg(278, 'The chain: customers start, move through the five channels, and end in a conversion or a drop-off.', b, defs);
+    })();
+
+    // Fig. 4: removing a channel
+    const f4 = (() => {
+      const { T, L, Dot, defs } = kit();
+      let b = '';
+      const panel = (x0, removed) => {
+        let p = T(x0, 22, removed ? 'WITHOUT FACEBOOK' : 'ALL FIVE CHANNELS', 'f-up', 'start', removed ? '' : 'fill:var(--f-soft)');
+        const cys = [48, 68, 88, 108, 128];
+        cys.forEach((cy, i) => {
+          const gone = removed && i === 0;
+          p += L(x0 + 15, 88, x0 + 84, cy, 'soft', 1);
+          p += gone ? L(x0 + 96, cy, x0 + 172, 120, 'mid', 1, '3 3') : L(x0 + 96, cy, x0 + 172, 70, 'ink', 1);
+        });
+        p += Dot(x0 + 10, 88, 5, 'soft');
+        cys.forEach((cy, i) => { p += (removed && i === 0) ? Dot(x0 + 90, cy, 5, 'hollow') + L(x0 + 85, cy - 5, x0 + 95, cy + 5, 'ink', 1.2) + L(x0 + 95, cy - 5, x0 + 85, cy + 5, 'ink', 1.2) : Dot(x0 + 90, cy, 5, 'mid'); });
+        p += Dot(x0 + 178, 70, 7, 'ink') + Dot(x0 + 178, 120, 6, 'hollow');
+        return p;
+      };
+      b += panel(15, false) + panel(235, true);
+      b += T(15, 162, 'CHANCE OF CONVERTING', 'f-up', 'start', 'fill:var(--f-soft)');
+      b += `<rect x="15" y="172" width="180" height="14" fill="var(--f-ink)"/>`;
+      b += `<rect x="235" y="172" width="130" height="14" fill="var(--f-ink)"/>`;
+      b += `<rect x="365" y="172" width="50" height="14" fill="none" stroke="var(--f-mid)" stroke-width="1" stroke-dasharray="3 3"/>`;
+      b += L(365, 194, 415, 194, 'ink', 1) + T(390, 212, 'removal effect', 'f-it', 'middle');
+      return svg(222, 'Illustrative: with Facebook removed, its customers drop off and the chance of converting falls. The fall is Facebook’s removal effect.', b, defs);
+    })();
+
+    const results = figureHtml({ type: 'bars', title: 'Share of conversion credit, by channel', series: [], bar: ['Facebook | 28', 'Paid Search | 26', 'Instagram | 17', 'Online Video | 16', 'Online Display | 12'], unit: '%', highlight: 'Facebook', note: 'the most credit', caption: 'Share of the 17,639 conversions credited to each channel by its removal effect. Rounded, so they add to 99%.', source: 'the analysis' }, 5);
+    const headline = figureHtml({ type: 'number', value: '54%', text: 'of all the credit goes to Facebook and Paid Search together, more than the other three channels combined.' }, 6);
+
+    root.innerHTML = `
+      <div class="cs">
+        <p class="post-kicker">${esc(project.tag || 'Case study')} &middot; Marketing attribution &middot; 2023</p>
+        <h1 class="post-title">Which channels really drive conversions?</h1>
+        <p class="calc-intro">Customers often see several ads before they buy, but standard reporting hands all the credit to the last one. I built a Markov chain model that instead credits each channel by how much the customer journey falls apart without it.</p>
+        <p class="cs-tools">Python &middot; pandas &middot; NumPy</p>
+        <div class="cs-stats">
+          <div class="cs-stat"><b>600k</b><span>Touchpoints</span></div>
+          <div class="cs-stat"><b>250k</b><span>Customers</span></div>
+          <div class="cs-stat"><b>5</b><span>Channels</span></div>
+          <div class="cs-stat"><b>17,639</b><span>Conversions</span></div>
+        </div>
+        <div class="post-body" id="cs-body">
+          <h2>The problem</h2>
+          <p>A customer might see an Instagram ad, then a display banner, then search for the brand and buy. Last-click reporting gives all the credit to search, which makes the channels that started the journey look worthless. Rules like &ldquo;split it evenly&rdquo; are no better: they&rsquo;re just a different guess.</p>
+          ${fig(1, 'Example', 'One journey, many touches', f1, 'An example journey. Last-click reporting gives all the credit to the final touch.')}
+
+          <h2>The data</h2>
+          <p>The analysis used a public eCommerce dataset: about 600,000 touchpoints from 250,000 customers, across five channels: Facebook, Instagram, Online Display, Online Video and Paid Search. Each touchpoint records who saw which channel, when, and whether it ended in a conversion.</p>
+          <p>I sorted each customer&rsquo;s touchpoints by time and folded them into a single journey, from a common start to either a conversion or a drop-off. Two real journeys from the data: Start, Instagram, Online Display, then a drop-off; and Start, Paid Search, then a drop-off.</p>
+          ${fig(2, 'Example', 'From rows to a journey', f2, 'An example customer. Journeys that never convert end in a drop-off instead.')}
+
+          <h2>Journeys as a chain</h2>
+          <p>A Markov chain treats each channel as a state and asks a simple question: from here, where do customers go next? Counting every move in the data gives the probability of each step, such as from Instagram to Paid Search, or from Paid Search to a conversion. The simplifying assumption is that the next step depends only on where a customer is now, not on the whole path behind them.</p>
+          ${fig(3, 'Diagram', 'Every journey, as one system', f3, 'The chain’s states and the moves between them. Customers can also move between channels, which isn’t drawn here.')}
+
+          <h2>Taking a channel away</h2>
+          <p>To value a channel, take it out of the chain and send everyone who would have passed through it to a drop-off instead. Then work out how likely a customer is to reach a conversion from the start. The fall in that probability is the channel&rsquo;s removal effect: how much the whole system relies on it.</p>
+          <p>Doing this for every channel, then sharing out the 17,639 conversions in proportion to their removal effects, gives each channel its credit.</p>
+          ${fig(4, 'Example', 'The removal effect', f4, 'Illustrative. Take a channel out, send its customers to a drop-off, and see how far the chance of converting falls.')}
+
+          <h2>What it found</h2>
+          <p>Facebook earns the most credit, at 28% of conversions, closely followed by Paid Search at 26%. Instagram, Online Video and Online Display trail well behind.</p>
+          ${results}
+          <p>Together, Facebook and Paid Search account for more than half of all the credit. Facebook alone earns almost as much as Online Display and Online Video combined.</p>
+          ${headline}
+
+          <h2>Why it matters</h2>
+          <p>Because the credit comes from how customers actually move between channels, rather than from a fixed rule, it gives marketing and growth teams firmer evidence for decisions about their channel mix.</p>
+        </div>
+        <p class="cs-links"><a href="https://github.com/henrybellhouse/markovchains" target="_blank" rel="noopener">View the code on GitHub &rarr;</a></p>
+      </div>`;
+
+    const body = root.querySelector('#cs-body');
+    projectRedraw = () => drawFigures(body);
+    drawFigures(body);
+  }
+
   // Live projects and the function that draws each one
   const PROJECT_VIEWS = {
     'sample-size': renderSampleSize,
     'causal-method-finder': renderMethodFinder,
+    'markov-attribution': renderMarkov,
   };
 
   // The button names the mode it switches to
