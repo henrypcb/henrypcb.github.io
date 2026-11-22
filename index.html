@@ -3543,9 +3543,9 @@
             <p class="gm-ch-p">One number that shows customers getting value from your product. Then break it into the parts that multiply or add up to it, such as customers &times; share who buy &times; spend per buyer. Choose the one part your growth model in chapter 2 will count.</p>
             <div class="gm-ns-eg"><span>Start from an example:</span> ${EXAMPLES.map(([t], i) => `<button type="button" class="calc-link" data-ex="${i}">${t}</button>`).join('')}<span class="gm-undo" id="gm-undo" hidden><button type="button" class="calc-link" id="gm-undo-btn">Undo</button></span></div>
             <div class="gm-ai" id="gm-ai" hidden>
-              <label class="calc-label" for="gm-ai-text">Or describe your product, and draft a model with on-device AI</label>
-              <textarea class="f-text gm-ai-text" id="gm-ai-text" maxlength="600" placeholder="For example: a savings app. People sign up, verify their identity, add money, then save every month. Some refer friends."></textarea>
-              <div class="f-actions"><button type="button" class="f-btn" id="gm-ai-go">Draft my model</button><span class="calc-help" id="gm-ai-status">Runs on your device with Chrome&rsquo;s built-in AI. Nothing you type leaves your browser.</span></div>
+              <label class="calc-label" for="gm-ai-text">Or describe your product, and Chrome&rsquo;s built-in AI will draft a model to edit</label>
+              <textarea class="f-text gm-ai-text" id="gm-ai-text" maxlength="800" placeholder="For example: a budgeting app. People download it, connect their bank, set a budget, then check in each week. Most keep going month to month, and happy users tell friends. Value shows up as people who stick to a budget."></textarea>
+              <div class="f-actions"><button type="button" class="f-btn" id="gm-ai-go">Draft my model</button><span class="calc-help" id="gm-ai-status">Runs on your device with Chrome&rsquo;s built-in AI. The more you say about the steps and what customers value, the better the draft. Nothing you type leaves your browser.</span></div>
             </div>
             <div class="mt" id="gm-tree"></div>
             <p class="calc-help mt-note" id="gm-tree-note"></p>
@@ -3726,45 +3726,77 @@
         if (await LanguageModel.availability(LM_OPTS) === 'available' && root.isConnected) $('#gm-ai').hidden = false;
       } catch (e) {}
     })();
+    // ── Draft a model with Chrome's built-in AI, grounded in the described product.
+    // Two short asks in one session (so the product stays in mind); references are by
+    // position and type, so a small model never has to echo step names back exactly.
+    const AI_PCT = x => clamp(num(x), 1, 100);
+    const AI_IDX = (i, last) => clamp(Math.round(num(i)), 0, last);
+    const AI_STAY = x => { let v = num(x); if (v > 1) v /= 100; return clamp(v, 0.5, 0.99); };
+    const AI_REFER = x => { let v = num(x); if (v > 1) v /= 100; return clamp(v, 0.005, 0.5); };
+    const AI_UNIT = k => k === 'percent' ? 'p' : (k === 'money' || k === 'pounds' ? 'g' : 'n');
+
+    // Turn the two AI answers into a model we can load. Pure, so it can be tested on its own.
+    function modelFromDraft(a, b) {
+      const names = (b.steps || []).map(s => String(s && s.name || '').slice(0, 40).trim()).filter(Boolean).slice(0, MAX_STEPS);
+      if (names.length < 2) return null;
+      const factors = (a.factors || []).filter(f => f && f.name).slice(0, 4);
+      let linkI = factors.findIndex(f => f.kind === 'people');
+      if (linkI < 0) linkI = factors.length ? 0 : -1;
+      const steps = names.map((nm, i) => ({ id: 'a' + i, name: nm, from: i ? 'a' + (i - 1) : null, rate: i ? AI_PCT(b.steps[i] && b.steps[i].percentOfPrevious) : 100, inf: [1, 1, 1] }));
+      const last = steps.length - 1;
+      // The journey produces the "people" factor, so name the last step after it.
+      if (linkI >= 0 && factors[linkI]) steps[last].name = String(factors[linkI].name).slice(0, 40);
+      const tree = factors.length < 2
+        ? { id: 't0', name: String(a.northStar || 'North Star').slice(0, 60), op: 'x', unit: 'n', v: 1, link: true, inf: [1, 1, 1], kids: [] }
+        : { id: 't0', name: String(a.northStar || 'North Star').slice(0, 60), op: 'x', unit: 'n', v: 1, link: false, inf: [1, 1, 1],
+            kids: factors.map((f, i) => ({ id: 't' + (i + 1), name: String(f.name).slice(0, 60), op: 'x', unit: i === linkI ? 'n' : AI_UNIT(f.kind), v: i === linkI ? null : Math.max(0, num(f.value)), link: i === linkI, kids: [], inf: [1, 1, 1] })) };
+      const loops = (b.loops || []).slice(0, MAX_LOOPS).map(l => {
+        const at = AI_IDX(l && l.atStep, last);
+        return (l && l.type === 'acquisition')
+          ? { name: String(l && l.name || 'Bring a friend').slice(0, 40), from: 'a' + (at || last), to: 'a0', k: AI_REFER(l && l.strength) }
+          : { name: String(l && l.name || 'Stay').slice(0, 40), from: 'a' + at, to: 'a' + at, k: AI_STAY(l && l.strength) };
+      });
+      return clean({ entry: Math.max(1, num(a.newPeoplePerMonth) || 10000), ns: { name: tree.name, checks: ['', '', ''] }, steps, loops, goal: 'a' + last, tree });
+    }
+
     $('#gm-ai-go').addEventListener('click', async () => {
       const text = $('#gm-ai-text').value.trim(), btn = $('#gm-ai-go'), status = $('#gm-ai-status');
       if (text.length < 15) { status.textContent = 'Describe your product in a sentence or two first.'; return; }
       btn.disabled = true; btn.textContent = 'Drafting…';
+      let session = null;
       try {
-        const part = { type: 'object', properties: { name: { type: 'string' }, unit: { type: 'string', enum: ['number', 'percent', 'pounds'] }, value: { type: 'number' }, countedByJourney: { type: 'boolean' } }, required: ['name', 'unit', 'value', 'countedByJourney'] };
-        const schema = { type: 'object', required: ['northStar', 'parts', 'newPeoplePerMonth', 'steps', 'loops'], properties: {
-          northStar: { type: 'string' }, parts: { type: 'array', items: part },
-          newPeoplePerMonth: { type: 'number' },
-          steps: { type: 'array', items: { type: 'object', required: ['name', 'after', 'percent'], properties: { name: { type: 'string' }, after: { type: 'string' }, percent: { type: 'number' } } } },
-          loops: { type: 'array', items: { type: 'object', required: ['name', 'from', 'to', 'perPerson'], properties: { name: { type: 'string' }, from: { type: 'string' }, to: { type: 'string' }, perPerson: { type: 'number' } } } }
-        } };
-        const prompt = 'You help product teams sketch a growth model. From the description below, draft:\n' +
-          '1. northStar: one metric that shows customers getting value (not revenue unless the product is about spending).\n' +
-          '2. parts: 2 or 3 parts that multiply to give the North Star. Exactly one part is a number of people, marked countedByJourney true, with value 0. Give the others rough values.\n' +
-          '3. steps: 3 to 6 steps in order, from first hearing about the product to the people counted in that part. The first step has after "" and percent 100. Each later step names the step it comes after and the rough percent of those people who reach it. The last step has the same name as the counted part.\n' +
-          '4. loops: up to 2. A loop where a step leads back to itself means people staying each month (perPerson below 1, such as 0.95). A loop to the first step means each person bringing in new people each month (usually small, such as 0.05).\n' +
-          '5. newPeoplePerMonth: a rough number.\nUse plain English names of at most 4 words.\n\nDescription: ' + text;
-        const session = await LanguageModel.create(LM_OPTS);
-        const r = JSON.parse(await session.prompt(prompt, { responseConstraint: schema }));
-        session.destroy && session.destroy();
-        const names = (r.steps || []).slice(0, MAX_STEPS).map(x => String(x.name || '').slice(0, 40));
-        const sid = nm => { const i = names.findIndex(n => n.toLowerCase() === String(nm || '').toLowerCase()); return i >= 0 ? 'a' + i : null; };
-        const steps = names.map((nm, i) => ({ id: 'a' + i, name: nm, from: i ? (sid(r.steps[i].after) && sid(r.steps[i].after) !== 'a' + i ? sid(r.steps[i].after) : 'a' + (i - 1)) : null, rate: i ? r.steps[i].percent : 100, inf: [1, 1, 1] }));
-        const parts = (r.parts || []).slice(0, 4);
-        const linkI = Math.max(0, parts.findIndex(p => p.countedByJourney));
-        const tree = { id: 't0', name: String(r.northStar || 'North Star'), op: 'x', unit: 'n', v: 1, link: parts.length < 2, inf: [1, 1, 1],
-          kids: parts.length < 2 ? [] : parts.map((p, i) => ({ id: 't' + (i + 1), name: p.name, op: 'x', unit: p.unit === 'percent' ? 'p' : (p.unit === 'pounds' ? 'g' : 'n'), v: i === linkI ? null : p.value, link: i === linkI, kids: [], inf: [1, 1, 1] })) };
-        const last = steps.length - 1;
-        const linkedName = parts[linkI] ? parts[linkI].name : '';
-        const goal = sid(linkedName) || 'a' + last;
-        const loops = (r.loops || []).slice(0, MAX_LOOPS).map(l => ({ name: l.name, from: sid(l.from) || goal, to: sid(l.to) || 'a0', k: l.perPerson }));
-        const next = clean({ entry: r.newPeoplePerMonth || 10000, ns: { name: tree.name, checks: ['', '', ''] }, steps, loops, goal, tree });
+        session = await LanguageModel.create(LM_OPTS);
+        status.textContent = 'Working out your North Star…';
+        const factor = { type: 'object', required: ['name', 'kind', 'value'], properties: { name: { type: 'string' }, kind: { type: 'string', enum: ['people', 'percent', 'money', 'number'] }, value: { type: 'number' } } };
+        const aSchema = { type: 'object', required: ['northStar', 'newPeoplePerMonth', 'factors'], properties: { northStar: { type: 'string' }, newPeoplePerMonth: { type: 'number' }, factors: { type: 'array', items: factor } } };
+        const aPrompt = 'You help a product team sketch a growth model. A product is described at the end.\n' +
+          'Give its North Star: the one number that shows customers getting real value (not revenue, unless the product is fundamentally about spending). ' +
+          'Then give 2 or 3 factors that MULTIPLY to make that North Star. Exactly one factor must be a count of people or customers — give it kind "people" and value 0. ' +
+          'Give each other factor a realistic rough value and the right kind (percent, money, or number). Also estimate how many new people discover the product each month. ' +
+          'Use short, product-specific names (at most 4 words).\n' +
+          'Example — a meal-kit subscription: northStar "Boxes delivered a month"; factors [Active subscribers (people, 0), Boxes per subscriber (number, 4)]; newPeoplePerMonth 20000.\n\n' +
+          'Product: ' + text;
+        const a = JSON.parse(await session.prompt(aPrompt, { responseConstraint: aSchema }));
+        const counted = ((a.factors || []).find(f => f && f.kind === 'people') || {}).name || 'customers';
+        status.textContent = 'Sketching the journey and loops…';
+        const bSchema = { type: 'object', required: ['steps', 'loops'], properties: {
+          steps: { type: 'array', items: { type: 'object', required: ['name', 'percentOfPrevious'], properties: { name: { type: 'string' }, percentOfPrevious: { type: 'number' } } } },
+          loops: { type: 'array', items: { type: 'object', required: ['name', 'type', 'atStep', 'strength'], properties: { name: { type: 'string' }, type: { type: 'string', enum: ['retention', 'acquisition'] }, atStep: { type: 'integer' }, strength: { type: 'number' } } } } } };
+        const bPrompt = 'Now map the journey people take to become "' + counted + '", in order, starting from first hearing about the product. ' +
+          'Give 3 to 6 steps. The first step is first contact; each later step gives the rough percentage of the previous step who reach it. ' +
+          'Use short, product-specific names. The LAST step must be "' + counted + '".\n' +
+          'Then up to 2 loops. type "retention" = people who stay month to month (atStep = the step index they stay at, strength like 0.9). ' +
+          'type "acquisition" = people who bring in new people (atStep = the step index, strength small like 0.05). Steps are numbered from 0.\n' +
+          'Example for the meal kit: steps [Visit (100), Start a trial box (8), Cook the first box (70), Active subscribers (60)]; loops [retention atStep 3 strength 0.9, acquisition atStep 3 strength 0.05].';
+        const b = JSON.parse(await session.prompt(bPrompt, { responseConstraint: bSchema }));
+        const next = modelFromDraft(a, b);
         if (!next) throw new Error('empty');
         replaceModel(next);
-        status.textContent = 'Here’s a first draft. Check every number: they’re rough guesses to edit.';
+        status.textContent = 'Here’s a draft from what you described. Every number is a rough guess — edit them to fit, then move on to chapter 2.';
       } catch (e) {
-        status.textContent = 'Couldn’t draft a model this time. Try describing the steps people take, or start from an example.';
+        status.textContent = 'Couldn’t draft a model this time. Try describing the steps people take in a sentence or two, or start from an example above.';
       }
+      if (session && session.destroy) session.destroy();
       btn.disabled = false; btn.textContent = 'Draft my model';
     });
 
