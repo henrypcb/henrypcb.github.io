@@ -2118,7 +2118,7 @@
 
   function renderProjectGrid(list) {
     document.getElementById('projects-count').textContent =
-      String(list.length).padStart(3, '0') + (list.length === 1 ? ' project' : ' projects');
+      String(list.length).padStart(3, '0') + (list.length === 1 ? ' piece' : ' pieces');
     const grid = document.getElementById('projects-index');
     grid.innerHTML = list.map((p, i) => {
       const live = p.live && PROJECT_VIEWS[p.slug];
