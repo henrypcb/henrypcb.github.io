@@ -1,9 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <script>
-    sessionStorage.setItem('redirect', window.location.pathname);
-    window.location.href = '/';
-  </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Page not found — Henry</title>
+<script>
+  // Hand the address to the main page, which shows the right section or a not-found page
+  try { sessionStorage.setItem('redirect', location.pathname); } catch (e) {}
+  location.replace('/');
+</script>
 </head>
+<body>
+<p>Page not found. <a href="/">Go to the home page</a>.</p>
+</body>
 </html>

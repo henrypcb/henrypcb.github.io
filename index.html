@@ -15,11 +15,13 @@
 
 <script>
   try { if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}
-  const redirect = sessionStorage.getItem('redirect');
-  if (redirect) {
-    sessionStorage.removeItem('redirect');
-    history.replaceState(null, '', redirect);
-  }
+  try {
+    const redirect = sessionStorage.getItem('redirect');
+    if (redirect) {
+      sessionStorage.removeItem('redirect');
+      history.replaceState(null, '', redirect);
+    }
+  } catch (e) {}
 </script>
 
 <style>
@@ -491,10 +493,11 @@
   .mk-c.none { color: var(--f-mid); background: none; }
   .mk-mx[data-sel] .mk-c:not(.on) { opacity: 0.45; }
   .mk-flow { margin-top: 28px; }
-  .mk-flow svg, .mk-rm svg { display: block; width: 100%; max-width: 420px; height: auto; overflow: visible; }
+  .mk-rm svg { display: block; width: 100%; max-width: 420px; height: auto; overflow: visible; }
+  .mdiag .mk-flow svg { display: block; width: 100%; max-width: none; height: auto; overflow: visible; }
   .mk-flow text, .mk-rm text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-  .mk-flow .f-ax, .mk-rm .f-num { font-size: 11px; }
-  .mk-flow .f-num { font-size: 11px; }
+  .mk-rm .f-num { font-size: 11px; }
+  .mk-flow .f-ax, .mk-flow .f-num { font-size: 12px; }
 
   .mk-toggles { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; }
   .mk-tog { font: inherit; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; background: none; color: var(--f-soft); border: 1px solid var(--f-rule); padding: 8px 11px; cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s; }
@@ -758,11 +761,27 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.4);
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
     cursor: pointer;
     transition: color 0.2s;
   }
 
-  .lightbox-close:hover { color: white; }
+  .lightbox-close:hover,
+  .lightbox-close:focus-visible { color: white; }
+  .lightbox-close:focus-visible { outline: 1px solid white; outline-offset: 4px; }
+
+  /* Keyboard focus: visible wherever the default ring was removed or missing */
+  .calc-range:focus-visible { outline: 1px solid var(--black); outline-offset: 10px; }
+  .carousel-slide img:focus { outline: none; }
+  .carousel-slide img:focus-visible { outline: 2px solid var(--black); outline-offset: -2px; }
+
+  /* ─── NOT FOUND ───────────────────────────────────── */
+  .notfound-title { font-family: Georgia, serif; font-weight: 400; font-size: 32px; margin-bottom: 16px; }
+  .notfound p { color: var(--gray); line-height: 1.6; }
+  .notfound a { color: var(--black); }
 
   /* ─── FOOTER ──────────────────────────────────────── */
   footer {
@@ -1121,12 +1140,12 @@
 <body>
 
 <nav>
-  <a class="nav-brand" href="#" onclick="show('home'); return false;">Henry</a>
+  <a class="nav-brand" href="/" onclick="return navClick(event, 'home')">Henry</a>
   <ul class="nav-links">
-    <li><a href="#" onclick="show('projects'); return false;" id="nav-projects">Projects</a></li>
-    <li><a href="#" onclick="show('experience'); return false;" id="nav-experience">Experience</a></li>
-    <li><a href="#" onclick="show('writing'); return false;" id="nav-writing">Writing</a></li>
-    <li><a href="#" onclick="show('photography'); return false;" id="nav-photography">Photography</a></li>
+    <li><a href="/projects" onclick="return navClick(event, 'projects')" id="nav-projects">Projects</a></li>
+    <li><a href="/experience" onclick="return navClick(event, 'experience')" id="nav-experience">Experience</a></li>
+    <li><a href="/writing" onclick="return navClick(event, 'writing')" id="nav-writing">Writing</a></li>
+    <li><a href="/photography" onclick="return navClick(event, 'photography')" id="nav-photography">Photography</a></li>
   </ul>
   <button class="dark-toggle" id="dark-toggle" onclick="toggleDark()">Light</button>
 </nav>
@@ -1185,7 +1204,7 @@
       </ul>
       <div class="experience-role-row">
         <span class="experience-role">Data Scientist</span>
-        <span class="experience-dates">Oct 2023 — Sep 2025</span>
+        <span class="experience-dates">Oct 2023 — Oct 2025</span>
       </div>
       <ul class="experience-points">
         <li>Led the experimentation roadmap for a £100m lending portfolio. I decided what we tested across acquisition, activation and pricing, running over 30 A/B tests that grew loan volume by 35%.</li>
@@ -1200,15 +1219,15 @@
         <span class="experience-company-name">Klarna</span>
       </div>
       <div class="experience-role-row">
-        <span class="experience-role">Analyst II, Strategy &amp; Analytics</span>
-        <span class="experience-dates">May 2022 — Apr 2023</span>
+        <span class="experience-role">Strategy Associate</span>
+        <span class="experience-dates">Apr 2022 — Apr 2023</span>
       </div>
       <ul class="experience-points">
         <li>Shaped the growth roadmap for PriceRunner, Klarna&rsquo;s price comparison site, built on sizing the overlap between its customers and Klarna&rsquo;s. It led to a new five-person growth squad.</li>
         <li>Won C-suite approval to launch a product in two European markets that turned Pay in 3 and Pay Later purchases into longer-term loans, by showing the unmet need, building the commercial case and forecasting the revenue.</li>
       </ul>
       <div class="experience-role-row">
-        <span class="experience-role">Analyst I, Strategy &amp; Analytics</span>
+        <span class="experience-role">Strategy Analyst</span>
         <span class="experience-dates">Nov 2021 — Apr 2022</span>
       </div>
       <ul class="experience-points">
@@ -1312,8 +1331,15 @@
 </section>
 
 
-<div class="lightbox" id="lightbox">
-  <span class="lightbox-close" id="lightbox-close">Close &times;</span>
+<section class="section notfound" id="notfound">
+  <h1 class="notfound-title">Page not found</h1>
+  <p>There&rsquo;s nothing at this address. It may have moved, or the link may be mistyped.</p>
+  <p><a href="/" onclick="return navClick(event, 'home')">Go to the home page &rarr;</a></p>
+</section>
+
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo, full size" hidden>
+  <button type="button" class="lightbox-close" id="lightbox-close">Close &times;</button>
   <img id="lightbox-img" src="" alt="" />
 </div>
 
@@ -1323,11 +1349,21 @@
 
 <script>
   // ── Navigation ────────────────────────────────────
-  const VALID = ['home', 'projects', 'experience', 'writing', 'photography'];
+  const VALID = ['home', 'projects', 'experience', 'writing', 'photography', 'notfound'];
   let navTimer = null;
   let projectRedraw = null;
 
+  // Plain clicks move within the page; Cmd/Ctrl/Shift/middle-click keep the browser's
+  // own behaviour, so links open in a new tab or window as expected.
+  function navClick(e, route) {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button > 0) return true;
+    e.preventDefault();
+    show(route);
+    return false;
+  }
+
   function activate(id, animated) {
+    if (typeof closeLightbox === 'function' && !lightbox.hidden) closeLightbox(false);
     document.querySelectorAll('.section').forEach(s => s.classList.remove('visible', 'fade-out', 'fade-in'));
     const next = document.getElementById(id);
     next.classList.add('visible');
@@ -1337,7 +1373,8 @@
     if (navEl) navEl.classList.add('active');
     window.scrollTo(0, 0);
     if (id === 'photography') onPhotographyShown();
-    if (id !== 'writing' && id !== 'projects') document.title = baseTitle;
+    if (id === 'notfound') document.title = 'Page not found — Henry';
+    else if (id !== 'writing' && id !== 'projects') document.title = baseTitle;
     if (id === 'projects' && projectRedraw) projectRedraw();
     if (id === 'writing') drawFigures(document.getElementById('post-body'));
   }
@@ -1349,7 +1386,8 @@
     if (!VALID.includes(id)) { id = 'home'; slug = undefined; }
     if (id !== 'writing' && id !== 'projects') slug = undefined;
 
-    if (push) {
+    // The not-found page keeps the address that was asked for, so it's never pushed
+    if (push && id !== 'notfound') {
       const url = id === 'home' ? '/' : '/' + id + (slug ? '/' + slug : '');
       if (location.pathname !== url) history.pushState(null, '', url);
     }
@@ -1366,11 +1404,20 @@
     navTimer = setTimeout(() => activate(id, true), 300);
   }
 
+  // True while the address still matches what an async render was started for
+  function stillAt(base, slug) {
+    const here = location.pathname.replace(/\/+$/, '') || '/';
+    return here === (slug ? base + '/' + slug : base);
+  }
+
   function pathToSection() {
-    const path = location.pathname.replace(/^\/+|\/+$/g, '') || 'home';
-    const [id, slug] = path.split('/');
-    if (!VALID.includes(id)) return 'home';
-    return (id === 'writing' || id === 'projects') && slug ? id + '/' + slug : id;
+    const path = location.pathname.replace(/^\/+|\/+$/g, '');
+    if (path === '' || path === 'index.html') return 'home';
+    const parts = path.split('/');
+    const [id, slug] = parts;
+    if (!VALID.includes(id) || id === 'home' || id === 'notfound') return 'notfound';
+    if (id === 'writing' || id === 'projects') return parts.length > 2 ? 'notfound' : (slug ? id + '/' + slug : id);
+    return parts.length > 1 ? 'notfound' : id;
   }
 
   // ── Writing ───────────────────────────────────────
@@ -1697,7 +1744,9 @@
     ['All', ...new Set(posts.map(p => p[key]))].forEach(v => {
       const n = v === 'All' ? posts.length : posts.filter(p => p[key] === v).length;
       const b = document.createElement('button');
+      b.type = 'button';
       b.className = 'wf-option' + (wState[key] === v ? ' on' : '');
+      b.setAttribute('aria-pressed', wState[key] === v);
       b.innerHTML = `<span class="wf-name">${esc(v)}</span><span class="wf-n">${n}</span>`;
       b.onclick = () => { wState[key] = v; renderIndex(posts); };
       box.appendChild(b);
@@ -1739,12 +1788,13 @@
 
   async function renderWriting(slug) {
     const posts = await loadPosts();
+    if (!stillAt('/writing', slug)) return;   // the visitor moved on while this loaded
     const index = document.getElementById('writing-index');
     const article = document.getElementById('writing-post');
     const post = slug && posts.find(p => p.slug === slug);
 
+    if (slug && !post) { show('notfound', { push: false, animate: false }); return; }
     if (!post) {
-      if (slug) history.replaceState(null, '', '/writing');
       article.hidden = true;
       article.style.display = 'none';
       index.hidden = false;
@@ -1774,17 +1824,19 @@
 
     try {
       const md = await loadPiece(post.slug);
+      if (!stillAt('/writing', slug)) return;
       body.innerHTML = markdown(md);
       drawFigures(body);
       body.querySelectorAll('a[href^="/"]').forEach(a => a.addEventListener('click', e => {
-        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
-        e.preventDefault();
-        show(a.getAttribute('href').replace(/^\/+|\/+$/g, '') || 'home');
+        const route = a.getAttribute('href').replace(/^\/+|\/+$/g, '');
+        if (/\.[a-z0-9]+$/i.test(route)) return;   // a file such as a PDF or photo: let the browser open it
+        if (navClick(e, route || 'home')) return;
         window.scrollTo(0, 0);
       }));
       const mins = Math.max(1, Math.round(md.split(/\s+/).length / 220));
       meta.textContent = fmtDate(post.date) + ' · ' + mins + ' min read';
     } catch (err) {
+      if (!stillAt('/writing', slug)) return;
       body.innerHTML = '<p>Sorry, this piece couldn&rsquo;t be loaded.</p>';
     }
   }
@@ -1870,13 +1922,14 @@
 
   async function renderProjects(slug) {
     const list = await loadProjects();
+    if (!stillAt('/projects', slug)) return;
     const index = document.getElementById('projects-index');
     const view = document.getElementById('project-view');
     const sec = document.getElementById('projects');
     const p = slug && list.find(x => x.slug === slug && x.live && PROJECT_VIEWS[x.slug]);
 
+    if (slug && !p) { show('notfound', { push: false, animate: false }); return; }
     if (!p) {
-      if (slug) history.replaceState(null, '', '/projects');
       view.hidden = true; view.style.display = 'none';
       index.hidden = false; index.style.display = '';
       sec.classList.remove('reading');
@@ -1926,29 +1979,8 @@
     return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
   }
 
-  // People per group for a two-sided test with equal groups
-  function nForRate(p1, lift, za, zb) {
-    const p2 = p1 * (1 + lift);
-    if (!(p1 > 0 && p1 < 1 && p2 > 0 && p2 < 1 && lift > 0)) return NaN;
-    const pbar = (p1 + p2) / 2;
-    const top = za * Math.sqrt(2 * pbar * (1 - pbar)) + zb * Math.sqrt(p1 * (1 - p1) + p2 * (1 - p2));
-    return Math.ceil(top * top / Math.pow(p2 - p1, 2));
-  }
-
-  function nForMean(mean, sd, lift, za, zb) {
-    const delta = Math.abs(mean * lift);
-    if (!(delta > 0 && sd > 0)) return NaN;
-    return Math.ceil(2 * Math.pow(za + zb, 2) * sd * sd / (delta * delta));
-  }
-
   const fmtInt = n => Math.round(n).toLocaleString('en-GB');
   const fmtNum = n => (+n.toFixed(2)).toLocaleString('en-GB', { maximumFractionDigits: 2 });
-  function fmtCompact(n) {
-    if (n >= 1e6) return (n / 1e6).toFixed(n < 1e7 ? 1 : 0).replace(/\.0$/, '') + 'm';
-    if (n >= 1e3) return (n / 1e3).toFixed(n < 1e4 ? 1 : 0).replace(/\.0$/, '') + 'k';
-    return String(Math.round(n));
-  }
-
   function renderSampleSize(root, project) {
     const st = { metric: 'rate', rate: 10, mean: 50, sd: 40, liftMode: 'rel', lift: 5, conf: 95, power: 80,
                  groups: 2, correct: true, control: 50, evenSplit: true, traffic: 5000 };
@@ -2133,17 +2165,18 @@
       }
       if (pts.length < 2) return;
       const narrow = W < 520, H = narrow ? 230 : 270;
-      const m = { l: 48, r: 20, t: 30, b: 30 };
       const xLo = pts[0][0], xHi = pts[pts.length - 1][0];
       const maxN = Math.max(...pts.map(p => p[1]));
       const step = niceStep(maxN / 3), top = step * Math.ceil(maxN / step);
+      // Axis labels are full numbers with commas, so make room for the widest one
+      const m = { l: Math.max(48, 16 + fmtInt(top).length * 6.5), r: 20, t: 30, b: 30 };
       const x = L => m.l + (L - xLo) / (xHi - xLo) * (W - m.l - m.r);
       const y = n => H - m.b - n / top * (H - m.t - m.b);
       const svg = sv('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img',
         'aria-label': `Total people needed, from ${fmtInt(pts[0][1])} at a ${fmtNum(xLo)}${u} lift to ${fmtInt(pts[pts.length - 1][1])} at ${fmtNum(xHi)}${u}` }, box);
       for (let v = 0; v <= top + 1e-9; v += step) {
         sv('line', { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), stroke: v ? 'var(--f-rule)' : 'var(--f-ink)', 'stroke-width': 1 }, svg);
-        svText(svg, 'f-ax', m.l - 8, y(v) + 3, fmtCompact(v), 'end');
+        svText(svg, 'f-ax', m.l - 8, y(v) + 3, fmtInt(v), 'end');
       }
       const xStep = niceStep((xHi - xLo) / (narrow ? 4 : 5));
       for (let L = Math.ceil(xLo / xStep) * xStep; L <= xHi + 1e-9; L += xStep) {
@@ -2173,6 +2206,20 @@
       hit.addEventListener('mouseleave', () => { cross.setAttribute('opacity', 0); dot.setAttribute('opacity', 0); hideTip(wrap); });
     }
 
+    // Says which number stops the calculation, checked in the order the fields appear
+    function inputProblem() {
+      if (isRate()) {
+        if (!(st.rate > 0 && st.rate < 100)) return 'The current conversion rate needs to be above 0% and below 100%.';
+      } else {
+        if (!(st.mean > 0)) return 'The current average needs to be above zero.';
+        if (!(st.sd > 0)) return 'The standard deviation needs to be above zero.';
+      }
+      if (!(st.lift > 0)) return 'The smallest lift worth detecting needs to be above zero.';
+      if (isRate() && !(target(st.lift) < 1)) return 'That lift takes the conversion rate to 100% or more. Choose a smaller lift.';
+      if (!st.evenSplit && !(st.control > 0 && st.control < 100)) return 'The control’s share of traffic needs to be above 0% and below 100%.';
+      return 'Check the numbers above.';
+    }
+
     function update() {
       const mVar = st.groups - 1;
       root.querySelectorAll('[data-for="rate"]').forEach(e => e.hidden = !isRate());
@@ -2187,8 +2234,8 @@
 
       // Split and correction
       const vShare = st.evenSplit ? 100 / st.groups : (100 - st.control) / mVar;
-      $('calc-split-help').textContent = mVar === 1
-        ? `The variant gets ${fmtNum(100 - st.control)}%.`
+      $('calc-split-help').textContent = !(vShare > 0 && vShare < 100) ? ''
+        : mVar === 1 ? `The variant gets ${fmtNum(vShare)}%.`
         : `Each of the ${mVar} variants gets ${fmtNum(vShare)}%.`;
       $('calc-even').hidden = st.evenSplit;
       $('calc-correct-help').textContent = st.correct
@@ -2202,9 +2249,7 @@
         ['calc-n', 'calc-nc', 'calc-nv', 'calc-weeks'].forEach(id => $(id).textContent = '–');
         $('calc-days').textContent = 'To run';
         sentence.textContent = '';
-        note.textContent = isRate()
-          ? 'Check the numbers: the rate needs to be between 0 and 100%, and stay below 100% after the lift.'
-          : 'Check the numbers: the average, standard deviation and lift all need to be above zero.';
+        note.textContent = inputProblem();
         drawChart();
         return;
       }
@@ -2903,23 +2948,27 @@
       </div>
       <div class="mk-flow" id="mk-flow" aria-live="polite"></div>`;
 
+    // Drawn at the figure's own width, so it lines up with the matrix above it:
+    // starts at the matrix's left edge, percentages end at its right edge
     function flowSvg(i) {
       const { T, defs } = kit();
+      const W = Math.max(280, Math.round(flow.clientWidth) || 480);
       const dests = MX_COLS.map((c, j) => [c, MX[i][j]]).filter(d => d[1] > 0).sort((a, b) => b[1] - a[1]);
       const gap = 30, top = 44, h = top + dests.length * gap;
       const sy = top + (dests.length - 1) * gap / 2;
-      let b = T(15, 16, 'FROM ' + MX_ROWS[i].toUpperCase(), 'f-up');
+      const x0 = 7, dotX = Math.round(W * 0.52), span = dotX - x0;
+      let b = T(0, 16, 'FROM ' + MX_ROWS[i].toUpperCase(), 'f-up');
       dests.forEach(([c, p], k) => {
         const y = top + k * gap;
         const w = Math.max(1, p * 11);
         const col = c === 'Conversion' ? 'var(--f-ink)' : 'var(--f-mid)';
-        b += `<path d="M 34 ${sy} C 120 ${sy}, 130 ${y}, 196 ${y}" fill="none" stroke="${col}" stroke-width="${w.toFixed(1)}" opacity="${c === 'Conversion' ? 1 : (c === 'Drop-off' ? 0.5 : 0.8)}"/>`;
-        b += `<circle cx="200" cy="${y}" r="${c === 'Conversion' ? 5 : 3.5}" fill="${c === 'Conversion' ? 'var(--f-ink)' : 'var(--f-mid)'}"/>`;
-        b += T(212, y + 4, c, 'f-ax', 'start', c === 'Conversion' ? 'fill:var(--f-ink)' : '');
-        b += T(350, y + 4, pct(p, p < 0.1 ? 1 : 0), 'f-num', 'end', c === 'Conversion' ? 'fill:var(--f-ink)' : '');
+        b += `<path d="M ${x0 + 4} ${sy} C ${x0 + span * 0.45} ${sy}, ${x0 + span * 0.55} ${y}, ${dotX - 4} ${y}" fill="none" stroke="${col}" stroke-width="${w.toFixed(1)}" opacity="${c === 'Conversion' ? 1 : (c === 'Drop-off' ? 0.5 : 0.8)}"/>`;
+        b += `<circle cx="${dotX}" cy="${y}" r="${c === 'Conversion' ? 5 : 3.5}" fill="${c === 'Conversion' ? 'var(--f-ink)' : 'var(--f-mid)'}"/>`;
+        b += T(dotX + 14, y + 4, c, 'f-ax', 'start', c === 'Conversion' ? 'fill:var(--f-ink)' : '');
+        b += T(W, y + 4, pct(p, p < 0.1 ? 1 : 0), 'f-num', 'end', c === 'Conversion' ? 'fill:var(--f-ink)' : '');
       });
-      b += `<circle cx="30" cy="${sy}" r="6" fill="var(--f-ink)"/>`;
-      return `<svg viewBox="0 0 360 ${h}" role="img" aria-label="Where customers go next from ${MX_ROWS[i]}">${defs}${b}</svg>`;
+      b += `<circle cx="${x0}" cy="${sy}" r="6" fill="var(--f-ink)"/>`;
+      return `<svg width="${W}" height="${h}" viewBox="0 0 ${W} ${h}" role="img" aria-label="Where customers go next from ${MX_ROWS[i]}">${defs}${b}</svg>`;
     }
 
     // Fig. 4: switch a channel off
@@ -2943,45 +2992,44 @@
       return `<svg viewBox="0 0 360 134" role="img" aria-label="Chance of converting: ${pct(BASE, 1)} with all channels, ${pct(WITHOUT[c], 1)} without ${c}.">${b}</svg>`;
     }
 
-    const results = figureHtml({ type: 'bars', title: 'Share of conversion credit, by channel', series: [], bar: ['Facebook | 28', 'Paid Search | 26', 'Instagram | 17', 'Online Video | 16', 'Online Display | 12'], unit: '%', highlight: 'Facebook', note: 'the most credit', caption: 'Share of the 17,639 conversions credited to each channel. Rounded, so they add to 99%.', source: 'the analysis' }, 5);
+    const results = figureHtml({ type: 'bars', title: 'Share of conversion credit, by channel', series: [], bar: ['Facebook | 28', 'Paid Search | 26', 'Instagram | 17', 'Online Video | 16', 'Online Display | 12'], unit: '%', highlight: 'Facebook', note: 'the most credit', caption: 'How the 17,639 sales are shared between channels. The figures are rounded, so they add up to 99% rather than 100%.', source: 'my analysis of the dataset' }, 5);
 
     root.innerHTML = `
       <div class="cs">
         <p class="post-kicker">${esc(project.tag || 'Case study')} &middot; Marketing attribution &middot; 2023</p>
-        <h1 class="post-title">Which channels really drive conversions?</h1>
-        <p class="calc-intro">Customers often see several ads before they buy, but standard reporting gives all the credit to the last one. I built a Markov chain model that credits each channel by how much the journey falls apart without it.</p>
+        <h1 class="post-title">Which marketing channels really lead to a sale?</h1>
+        <p class="calc-intro">Most people see a few ads before they buy something, yet the usual reports hand all the credit to the last one. I wanted a fairer answer, so I built a model that asks a simple question of each channel: if it disappeared, how many sales would we lose?</p>
         <p class="cs-tools">Python &middot; pandas &middot; NumPy</p>
         <div class="cs-stats">
-          <div class="cs-stat"><b>586,737</b><span>Touchpoints</span></div>
+          <div class="cs-stat"><b>586,737</b><span>Ad views and clicks</span></div>
           <div class="cs-stat"><b>240,108</b><span>Customers</span></div>
           <div class="cs-stat"><b>5</b><span>Channels</span></div>
-          <div class="cs-stat"><b>17,639</b><span>Conversions</span></div>
+          <div class="cs-stat"><b>17,639</b><span>Sales</span></div>
         </div>
         <div class="post-body" id="cs-body">
           <h2>The problem</h2>
-          <p>A customer sees an Instagram ad, then a display banner, then searches and buys. Last-click reporting gives search all the credit, so the channels that started the journey look worthless.</p>
-          ${fig(1, 'Example', 'One journey, many touches', f1, 'An example journey. Last-click gives all the credit to the final touch.')}
+          <p>Picture someone who sees an Instagram ad, later notices a banner on a news site, then searches for the brand and buys. Most reporting looks only at the last click, so the search gets all the credit. Instagram and the banner did real work to get that person there, but on paper they look worthless.</p>
+          ${fig(1, 'Example', 'One journey, many touches', f1, 'One person&rsquo;s path to buying. Last-click reporting gives all the credit to the final step.')}
 
           <h2>The data</h2>
-          <p>A public eCommerce dataset of ad touchpoints across five channels. I sorted each customer&rsquo;s touchpoints by time into one journey, ending in a conversion or a drop-off.</p>
-          ${fig(2, 'Example', 'From rows to a journey', f2, 'An example customer. Journeys that never convert end in a drop-off.')}
+          <p>I used a public dataset from an online shop: 586,737 ad views and clicks from 240,108 customers, across five channels. For each customer, I lined up their ad views and clicks in time order to make one journey. Every journey ends one of two ways: a <em>conversion</em>, where they buy, or a <em>drop-off</em>, where they leave without buying.</p>
+          ${fig(2, 'Example', 'From rows to a journey', f2, 'One customer&rsquo;s rows, turned into their journey. Someone who never buys ends in a drop-off instead.')}
 
           <h2>Journeys as a chain</h2>
-          <p>A Markov chain asks one question of every channel: from here, where do customers go next? Counting every move in the data gives the transition matrix.</p>
-          ${fig(3, 'From the data', 'The transition matrix', f3, 'Each row is where customers are; each column is where they go next, in %. Rows add up to 100. Choose a row to draw it.')}
+          <p>A Markov chain sounds technical, but the idea behind it is simple. For each channel, it asks: once someone has seen this, where do they go next? Count every step that every customer took and you get a table of those chances, called a <em>transition matrix</em>.</p>
+          ${fig(3, 'From the data', 'The transition matrix', f3, 'Read across a row to see where people go next from that point, in percentages that add up to 100. Hover over or tap a row to draw it below.')}
 
           <h2>Taking a channel away</h2>
-          <p>To value a channel, remove it and send its customers to a drop-off. The fall in the chance of converting is its removal effect. Sharing the 17,639 conversions out in proportion to these effects gives each channel its credit.</p>
-          ${fig(4, 'From the data', 'Switch a channel off', f4, 'Removal effects from the model. Choose a channel to remove it.')}
+          <p>To work out what a channel is worth, I took it out of the model. Anyone who would have reached it leaves instead. How far the chance of buying falls is that channel&rsquo;s <em>removal effect</em>: the bigger the fall, the more the channel matters. I then shared the 17,639 sales between the channels in proportion to their removal effects.</p>
+          ${fig(4, 'From the data', 'Switch a channel off', f4, 'Pick a channel to take it out, and see how many fewer people buy.')}
 
           <h2>What it found</h2>
-          <p>Facebook earns the most credit, closely followed by Paid Search. Together they take more than half.</p>
+          <p>Facebook comes out on top, with Paid Search close behind. Between them they earn more than half the credit, and Instagram, Online Video and Online Display share the rest.</p>
           ${results}
 
           <h2>Why it matters</h2>
-          <p>The credit comes from how customers actually move between channels, not from a fixed rule, which gives marketing teams firmer evidence for their channel mix.</p>
+          <p>The credit comes from how real customers moved between channels, not from a rule picked in advance. That gives marketing teams a fairer picture of what each channel does, and firmer ground for deciding where the next pound of budget should go.</p>
         </div>
-        <p class="cs-links"><a href="https://github.com/henrybellhouse/markovchains" target="_blank" rel="noopener">View the code on GitHub &rarr;</a></p>
       </div>`;
 
     const body = root.querySelector('#cs-body');
@@ -3009,12 +3057,12 @@
       body.querySelectorAll('.mk-tog').forEach(b => b.setAttribute('aria-pressed', b.dataset.c === c));
       rm.innerHTML = removalSvg(c);
       const effect = 1 - WITHOUT[c] / BASE;
-      rmLine.innerHTML = `Without ${c}, the chance of converting falls from ${pct(BASE, 1)} to ${pct(WITHOUT[c], 1)}. That ${pct(effect)} fall is its removal effect.`;
+      rmLine.innerHTML = `Without ${c}, the chance that someone buys falls from ${pct(BASE, 1)} to ${pct(WITHOUT[c], 1)}. That&rsquo;s a ${pct(effect)} drop, so ${c}&rsquo;s removal effect is ${pct(effect)}.`;
     };
     body.querySelectorAll('.mk-tog').forEach(b => b.addEventListener('click', () => pickChannel(b.dataset.c)));
     pickChannel('Facebook');
 
-    projectRedraw = () => drawFigures(body);
+    projectRedraw = () => { drawFigures(body); if (row >= 0) flow.innerHTML = flowSvg(row); };
     drawFigures(body);
   }
 
@@ -3074,9 +3122,24 @@
   let idx = 0;   // which photo (0–23)
   let pos = 1;   // where the track is, counting the copy at the start
 
+  // Only the photo in the middle can be focused and opened; copies at the ends never can
   function setActive() {
     allSlides.forEach(s => s.classList.remove('active'));
     allSlides[pos].classList.add('active');
+    const hadFocus = document.activeElement && document.activeElement.matches('.carousel-slide img');
+    slides.forEach((s, i) => {
+      const img = s.querySelector('img');
+      if (i === idx) {
+        img.tabIndex = 0;
+        img.setAttribute('role', 'button');
+        img.setAttribute('aria-label', `Photo ${i + 1} of ${total}. Open full size`);
+      } else {
+        img.removeAttribute('tabindex');
+        img.removeAttribute('role');
+        img.removeAttribute('aria-label');
+      }
+    });
+    if (hadFocus) slides[idx].querySelector('img').focus({ preventScroll: true });
   }
 
   function positionTrack(animated = true) {
@@ -3112,6 +3175,7 @@
     counter.textContent = (idx + 1) + ' / ' + total;
     const nextImg = slides[(idx + 1) % total].querySelector('img');
     if (nextImg) nextImg.loading = 'eager';
+    if (!lightbox.hidden) showInLightbox();
   }
 
   function onPhotographyShown() {
@@ -3132,12 +3196,6 @@
   document.getElementById('carousel-prev').addEventListener('click', () => goTo(idx - 1));
   document.getElementById('carousel-next').addEventListener('click', () => goTo(idx + 1));
 
-  document.addEventListener('keydown', e => {
-    if (!document.getElementById('photography').classList.contains('visible')) return;
-    if (e.key === 'ArrowLeft') goTo(idx - 1);
-    if (e.key === 'ArrowRight') goTo(idx + 1);
-  });
-
   let touchStartX = 0;
   track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
   track.addEventListener('touchend', e => {
@@ -3145,37 +3203,72 @@
     if (Math.abs(diff) > 40) goTo(diff > 0 ? idx + 1 : idx - 1);
   });
 
+  // ── Lightbox ──────────────────────────────────────
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxClose = document.getElementById('lightbox-close');
+  let focusBeforeLightbox = null;
 
-  function openLightbox(src) {
-    lightboxImg.src = src;
+  // The lightbox always shows the carousel's current photo, so the two never disagree
+  function showInLightbox() {
+    lightboxImg.src = slides[idx].querySelector('img').src;
+    lightboxImg.alt = `Photo ${idx + 1} of ${total}`;
+  }
+
+  function openLightbox() {
+    focusBeforeLightbox = document.activeElement;
+    showInLightbox();
+    lightbox.hidden = false;
     lightbox.classList.add('open');
     document.body.style.overflow = 'hidden';
+    lightboxClose.focus({ preventScroll: true });
   }
 
-  function closeLightbox() {
+  function closeLightbox(restoreFocus = true) {
     lightbox.classList.remove('open');
-    lightboxImg.src = '';
+    lightbox.hidden = true;
+    lightboxImg.removeAttribute('src');
     document.body.style.overflow = '';
+    if (restoreFocus && focusBeforeLightbox && document.contains(focusBeforeLightbox)) {
+      // If it was opened from a photo, return to the photo now showing, which may have changed
+      const back = focusBeforeLightbox.matches('.carousel-slide img') ? slides[idx].querySelector('img') : focusBeforeLightbox;
+      back.focus({ preventScroll: true });
+    }
+    focusBeforeLightbox = null;
   }
 
-  document.getElementById('carousel-track').addEventListener('click', e => {
-    const img = e.target.closest('.carousel-slide.active img');
-    if (img) openLightbox(img.src);
+  track.addEventListener('click', e => {
+    if (e.target.closest('.carousel-slide.active img')) openLightbox();
   });
 
   lightbox.addEventListener('click', e => {
     if (e.target === lightbox) closeLightbox();
   });
 
-  document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+  lightboxClose.addEventListener('click', () => closeLightbox());
 
+  // One keyboard handler, so the lightbox and carousel never both react to a key
   document.addEventListener('keydown', e => {
-    if (['Escape', 'Enter', 'Backspace'].includes(e.key) && lightbox.classList.contains('open')) {
-      closeLightbox();
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (!lightbox.hidden) {
+      if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(idx - 1); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); goTo(idx + 1); }
+      else if (e.key === 'Tab') { e.preventDefault(); lightboxClose.focus(); }   // keep focus inside
+      return;
+    }
+    if (!document.getElementById('photography').classList.contains('visible')) return;
+    if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable]')) return;
+    if (e.key === 'ArrowLeft') goTo(idx - 1);
+    else if (e.key === 'ArrowRight') goTo(idx + 1);
+    else if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.carousel-slide.active img')) {
+      e.preventDefault();
+      openLightbox();
     }
   });
+
+  setActive();
+
   // ── Living detail: London time + weather ──────────
   const livingEl = document.getElementById('living-detail');
   let weatherText = '';
