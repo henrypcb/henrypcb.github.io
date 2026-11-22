@@ -583,6 +583,15 @@
     .mt-acts { flex-wrap: wrap; gap: 6px 14px; padding-bottom: 8px; }
     .mt-kids { padding-left: 12px; }
   }
+  .gm-undo { margin-left: 6px; }
+  .gm-ai { margin-top: 22px; max-width: 620px; }
+  .gm-ai-text { min-height: 72px; }
+  .gm-cp { padding-top: 22px; border-top: 1px solid var(--border); max-width: 640px; }
+  .gm-cp a { color: var(--black); text-underline-offset: 3px; }
+  .gm-cp-list { list-style: none; margin: 14px 0 10px; }
+  .gm-cp-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 14px; line-height: 1.55; color: #444; }
+  html.dark body .gm-cp-list li { color: #cfcfcf; }
+  .gm-cp-list em { font-style: normal; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); white-space: nowrap; }
   .gm-ns { margin-top: 24px; max-width: 520px; }
   .gm-ns input { font-size: 26px !important; }
   .gm-ns-eg { font-size: 12px; color: var(--gray); margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; }
@@ -3543,6 +3552,37 @@
       goal: 'd',
       tree: { id: 't0', name: 'Weekly active customers', op: 'x', unit: 'n', v: null, link: true, kids: [], inf: [1, 1, 1] }
     };
+    const I3 = [1, 1, 1];
+    const EXAMPLES = [
+      ['Savings app', {
+        entry: 50000, ns: { name: 'Total saved a month', checks: ['', '', ''] },
+        steps: [{ id: 'a', name: 'Hear about us', from: null, rate: 100, inf: I3 }, { id: 'b', name: 'Sign up', from: 'a', rate: 25, inf: I3 },
+          { id: 'c', name: 'Verify identity', from: 'b', rate: 70, inf: I3 }, { id: 'd', name: 'Add money', from: 'c', rate: 60, inf: I3 },
+          { id: 'e', name: 'Savers each month', from: 'd', rate: 50, inf: I3 }],
+        loops: [{ name: 'Keep saving', from: 'e', to: 'e', k: 0.95 }, { name: 'Refer a friend', from: 'e', to: 'a', k: 0.02 }], goal: 'e',
+        tree: { id: 't0', name: 'Total saved a month', op: 'x', unit: 'n', v: 1, link: false, inf: I3, kids: [
+          { id: 't1', name: 'Savers each month', op: 'x', unit: 'n', v: null, link: true, kids: [], inf: I3 },
+          { id: 't2', name: 'Average saved per saver', op: 'x', unit: 'g', v: 150, link: false, kids: [], inf: I3 }] }
+      }],
+      ['Subscription app', {
+        entry: 20000, ns: { name: 'Monthly revenue', checks: ['', '', ''] },
+        steps: [{ id: 'a', name: 'Visit', from: null, rate: 100, inf: I3 }, { id: 'b', name: 'Start a free trial', from: 'a', rate: 8, inf: I3 },
+          { id: 'c', name: 'Use it in week one', from: 'b', rate: 50, inf: I3 }, { id: 'd', name: 'Subscribers', from: 'c', rate: 40, inf: I3 }],
+        loops: [{ name: 'Stay subscribed', from: 'd', to: 'd', k: 0.96 }], goal: 'd',
+        tree: { id: 't0', name: 'Monthly revenue', op: 'x', unit: 'n', v: 1, link: false, inf: I3, kids: [
+          { id: 't1', name: 'Subscribers', op: 'x', unit: 'n', v: null, link: true, kids: [], inf: I3 },
+          { id: 't2', name: 'Price a month', op: 'x', unit: 'g', v: 10, link: false, kids: [], inf: I3 }] }
+      }],
+      ['Marketplace', {
+        entry: 30000, ns: { name: 'Orders a month', checks: ['', '', ''] },
+        steps: [{ id: 'a', name: 'Visit', from: null, rate: 100, inf: I3 }, { id: 'b', name: 'Sign up', from: 'a', rate: 15, inf: I3 },
+          { id: 'c', name: 'First order', from: 'b', rate: 40, inf: I3 }, { id: 'd', name: 'Ordering customers', from: 'c', rate: 45, inf: I3 }],
+        loops: [{ name: 'Keep ordering', from: 'd', to: 'd', k: 0.85 }, { name: 'Tell a friend', from: 'd', to: 'a', k: 0.05 }], goal: 'd',
+        tree: { id: 't0', name: 'Orders a month', op: 'x', unit: 'n', v: 1, link: false, inf: I3, kids: [
+          { id: 't1', name: 'Ordering customers', op: 'x', unit: 'n', v: null, link: true, kids: [], inf: I3 },
+          { id: 't2', name: 'Orders per customer', op: 'x', unit: 'n', v: 2, link: false, kids: [], inf: I3 }] }
+      }]
+    ];
     const clone = o => JSON.parse(JSON.stringify(o));
     const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
     const num = v => { const n = parseFloat(String(v).replace(/,/g, '')); return isFinite(n) ? n : 0; };
@@ -3770,7 +3810,12 @@
           <div class="gm-ch-body">
             <h2 class="gm-ch-t" id="gm-h1">Choose your North Star, and break it down</h2>
             <p class="gm-ch-p">One number that shows customers getting value from your product. Then break it into the parts that multiply or add up to it, such as customers &times; share who buy &times; spend per buyer. Choose the one part your growth model in chapter 2 will count.</p>
-            <div class="gm-ns-eg"><span>For example:</span> ${['Weekly active customers', 'Total spend', 'Orders delivered on time'].map(t => `<button type="button" class="calc-link" data-eg="${t}">${t}</button>`).join('')}</div>
+            <div class="gm-ns-eg"><span>Start from an example:</span> ${EXAMPLES.map(([t], i) => `<button type="button" class="calc-link" data-ex="${i}">${t}</button>`).join('')}<span class="gm-undo" id="gm-undo" hidden><button type="button" class="calc-link" id="gm-undo-btn">Undo</button></span></div>
+            <div class="gm-ai" id="gm-ai" hidden>
+              <label class="calc-label" for="gm-ai-text">Or describe your product, and draft a model with on-device AI</label>
+              <textarea class="f-text gm-ai-text" id="gm-ai-text" maxlength="600" placeholder="For example: a savings app. People sign up, verify their identity, add money, then save every month. Some refer friends."></textarea>
+              <div class="f-actions"><button type="button" class="f-btn" id="gm-ai-go">Draft my model</button><span class="calc-help" id="gm-ai-status">Runs on your device with Chrome&rsquo;s built-in AI. Nothing you type leaves your browser.</span></div>
+            </div>
             <div class="mt" id="gm-tree"></div>
             <p class="calc-help mt-note" id="gm-tree-note"></p>
             <div class="gm-checks" id="gm-checks"></div>
@@ -3820,6 +3865,7 @@
 
         <div class="f-actions gm-actions">
           <button type="button" class="f-btn" id="gm-share">Copy link to this model</button>
+          <button type="button" class="calc-link" id="gm-prompt">Copy as a prompt for your AI assistant</button>
           <button type="button" class="calc-link" id="gm-reset">Start again</button>
         </div>
         <div class="calc-how">
@@ -3927,11 +3973,69 @@
       $('#gm-ns-note').textContent = no >= 0 ? NS_CHECKS[no][1]
         : (c.every(v => v === 'y') ? 'A strong North Star. Next, map how people reach it.' : 'Check your North Star against these three questions.');
     }
-    root.querySelectorAll('[data-eg]').forEach(b => b.addEventListener('click', () => {
-      model.tree.name = model.ns.name = b.dataset.eg;
-      const el = treeEl.querySelector(`.mt-name[data-id="${model.tree.id}"]`); if (el) el.value = b.dataset.eg;
-      update();
-    }));
+    // Replace the whole model, keeping the old one for Undo
+    let undoModel = null, undoTimer = null;
+    function replaceModel(next) {
+      undoModel = clone(model);
+      model = next;
+      cpVecs = {};
+      buildAll();
+      $('#gm-undo').hidden = false;
+      clearTimeout(undoTimer);
+      undoTimer = setTimeout(() => { $('#gm-undo').hidden = true; }, 12000);
+    }
+    root.querySelectorAll('[data-ex]').forEach(b => b.addEventListener('click', () => replaceModel(clean(clone(EXAMPLES[+b.dataset.ex][1])))));
+    $('#gm-undo-btn').addEventListener('click', () => { if (undoModel) { model = undoModel; undoModel = null; buildAll(); } $('#gm-undo').hidden = true; });
+
+    // ── Draft a model with Chrome's built-in AI, offered only when it's already on this device
+    const LM_OPTS = { expectedInputs: [{ type: 'text', languages: ['en'] }], expectedOutputs: [{ type: 'text', languages: ['en'] }] };
+    (async () => {
+      try {
+        if (!('LanguageModel' in self)) return;
+        if (await LanguageModel.availability(LM_OPTS) === 'available' && root.isConnected) $('#gm-ai').hidden = false;
+      } catch (e) {}
+    })();
+    $('#gm-ai-go').addEventListener('click', async () => {
+      const text = $('#gm-ai-text').value.trim(), btn = $('#gm-ai-go'), status = $('#gm-ai-status');
+      if (text.length < 15) { status.textContent = 'Describe your product in a sentence or two first.'; return; }
+      btn.disabled = true; btn.textContent = 'Drafting…';
+      try {
+        const part = { type: 'object', properties: { name: { type: 'string' }, unit: { type: 'string', enum: ['number', 'percent', 'pounds'] }, value: { type: 'number' }, countedByJourney: { type: 'boolean' } }, required: ['name', 'unit', 'value', 'countedByJourney'] };
+        const schema = { type: 'object', required: ['northStar', 'parts', 'newPeoplePerMonth', 'steps', 'loops'], properties: {
+          northStar: { type: 'string' }, parts: { type: 'array', items: part },
+          newPeoplePerMonth: { type: 'number' },
+          steps: { type: 'array', items: { type: 'object', required: ['name', 'after', 'percent'], properties: { name: { type: 'string' }, after: { type: 'string' }, percent: { type: 'number' } } } },
+          loops: { type: 'array', items: { type: 'object', required: ['name', 'from', 'to', 'perPerson'], properties: { name: { type: 'string' }, from: { type: 'string' }, to: { type: 'string' }, perPerson: { type: 'number' } } } }
+        } };
+        const prompt = 'You help product teams sketch a growth model. From the description below, draft:\n' +
+          '1. northStar: one metric that shows customers getting value (not revenue unless the product is about spending).\n' +
+          '2. parts: 2 or 3 parts that multiply to give the North Star. Exactly one part is a number of people, marked countedByJourney true, with value 0. Give the others rough values.\n' +
+          '3. steps: 3 to 6 steps in order, from first hearing about the product to the people counted in that part. The first step has after "" and percent 100. Each later step names the step it comes after and the rough percent of those people who reach it. The last step has the same name as the counted part.\n' +
+          '4. loops: up to 2. A loop where a step leads back to itself means people staying each month (perPerson below 1, such as 0.95). A loop to the first step means each person bringing in new people each month (usually small, such as 0.05).\n' +
+          '5. newPeoplePerMonth: a rough number.\nUse plain English names of at most 4 words.\n\nDescription: ' + text;
+        const session = await LanguageModel.create(LM_OPTS);
+        const r = JSON.parse(await session.prompt(prompt, { responseConstraint: schema }));
+        session.destroy && session.destroy();
+        const names = (r.steps || []).slice(0, MAX_STEPS).map(x => String(x.name || '').slice(0, 40));
+        const sid = nm => { const i = names.findIndex(n => n.toLowerCase() === String(nm || '').toLowerCase()); return i >= 0 ? 'a' + i : null; };
+        const steps = names.map((nm, i) => ({ id: 'a' + i, name: nm, from: i ? (sid(r.steps[i].after) && sid(r.steps[i].after) !== 'a' + i ? sid(r.steps[i].after) : 'a' + (i - 1)) : null, rate: i ? r.steps[i].percent : 100, inf: [1, 1, 1] }));
+        const parts = (r.parts || []).slice(0, 4);
+        const linkI = Math.max(0, parts.findIndex(p => p.countedByJourney));
+        const tree = { id: 't0', name: String(r.northStar || 'North Star'), op: 'x', unit: 'n', v: 1, link: parts.length < 2, inf: [1, 1, 1],
+          kids: parts.length < 2 ? [] : parts.map((p, i) => ({ id: 't' + (i + 1), name: p.name, op: 'x', unit: p.unit === 'percent' ? 'p' : (p.unit === 'pounds' ? 'g' : 'n'), v: i === linkI ? null : p.value, link: i === linkI, kids: [], inf: [1, 1, 1] })) };
+        const last = steps.length - 1;
+        const linkedName = parts[linkI] ? parts[linkI].name : '';
+        const goal = sid(linkedName) || 'a' + last;
+        const loops = (r.loops || []).slice(0, MAX_LOOPS).map(l => ({ name: l.name, from: sid(l.from) || goal, to: sid(l.to) || 'a0', k: l.perPerson }));
+        const next = clean({ entry: r.newPeoplePerMonth || 10000, ns: { name: tree.name, checks: ['', '', ''] }, steps, loops, goal, tree });
+        if (!next) throw new Error('empty');
+        replaceModel(next);
+        status.textContent = 'Here’s a first draft. Check every number: they’re rough guesses to edit.';
+      } catch (e) {
+        status.textContent = 'Couldn’t draft a model this time. Try describing the steps people take, or start from an example.';
+      }
+      btn.disabled = false; btn.textContent = 'Draft my model';
+    });
 
     // ── Chapter 2: the journey
     function buildSteps() {
@@ -4276,8 +4380,106 @@
           out += `<p class="calc-sentence gm-tip-line">To raise your influence here: ${gapText(L)}.</p>`;
         }
       }
+      if (limit) out += notesHtml(list, ranked[0]);
       $('#gm-out').innerHTML = out;
+      const cpGo = $('#gm-cp-go'); if (cpGo) cpGo.addEventListener('click', matchNotes);
+      root.querySelectorAll('.gm-cp-link').forEach(a => a.addEventListener('click', e => { if (e.metaKey || e.ctrlKey || e.shiftKey) return; e.preventDefault(); show('projects/customer-problems'); }));
+      if (cpState === 'meaning' && list.some(x => !cpVecs[leverText(x)])) matchNotes();
       save();
+    }
+
+    // ── Customer notes from "Make sense of customer problems", matched to steps by meaning
+    let cpVecs = {}, cpNotes = null, cpSource = '', cpState = 'idle', embedMod = null;
+    const dot = (a, b) => { let t = 0; for (let i = 0; i < a.length; i++) t += a[i] * b[i]; return t; };
+    const STOPW = new Set('the a an to of and or for in on at by with my our your is are be it this that from get getting into'.split(' '));
+    const wordsOf = t => new Set((String(t).toLowerCase().match(/[a-z0-9]+/g) || []).filter(w => w.length > 2 && !STOPW.has(w)).map(w => w.replace(/(ing|ed|es|s)$/, '')));
+    const leverText = x => x.kind === 'value' ? `Problems that hold back ${label(x.s).toLowerCase()}` : `Problems when trying to ${label(x.s).toLowerCase()}`;
+    async function loadNotes() {
+      try {
+        const st = JSON.parse(localStorage.getItem('customer-problems-v1') || 'null');
+        if (st && Array.isArray(st.notes) && st.notes.length) { cpSource = 'yours'; return st.notes.filter(n => n && n.text).map(n => ({ text: String(n.text), sev: +n.sev || 2, v: Array.isArray(n.v) && n.v.length === 384 ? n.v : null })); }
+      } catch (e) {}
+      cpSource = 'sample';
+      const list = await fetch('/assets/problems/sample.json').then(r => r.json());
+      return list.map(n => ({ text: n.text, sev: n.sev, v: n.v }));
+    }
+    async function matchNotes() {
+      cpState = 'loading'; update();
+      try {
+        if (!cpNotes) cpNotes = await loadNotes();
+        try {
+          if (!embedMod) { embedMod = await import('/assets/ml/embed.mjs'); await embedMod.load(); }
+          const { list } = levers();
+          const texts = [...new Set(list.map(leverText).filter(t => !cpVecs[t]))];
+          const todo = cpNotes.filter(n => !n.v);
+          const vecs = await embedMod.embed(texts.concat(todo.map(n => n.text)));
+          texts.forEach((t, i) => { cpVecs[t] = Array.from(vecs[i]); });
+          todo.forEach((n, i) => { n.v = Array.from(vecs[texts.length + i]); });
+          cpState = 'meaning';
+        } catch (e) { cpState = 'words'; }
+      } catch (e) { cpState = 'failed'; }
+      if (root.isConnected) update();
+    }
+    // Each note goes to the step or value it's closest to, if it's close enough
+    function notesByLever(list) {
+      const out = new Map();
+      if (!cpNotes || (cpState !== 'meaning' && cpState !== 'words')) return null;
+      const pool = list.filter(x => x.kind === 'step' || x.room);
+      cpNotes.forEach(n => {
+        let best = null, bestS = -1;
+        pool.forEach(x => {
+          let sc;
+          if (cpState === 'meaning') { const v = cpVecs[leverText(x)]; if (!v || !n.v) return; sc = dot(v, n.v); }
+          else { const a = wordsOf(label(x.s)), b = wordsOf(n.text); let c = 0; a.forEach(w => { if (b.has(w)) c++; }); sc = a.size ? c / a.size : 0; }
+          if (sc > bestS) { bestS = sc; best = x; }
+        });
+        if (best && bestS >= (cpState === 'meaning' ? 0.25 : 0.34)) {
+          if (!out.has(best.s.id)) out.set(best.s.id, []);
+          out.get(best.s.id).push({ n, sc: bestS });
+        }
+      });
+      out.forEach(arr => arr.sort((a, b) => b.n.sev - a.n.sev || b.sc - a.sc));
+      return out;
+    }
+    function notesHtml(list, L) {
+      const SEV = { 1: 'Annoying', 2: 'Gets in the way', 3: 'Stops them' };
+      const intro = `<span class="calc-label">What customers say about it</span>`;
+      if (cpState === 'idle' || cpState === 'failed') return `<div class="gm-insight gm-cp">${intro}
+        <p class="calc-sentence">${cpState === 'failed' ? 'The customer notes couldn&rsquo;t load. Try again in a moment.' : 'Match notes from <a href="/projects/customer-problems" class="gm-cp-link">Make sense of customer problems</a> to your steps, to see what customers say about this one.'}</p>
+        <div class="f-actions"><button type="button" class="f-btn" id="gm-cp-go">Match customer notes</button><span class="calc-help">Uses a small model that runs in your browser. It downloads once, about 38 MB.</span></div></div>`;
+      if (cpState === 'loading') return `<div class="gm-insight gm-cp">${intro}<p class="calc-sentence">Reading the notes and matching them to your steps&hellip;</p></div>`;
+      const by = notesByLever(list) || new Map();
+      const mine = by.get(L.s.id) || [];
+      const src = cpSource === 'yours' ? 'your notes' : 'the sample notes';
+      const srcN = cpSource === 'yours' ? `your ${commas(cpNotes.length)} notes` : `the ${commas(cpNotes.length)} sample notes`;
+      const how = cpState === 'meaning' ? 'by meaning' : 'by shared words, because the meaning model couldn&rsquo;t load here';
+      const others = list.filter(x => x.s.id !== L.s.id && by.has(x.s.id)).map(x => `${esc(label(x.s))}: ${by.get(x.s.id).length}`);
+      return `<div class="gm-insight gm-cp">${intro}
+        <p class="calc-sentence">${mine.length
+          ? `${mine.length} of ${srcN} fit &ldquo;${esc(label(L.s))}&rdquo;. The most severe:`
+          : `None of ${srcN} clearly fit &ldquo;${esc(label(L.s))}&rdquo;. That&rsquo;s a gap worth filling: talk to customers at this step.`}</p>
+        ${mine.length ? `<ul class="gm-cp-list">${mine.slice(0, 4).map(({ n }) => `<li><span>${esc(n.text)}</span><em>${SEV[n.sev] || ''}</em></li>`).join('')}</ul>` : ''}
+        ${others.length ? `<p class="calc-help">Other notes fit: ${others.join(' &middot; ')}.</p>` : ''}
+        <p class="calc-note">Matched ${how}, from ${src}${cpSource === 'sample' ? '. Add your own in <a href="/projects/customer-problems" class="gm-cp-link">Make sense of customer problems</a>' : ''}. Check them: a note can fit more than one step.</p></div>`;
+    }
+
+    // ── Copy the model as a prompt for any AI assistant
+    function promptText() {
+      const m = model, { list, people, end } = levers();
+      const ru = unitOf(m.tree), at = s => label(s);
+      const lines = [];
+      const treeLines = (n, d) => { const leaf = !n.kids.length; lines.push(`${'  '.repeat(d)}- ${n.name}${leaf ? (n.link ? ` (counted by the journey below: ${commas(people)})` : `: ${fmtU(valOf(n, people), unitOf(n))}`) : ` = parts ${n.op === 'p' ? 'added' : 'multiplied'}`}`); n.kids.forEach(k => treeLines(k, d + 1)); };
+      lines.push('I’m using a growth model to find the rate-limiting step in my product, following the idea from Matt Lerner’s Growth Levers and How to Find Them.', '');
+      lines.push(`North Star: ${nsLabel()} (${fmtU(end, ru)})`, 'How it breaks down:'); treeLines(m.tree, 0);
+      lines.push('', `Customer journey (about ${commas(m.entry)} new people a month at "${at(m.steps[0])}"):`);
+      m.steps.slice(1).forEach(s => lines.push(`- ${at(s)}: ${+s.rate.toFixed(1)}% of "${at(byId(s.from))}"`));
+      if (m.loops.length) { lines.push('Loops:'); m.loops.forEach(l => lines.push(l.from === l.to ? `- ${l.name}: ${+(l.k * 100).toFixed(1)}% of people at "${at(byId(l.from))}" stay each month` : `- ${l.name}: each person at "${at(byId(l.from))}" brings ${short(l.k)} new people a month to "${at(byId(l.to))}"`)); }
+      const ranked = list.filter(x => x.room && isFinite(x.gain)).sort((a, b) => b.gain - a.gain);
+      lines.push('', `Impact of improving each one (a step by ${lift} points, a value by ${lift}%), with my influence over it:`);
+      ranked.forEach(x => lines.push(`- ${at(x.s)}: +${fmtU(x.gain, ru)}, influence ${x.level.toLowerCase()} (team can change it: ${['no', 'partly', 'yes'][x.s.inf[0]]}; know why people stop: ${['no', 'partly', 'yes'][x.s.inf[1]]}; cheap to test: ${['no', 'partly', 'yes'][x.s.inf[2]]})`));
+      if (ranked[0]) lines.push('', `The model says my rate-limiting ${ranked[0].kind === 'value' ? 'lever' : 'step'} is "${at(ranked[0].s)}".`);
+      lines.push('', 'Please help me:', '1. Challenge the model: which steps, loops or numbers look wrong or missing for a product like mine?', '2. Write a short interview guide for customers at the rate-limiting step: who to recruit, and 6 to 8 open questions about what they expected and what got in the way.', '3. Suggest 3 to 5 changes to test at that step, each with the assumption it tests and how I’d know it worked.');
+      return lines.join('\n');
     }
 
     function save() {
@@ -4291,6 +4493,12 @@
       try { await navigator.clipboard.writeText(location.origin + location.pathname + '#g=' + encode(model)); btn.textContent = 'Link copied'; }
       catch (err) { btn.textContent = 'Couldn’t copy'; }
       setTimeout(() => { btn.textContent = text; }, 2000);
+    });
+    $('#gm-prompt').addEventListener('click', async e => {
+      const btn = e.currentTarget, text = 'Copy as a prompt for your AI assistant';
+      try { await navigator.clipboard.writeText(promptText()); btn.textContent = 'Copied. Paste it into your AI assistant'; }
+      catch (err) { btn.textContent = 'Couldn’t copy'; }
+      setTimeout(() => { btn.textContent = text; }, 2500);
     });
     $('#gm-reset').addEventListener('click', () => {
       model = clone(DEFAULT); lift = 5; $('#gm-lift').value = 5;
