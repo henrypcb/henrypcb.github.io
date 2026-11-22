@@ -18,15 +18,6 @@
     "live": true
   },
   {
-    "slug": "markov-attribution",
-    "title": "Markov chain attribution",
-    "summary": "Which marketing channels really lead to a sale? A model that credits each one by how many sales would be lost without it.",
-    "tag": "Case study",
-    "size": "s",
-    "art": "chain",
-    "live": true
-  },
-  {
     "slug": "customer-problems",
     "title": "Make sense of customer problems",
     "summary": "Jot down what customers struggle with and watch the notes group into themes, ranked by how many each one affects.",
