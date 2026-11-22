@@ -1,11 +1,20 @@
 [
   {
-    "slug": "sample-size",
-    "title": "Sample size calculator",
-    "summary": "How many customers an experiment needs to detect the change you care about, and how long it will take to run.",
+    "slug": "growth-model",
+    "title": "Draw your growth model",
+    "summary": "Sketch how people move through your product, and find the one step that most limits your growth.",
     "tag": "Tool",
     "size": "xl",
-    "art": "curves",
+    "art": "loop",
+    "live": true
+  },
+  {
+    "slug": "causal-method-finder",
+    "title": "Causal method finder",
+    "summary": "Describe what you want to learn, answer a few questions, and get the method that fits, with the assumptions to check.",
+    "tag": "Tool",
+    "size": "s",
+    "art": "tree",
     "live": true
   },
   {
@@ -18,15 +27,6 @@
     "live": true
   },
   {
-    "slug": "growth-model",
-    "title": "Draw your growth model",
-    "summary": "Sketch how people move through your product, and find the one step that most limits your growth.",
-    "tag": "Tool",
-    "size": "s",
-    "art": "loop",
-    "live": true
-  },
-  {
     "slug": "placeholder-three",
     "title": "Duis aute irure",
     "summary": "Excepteur sint occaecat cupidatat non proident.",
@@ -34,12 +34,12 @@
     "size": "s"
   },
   {
-    "slug": "causal-method-finder",
-    "title": "Causal method finder",
-    "summary": "Describe what you want to learn, answer a few questions, and get the method that fits, with the assumptions to check.",
+    "slug": "sample-size",
+    "title": "Sample size calculator",
+    "summary": "How many customers an experiment needs to detect the change you care about, and how long it will take to run.",
     "tag": "Tool",
     "size": "l",
-    "art": "tree",
+    "art": "curves",
     "live": true
   }
 ]
