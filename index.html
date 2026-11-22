@@ -267,6 +267,22 @@
   .seg button:hover { color: var(--black); }
   .seg button.on { color: var(--black); border-bottom-color: var(--black); }
 
+  .seg-small { margin-bottom: 2px; }
+  .seg-small button { font-size: 11px; letter-spacing: 0.04em; }
+
+  .calc-link {
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 4px;
+    font: inherit;
+    font-size: 12px;
+    color: var(--black);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
   .calc-metric { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--border); }
 
   .calc-label {
@@ -342,8 +358,8 @@
 
   .calc-n {
     font-family: Georgia, serif;
-    font-size: 80px;
-    line-height: 0.9;
+    font-size: 56px;
+    line-height: 0.95;
     letter-spacing: -0.02em;
   }
 
@@ -916,7 +932,7 @@
     .pcard-open { opacity: 1; transform: none; }
     .calc-grid { grid-template-columns: 1fr; gap: 26px; }
     .calc-result { grid-template-columns: 1fr; gap: 22px; }
-    .calc-n { font-size: 60px; }
+    .calc-n { font-size: 44px; }
     .blog-item { grid-template-columns: 1fr; gap: 8px; }
     .blog-title { font-size: 18px; }
     .blog-date { order: -1; }
@@ -1727,50 +1743,92 @@
   }
 
   function renderSampleSize(root, project) {
-    const st = { metric: 'rate', rate: 10, lift: 5, mean: 50, sd: 40, conf: 95, power: 80, groups: 2, traffic: 5000 };
-    const seg = (key, opts, fmt) => `<div class="seg" data-key="${key}">` +
-      opts.map(o => `<button type="button" data-v="${o}" class="${st[key] === o ? 'on' : ''}">${fmt ? fmt(o) : o}</button>`).join('') + '</div>';
-    const field = (key, label, unit, help, wide) => `
-      <div class="calc-field${wide ? ' wide' : ''}" data-for="${key}">
-        <label class="calc-label" for="calc-${key}">${label}</label>
-        <div class="calc-input"><input id="calc-${key}" type="number" inputmode="decimal" min="0" step="any" value="${st[key]}" data-key="${key}">${unit ? `<span class="calc-unit">${unit}</span>` : ''}</div>
-        ${help ? `<p class="calc-help">${help}</p>` : ''}
-      </div>`;
+    const st = { metric: 'rate', rate: 10, mean: 50, sd: 40, liftMode: 'rel', lift: 5, conf: 95, power: 80,
+                 groups: 2, correct: true, control: 50, evenSplit: true, traffic: 5000 };
+    const on = (key, v) => String(st[key]) === String(v);
+    const seg = (key, opts, cls) => `<div class="seg${cls ? ' ' + cls : ''}" data-key="${key}">` +
+      opts.map(([v, label]) => `<button type="button" data-v="${v}" class="${on(key, v) ? 'on' : ''}" aria-pressed="${on(key, v)}">${label}</button>`).join('') + '</div>';
+    const COMMAS = ['traffic', 'mean', 'sd'];
+    const withCommas = str => {
+      let raw = String(str).replace(/[^0-9.]/g, '');
+      const dot = raw.indexOf('.');
+      if (dot >= 0) raw = raw.slice(0, dot + 1) + raw.slice(dot + 1).replace(/\./g, '');
+      const [whole, dec] = raw.split('.');
+      return whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (dec !== undefined ? '.' + dec : '');
+    };
+    const input = (key, unit, min) => COMMAS.includes(key)
+      ? `<div class="calc-input"><input id="calc-${key}" type="text" inputmode="decimal" autocomplete="off" value="${withCommas(st[key])}" data-key="${key}" data-commas><span class="calc-unit" id="calc-${key}-unit">${unit || ''}</span></div>`
+      : `<div class="calc-input"><input id="calc-${key}" type="number" inputmode="decimal" min="${min || 0}" step="any" value="${st[key]}" data-key="${key}"><span class="calc-unit" id="calc-${key}-unit">${unit || ''}</span></div>`;
+
+    // Add commas as you type, keeping the cursor in the same place among the digits
+    function formatField(inp) {
+      const pos = inp.selectionStart == null ? inp.value.length : inp.selectionStart;
+      const before = inp.value.slice(0, pos).replace(/[^0-9.]/g, '').length;
+      const out = withCommas(inp.value);
+      if (out === inp.value) return;
+      let i = 0, seen = 0;
+      while (i < out.length && seen < before) { if (/[0-9.]/.test(out[i])) seen++; i++; }
+      inp.value = out;
+      try { inp.setSelectionRange(i, i); } catch (e) {}
+    }
 
     root.innerHTML = `
       <div class="calc">
         <p class="post-kicker">${esc(project.tag || 'Tool')} &middot; Experimentation</p>
         <h1 class="post-title">${esc(project.title)}</h1>
-        <p class="calc-intro">Before running an A/B test, check it can actually detect the change you care about. Set your numbers to see how many people each group needs, and how long the test will take.</p>
+        <p class="calc-intro">Before running an A/B test, check it can actually detect the change you care about. Set your numbers to see how many people the test needs, and how long it will take.</p>
 
         <div class="calc-metric">
           <span class="calc-label">What are you measuring?</span>
-          ${seg('metric', ['rate', 'mean'], v => v === 'rate' ? 'A conversion rate' : 'An average, like spend per customer')}
+          ${seg('metric', [['rate', 'A conversion rate'], ['mean', 'An average, like spend per customer']])}
         </div>
 
         <div class="calc-grid">
-          ${field('rate', 'Current conversion rate', '%', 'The share of people who convert today.')}
-          ${field('mean', 'Current average', '', 'For example, average spend per customer.')}
-          ${field('sd', 'Standard deviation', '', 'How spread out the values are. Take it from recent data.')}
+          <div class="calc-field" data-for="rate">
+            <label class="calc-label" for="calc-rate">Current conversion rate</label>${input('rate', '%')}
+            <p class="calc-help">The share of people who convert today.</p>
+          </div>
+          <div class="calc-field" data-for="mean">
+            <label class="calc-label" for="calc-mean">Current average</label>${input('mean', '')}
+            <p class="calc-help">For example, average spend per customer.</p>
+          </div>
+          <div class="calc-field" data-for="mean">
+            <label class="calc-label" for="calc-sd">Standard deviation</label>${input('sd', '')}
+            <p class="calc-help">How spread out the values are. Take it from recent data.</p>
+          </div>
           <div class="calc-field">
             <label class="calc-label" for="calc-lift">Smallest lift worth detecting</label>
-            <div class="calc-input"><input id="calc-lift" type="number" inputmode="decimal" min="0.1" step="any" value="${st.lift}" data-key="lift"><span class="calc-unit">% relative</span></div>
-            <input class="calc-range" type="range" min="0.5" max="50" step="0.5" value="${st.lift}" aria-label="Smallest lift worth detecting">
+            ${seg('liftMode', [['rel', 'Relative'], ['abs', 'Percentage points']], 'seg-small')}
+            ${input('lift', '% relative', 0)}
+            <input class="calc-range" id="calc-lift-range" type="range" min="0.5" max="50" step="0.5" value="${st.lift}" aria-label="Smallest lift worth detecting">
+            <p class="calc-help" id="calc-lift-help"></p>
           </div>
-          <div class="calc-field"><span class="calc-label">Confidence</span>${seg('conf', [90, 95, 99], v => v + '%')}</div>
-          <div class="calc-field"><span class="calc-label">Power</span>${seg('power', [80, 90], v => v + '%')}</div>
-          <div class="calc-field"><span class="calc-label">Groups, including control</span>${seg('groups', [2, 3, 4])}</div>
-          ${field('traffic', 'People entering the test per day', 'a day', '')}
+          <div class="calc-field"><span class="calc-label">Confidence</span>${seg('conf', [[90, '90%'], [95, '95%'], [99, '99%']])}</div>
+          <div class="calc-field"><span class="calc-label">Power</span>${seg('power', [[80, '80%'], [90, '90%']])}</div>
+          <div class="calc-field"><span class="calc-label">Groups, including control</span>${seg('groups', [[2, '2'], [3, '3'], [4, '4']])}</div>
+          <div class="calc-field" data-for="correct">
+            <span class="calc-label">Correct for multiple comparisons</span>${seg('correct', [['true', 'On'], ['false', 'Off']])}
+            <p class="calc-help" id="calc-correct-help"></p>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="calc-control">Control&rsquo;s share of traffic</label>${input('control', '% to control', 5)}
+            <input class="calc-range" id="calc-control-range" type="range" min="5" max="95" step="1" value="${st.control}" aria-label="Control's share of traffic">
+            <p class="calc-help"><span id="calc-split-help"></span> <button type="button" class="calc-link" id="calc-even">Make even</button></p>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="calc-traffic">People entering the test per day</label>${input('traffic', 'a day')}
+          </div>
         </div>
 
         <div class="calc-result">
-          <div><div class="calc-n" id="calc-n">&ndash;</div><p class="calc-sub">People per group</p></div>
+          <div><div class="calc-n" id="calc-n">&ndash;</div><p class="calc-sub">People in total</p></div>
           <div class="calc-stats">
-            <div class="calc-stat"><b id="calc-total">&ndash;</b><p class="calc-sub">In total</p></div>
-            <div class="calc-stat"><b id="calc-days">&ndash;</b><p class="calc-sub">To run</p></div>
+            <div class="calc-stat"><b id="calc-nc">&ndash;</b><p class="calc-sub">Control</p></div>
+            <div class="calc-stat"><b id="calc-nv">&ndash;</b><p class="calc-sub" id="calc-nv-label">Variant</p></div>
+            <div class="calc-stat"><b id="calc-weeks">&ndash;</b><p class="calc-sub" id="calc-days">To run</p></div>
           </div>
         </div>
-        <p class="calc-sentence" id="calc-sentence"></p>
+        <p class="calc-sentence" id="calc-sentence" aria-live="polite"></p>
         <p class="calc-note" id="calc-note"></p>
 
         <div class="post-body">
@@ -1778,62 +1836,119 @@
             <p class="fig-k">Fig. 1 &middot; Change over lift</p>
             <p class="fig-t">Smaller lifts need far more people</p>
             <div class="fig-wrap"><div class="fig-chart" id="calc-chart"></div><div class="fig-tip"></div></div>
-            <figcaption><span><em>Fig. 1</em> &mdash; People needed per group across a range of lifts, with your current settings marked.</span></figcaption>
+            <figcaption><span><em>Fig. 1</em> &mdash; Total people needed across a range of lifts, with your current settings marked.</span></figcaption>
           </figure>
         </div>
 
         <div class="calc-how">
-          <p>How it&rsquo;s worked out: a standard two-sided test with equal-sized groups. For conversion rates it compares two proportions; for averages it assumes the metric is roughly normally distributed and uses your standard deviation for both groups.</p>
-          <p>With more than two groups, each variant is compared with the control and no correction for multiple comparisons is applied, so treat the result as a minimum.</p>
+          <p>How it&rsquo;s worked out: a standard two-sided test. For conversion rates it compares two proportions; for averages it assumes the metric is roughly normally distributed and uses your standard deviation for every group.</p>
+          <p>Groups can be different sizes. You set the control&rsquo;s share, and the rest is split equally across the variants. Each variant is compared with the control.</p>
+          <p>With more than one variant, the Bonferroni correction divides the allowance for false positives across the comparisons, so each one needs more confidence. It&rsquo;s slightly cautious, which suits planning. Durations are rounded up to whole weeks, because behaviour often differs by day of the week.</p>
         </div>
       </div>`;
 
     const $ = id => root.querySelector('#' + id);
-    const range = root.querySelector('.calc-range');
+    const liftRange = $('calc-lift-range'), controlRange = $('calc-control-range');
+    const isRate = () => st.metric === 'rate';
+    const evenShare = () => Math.round(10000 / st.groups) / 100;
+    const liftUnit = () => st.liftMode === 'rel' ? '%' : (isRate() ? 'pp' : '');
 
-    function compute(lift) {
-      const za = invNorm(1 - (1 - st.conf / 100) / 2), zb = invNorm(st.power / 100);
-      return st.metric === 'rate'
-        ? nForRate(st.rate / 100, lift / 100, za, zb)
-        : nForMean(st.mean, st.sd, lift / 100, za, zb);
+    // The target value after the lift, as a rate (0–1) or an average
+    function target(L) {
+      if (isRate()) { const p1 = st.rate / 100; return st.liftMode === 'rel' ? p1 * (1 + L / 100) : p1 + L / 100; }
+      return st.liftMode === 'rel' ? st.mean * (1 + L / 100) : st.mean + L;
+    }
+
+    function compute(L) {
+      const m = st.groups - 1;
+      const alpha = 1 - st.conf / 100;
+      const a = st.correct && m > 1 ? alpha / m : alpha;
+      const za = invNorm(1 - a / 2), zb = invNorm(st.power / 100);
+      const c = st.evenSplit ? 1 / st.groups : st.control / 100, v = (1 - c) / m, r = v / c;
+      if (!(L > 0 && c > 0 && c < 1)) return null;
+      let nc;
+      if (isRate()) {
+        const p1 = st.rate / 100, p2 = target(L);
+        if (!(p1 > 0 && p1 < 1 && p2 > 0 && p2 < 1)) return null;
+        const pbar = (p1 + r * p2) / (1 + r);
+        const top = za * Math.sqrt(pbar * (1 - pbar) * (1 + 1 / r)) + zb * Math.sqrt(p1 * (1 - p1) + p2 * (1 - p2) / r);
+        nc = top * top / Math.pow(p2 - p1, 2);
+      } else {
+        const delta = target(L) - st.mean;
+        if (!(delta > 0 && st.sd > 0 && st.mean > 0)) return null;
+        nc = Math.pow(za + zb, 2) * st.sd * st.sd * (1 + 1 / r) / (delta * delta);
+      }
+      nc = Math.ceil(nc);
+      const nv = Math.ceil(nc * r);
+      return { nc, nv, total: nc + m * nv, m };
+    }
+
+    function setLiftRange() {
+      let min, max, step;
+      if (st.liftMode === 'rel') { min = 0.5; max = 50; step = 0.5; }
+      else if (isRate()) { min = 0.1; max = Math.max(0.2, Math.min(20, 99 - st.rate)); step = 0.1; }
+      else { max = Math.max(st.mean * 0.5, 0.01); step = niceStep(max / 100); min = step; }
+      liftRange.min = min; liftRange.max = max; liftRange.step = step;
+      if (isFinite(st.lift)) liftRange.value = Math.min(max, Math.max(min, st.lift));
+      $('calc-lift-unit').textContent = st.liftMode === 'rel' ? '% relative' : (isRate() ? 'percentage points' : 'absolute');
+      root.querySelector('.seg[data-key="liftMode"] [data-v="abs"]').textContent = isRate() ? 'Percentage points' : 'Absolute';
+    }
+
+    // Switch the lift between relative and absolute without changing the effect it describes
+    function convertLift(toMode, metric) {
+      const base = metric === 'rate' ? st.rate : st.mean;
+      if (!(base > 0) || !isFinite(st.lift)) return;
+      st.lift = toMode === 'abs' ? base * st.lift / 100 : st.lift / base * 100;
+      st.lift = +st.lift.toPrecision(3);
+      $('calc-lift').value = st.lift;
+    }
+
+    function syncSegs() {
+      root.querySelectorAll('.seg').forEach(g => g.querySelectorAll('button').forEach(b => {
+        const isOn = on(g.dataset.key, b.dataset.v);
+        b.classList.toggle('on', isOn);
+        b.setAttribute('aria-pressed', isOn);
+      }));
     }
 
     function drawChart() {
       const box = $('calc-chart');
       const W = Math.round(box.clientWidth);
       box.innerHTML = '';
-      const n0 = compute(st.lift);
-      if (!W || !isFinite(n0)) return;
-      const lo = Math.max(0.5, st.lift * 0.5), hi = Math.max(lo + 1, st.lift * 2.5);
+      const cur = compute(st.lift);
+      if (!W || !cur) return;
+      const L0 = st.lift, u = liftUnit();
+      const lo = st.liftMode === 'rel' ? Math.max(0.5, L0 * 0.5) : L0 * 0.4, hi = L0 * 2.5;
       const pts = [];
       for (let i = 0; i <= 60; i++) {
-        const L = lo + (hi - lo) * i / 60, n = compute(L);
-        if (isFinite(n)) pts.push([L, n]);
+        const L = lo + (hi - lo) * i / 60, res = compute(L);
+        if (res) pts.push([L, res.total]);
       }
       if (pts.length < 2) return;
       const narrow = W < 520, H = narrow ? 230 : 270;
       const m = { l: 48, r: 20, t: 30, b: 30 };
+      const xLo = pts[0][0], xHi = pts[pts.length - 1][0];
       const maxN = Math.max(...pts.map(p => p[1]));
       const step = niceStep(maxN / 3), top = step * Math.ceil(maxN / step);
-      const x = L => m.l + (L - lo) / (hi - lo) * (W - m.l - m.r);
+      const x = L => m.l + (L - xLo) / (xHi - xLo) * (W - m.l - m.r);
       const y = n => H - m.b - n / top * (H - m.t - m.b);
       const svg = sv('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img',
-        'aria-label': `People needed per group, from ${fmtInt(pts[0][1])} at a ${fmtNum(pts[0][0])}% lift to ${fmtInt(pts[pts.length - 1][1])} at ${fmtNum(pts[pts.length - 1][0])}%` }, box);
+        'aria-label': `Total people needed, from ${fmtInt(pts[0][1])} at a ${fmtNum(xLo)}${u} lift to ${fmtInt(pts[pts.length - 1][1])} at ${fmtNum(xHi)}${u}` }, box);
       for (let v = 0; v <= top + 1e-9; v += step) {
         sv('line', { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), stroke: v ? 'var(--f-rule)' : 'var(--f-ink)', 'stroke-width': 1 }, svg);
         svText(svg, 'f-ax', m.l - 8, y(v) + 3, fmtCompact(v), 'end');
       }
-      const xStep = niceStep((hi - lo) / (narrow ? 4 : 5));
-      for (let L = Math.ceil(lo / xStep) * xStep; L <= hi + 1e-9; L += xStep) {
-        svText(svg, 'f-ax', x(L), H - 10, fmtNum(L) + '%', 'middle');
+      const xStep = niceStep((xHi - xLo) / (narrow ? 4 : 5));
+      for (let L = Math.ceil(xLo / xStep) * xStep; L <= xHi + 1e-9; L += xStep) {
+        svText(svg, 'f-ax', x(L), H - 10, fmtNum(L) + u, 'middle');
       }
       sv('path', { d: pts.map((p, i) => (i ? 'L' : 'M') + x(p[0]).toFixed(1) + ',' + y(p[1]).toFixed(1)).join(' '),
         fill: 'none', stroke: 'var(--f-ink)', 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, svg);
-      const cx = x(st.lift), cy = y(n0);
+      const cx = x(L0), cy = y(cur.total);
       sv('line', { x1: cx, x2: cx, y1: cy, y2: H - m.b, stroke: 'var(--f-mid)', 'stroke-width': 1, 'stroke-dasharray': '3 3' }, svg);
       sv('circle', { cx, cy, r: 5, fill: 'var(--f-ink)', stroke: 'var(--f-bg)', 'stroke-width': 2 }, svg);
       const right = cx < W * 0.6;
-      svText(svg, 'f-it', cx + (right ? 12 : -12), cy - 10, `your test: ${fmtInt(n0)} per group`, right ? 'start' : 'end');
+      svText(svg, 'f-it', cx + (right ? 12 : -12), cy - 10, `your test: ${fmtInt(cur.total)} in total`, right ? 'start' : 'end');
 
       const wrap = box.parentNode;
       const cross = sv('line', { y1: m.t, y2: H - m.b, stroke: 'var(--f-soft)', 'stroke-width': 1, opacity: 0 }, svg);
@@ -1844,7 +1959,7 @@
         pts.forEach(p => { if (Math.abs(x(p[0]) - px) < Math.abs(x(best[0]) - px)) best = p; });
         cross.setAttribute('x1', x(best[0])); cross.setAttribute('x2', x(best[0])); cross.setAttribute('opacity', 1);
         dot.setAttribute('cx', x(best[0])); dot.setAttribute('cy', y(best[1])); dot.setAttribute('opacity', 1);
-        showTip(wrap, `<b style="font-weight:400">${fmtNum(best[0])}% lift</b><br>${fmtInt(best[1])} per group`, x(best[0]), 4);
+        showTip(wrap, `<b style="font-weight:400">${fmtNum(best[0])}${u} lift</b><br>${fmtInt(best[1])} in total`, x(best[0]), 4);
       };
       hit.addEventListener('mousemove', e => move(e.clientX - svg.getBoundingClientRect().left));
       hit.addEventListener('touchstart', e => move(e.touches[0].clientX - svg.getBoundingClientRect().left), { passive: true });
@@ -1852,59 +1967,121 @@
     }
 
     function update() {
-      root.querySelectorAll('[data-for="rate"]').forEach(e => e.hidden = st.metric !== 'rate');
-      root.querySelectorAll('[data-for="mean"], [data-for="sd"]').forEach(e => e.hidden = st.metric !== 'mean');
-      const n = compute(st.lift);
+      const mVar = st.groups - 1;
+      root.querySelectorAll('[data-for="rate"]').forEach(e => e.hidden = !isRate());
+      root.querySelectorAll('[data-for="mean"]').forEach(e => e.hidden = isRate());
+      root.querySelector('[data-for="correct"]').hidden = mVar < 2;
+
+      // Lift: what it means in plain numbers
+      const t = target(st.lift);
+      $('calc-lift-help').textContent = !isFinite(t) ? '' : isRate()
+        ? `${fmtNum(st.rate)}% becomes ${fmtNum(t * 100)}%.`
+        : `${fmtNum(st.mean)} becomes ${fmtNum(t)}.`;
+
+      // Split and correction
+      const vShare = st.evenSplit ? 100 / st.groups : (100 - st.control) / mVar;
+      $('calc-split-help').textContent = mVar === 1
+        ? `The variant gets ${fmtNum(100 - st.control)}%.`
+        : `Each of the ${mVar} variants gets ${fmtNum(vShare)}%.`;
+      $('calc-even').hidden = st.evenSplit;
+      $('calc-correct-help').textContent = st.correct
+        ? `Each of the ${mVar} comparisons uses ${fmtNum(100 - (100 - st.conf) / mVar)}% confidence.`
+        : `Without it, the chance of at least one false win rises to about ${fmtNum((1 - Math.pow(st.conf / 100, mVar)) * 100)}%.`;
+
+      const res = compute(st.lift);
       const sentence = $('calc-sentence'), note = $('calc-note');
-      if (!isFinite(n)) {
-        $('calc-n').textContent = '–'; $('calc-total').textContent = '–'; $('calc-days').textContent = '–';
+      $('calc-nv-label').textContent = mVar === 1 ? 'Variant' : 'Each variant';
+      if (!res) {
+        ['calc-n', 'calc-nc', 'calc-nv', 'calc-weeks'].forEach(id => $(id).textContent = '–');
+        $('calc-days').textContent = 'To run';
         sentence.textContent = '';
-        note.textContent = st.metric === 'rate'
+        note.textContent = isRate()
           ? 'Check the numbers: the rate needs to be between 0 and 100%, and stay below 100% after the lift.'
           : 'Check the numbers: the average, standard deviation and lift all need to be above zero.';
         drawChart();
         return;
       }
-      const total = n * st.groups;
-      const days = st.traffic > 0 ? Math.ceil(total / st.traffic) : NaN;
-      $('calc-n').textContent = fmtInt(n);
-      $('calc-total').textContent = fmtInt(total);
-      $('calc-days').textContent = isFinite(days) ? (days === 1 ? '1 day' : fmtInt(days) + ' days') : '–';
+      const days = st.traffic > 0 ? Math.ceil(res.total / st.traffic) : NaN;
+      const weeks = Math.max(1, Math.ceil(days / 7));
+      $('calc-n').textContent = fmtInt(res.total);
+      $('calc-nc').textContent = fmtInt(res.nc);
+      $('calc-nv').textContent = fmtInt(res.nv);
+      $('calc-weeks').textContent = isFinite(days) ? (weeks === 1 ? '1 week' : weeks + ' weeks') : '–';
+      $('calc-days').textContent = isFinite(days) ? `To run · ${days === 1 ? '1 day' : fmtInt(days) + ' days'} minimum` : 'To run';
 
-      const base = st.metric === 'rate'
-        ? `To detect a ${fmtNum(st.lift)}% lift on a ${fmtNum(st.rate)}% conversion rate (${fmtNum(st.rate)}% to ${fmtNum(st.rate * (1 + st.lift / 100))}%)`
-        : `To detect a ${fmtNum(st.lift)}% lift on an average of ${fmtNum(st.mean)} (to ${fmtNum(st.mean * (1 + st.lift / 100))}), with a standard deviation of ${fmtNum(st.sd)}`;
-      let text = `${base}, with ${st.conf}% confidence and ${st.power}% power, each group needs ${fmtInt(n)} people.`;
+      let base;
+      if (isRate()) {
+        const lt = st.liftMode === 'rel' ? `${fmtNum(st.lift)}% relative lift` : `${fmtNum(st.lift)} percentage point lift`;
+        base = `To detect a ${lt} on a ${fmtNum(st.rate)}% conversion rate (${fmtNum(st.rate)}% to ${fmtNum(t * 100)}%)`;
+      } else {
+        const lt = st.liftMode === 'rel' ? `a ${fmtNum(st.lift)}% lift` : `a lift of ${fmtNum(st.lift)}`;
+        base = `To detect ${lt} on an average of ${fmtNum(st.mean)} (to ${fmtNum(t)}), with a standard deviation of ${fmtNum(st.sd)}`;
+      }
+      let text = `${base}, with ${st.conf}% confidence and ${st.power}% power, the test needs ${fmtInt(res.total)} people: ${fmtInt(res.nc)} in the control and ${fmtInt(res.nv)} in ${mVar === 1 ? 'the variant' : 'each of the ' + mVar + ' variants'}.`;
       if (isFinite(days)) {
-        const weeks = days >= 14 ? ` (about ${Math.round(days / 7)} weeks)` : '';
-        text += ` With ${fmtInt(st.traffic)} people a day split across ${st.groups} groups, that&rsquo;s ${days === 1 ? '1 day' : fmtInt(days) + ' days'}${weeks}.`;
+        text += ` At ${fmtInt(st.traffic)} people a day, that&rsquo;s ${days === 1 ? '1 day' : fmtInt(days) + ' days'}. Round up to ${weeks === 1 ? '1 full week' : weeks + ' full weeks'}, so every day of the week counts equally.`;
       }
       sentence.innerHTML = text;
-      note.textContent = !isFinite(days) ? ''
-        : days < 7 ? 'Run it for at least a full week anyway, so every day of the week is covered.'
-        : days > 90 ? 'That&rsquo;s a long test. A bigger lift, more traffic or fewer groups would shorten it.'.replace('&rsquo;', '’')
-        : '';
+      note.textContent = isFinite(days) && days > 90
+        ? 'That’s a long test. A bigger lift, more traffic or fewer groups would shorten it.'
+        : (mVar > 1 && !st.correct ? 'Without a correction, a variant can look like a winner by chance more often than your confidence level suggests.' : '');
       drawChart();
     }
 
+    // Typing into a number box
     root.querySelectorAll('.calc-input input').forEach(inp => inp.addEventListener('input', () => {
-      const v = parseFloat(inp.value);
-      st[inp.dataset.key] = isFinite(v) ? v : NaN;
-      if (inp.dataset.key === 'lift' && isFinite(v)) range.value = Math.min(50, Math.max(0.5, v));
+      if (inp.hasAttribute('data-commas')) formatField(inp);
+      const key = inp.dataset.key, v = parseFloat(inp.value.replace(/,/g, ''));
+      st[key] = isFinite(v) ? v : NaN;
+      if (key === 'lift' && isFinite(v)) liftRange.value = v;
+      if (key === 'control') {
+        st.evenSplit = false;
+        if (isFinite(v)) controlRange.value = v;
+      }
+      if ((key === 'rate' || key === 'mean') && st.liftMode === 'abs') setLiftRange();
       update();
     }));
-    range.addEventListener('input', () => {
-      st.lift = parseFloat(range.value);
+
+    liftRange.addEventListener('input', () => {
+      st.lift = parseFloat(liftRange.value);
       $('calc-lift').value = st.lift;
       update();
     });
+
+    controlRange.addEventListener('input', () => {
+      st.control = parseFloat(controlRange.value);
+      st.evenSplit = false;
+      $('calc-control').value = st.control;
+      update();
+    });
+
+    $('calc-even').addEventListener('click', () => {
+      st.evenSplit = true;
+      st.control = evenShare();
+      $('calc-control').value = st.control;
+      controlRange.value = st.control;
+      update();
+    });
+
+    // Toggle buttons
     root.querySelectorAll('.seg').forEach(g => g.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
       const key = g.dataset.key, raw = btn.dataset.v;
-      st[key] = isNaN(+raw) ? raw : +raw;
-      g.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === btn));
+      const prevMetric = st.metric, prevMode = st.liftMode;
+      const val = key === 'correct' ? raw === 'true' : (isNaN(+raw) ? raw : +raw);
+      if (key === 'metric' && val !== prevMetric && prevMode === 'abs') { convertLift('rel', prevMetric); st.liftMode = 'rel'; }
+      if (key === 'liftMode' && val !== prevMode) convertLift(val, st.metric);
+      st[key] = val;
+      if (key === 'groups' && st.evenSplit) {
+        st.control = evenShare();
+        $('calc-control').value = st.control;
+        controlRange.value = st.control;
+      }
+      if (key === 'metric' || key === 'liftMode') setLiftRange();
+      syncSegs();
       update();
     })));
 
+    setLiftRange();
     projectRedraw = drawChart;
     update();
   }
