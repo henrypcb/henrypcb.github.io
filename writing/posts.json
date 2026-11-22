@@ -1,13 +1,5 @@
 [
   {
-    "slug": "causal-methods-field-guide",
-    "title": "A field guide to causal methods",
-    "summary": "Ten ways to tell whether a change caused an outcome, each with a diagram, a plain-English explanation and the assumptions to check.",
-    "topic": "Causal inference",
-    "format": "Guide",
-    "date": "2026-11-22"
-  },
-  {
     "slug": "visual-style",
     "title": "How things look here",
     "summary": "A reference for the figures, diagrams and type used across this site. Placeholder content throughout.",
