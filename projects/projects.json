@@ -2,7 +2,7 @@
   {
     "slug": "sample-size",
     "title": "Sample size calculator",
-    "summary": "How many people an experiment needs to detect the change you care about, and how long it will take to run.",
+    "summary": "How many customers an experiment needs to detect the change you care about, and how long it will take to run.",
     "tag": "Tool",
     "size": "xl",
     "art": "curves",

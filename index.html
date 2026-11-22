@@ -2126,11 +2126,11 @@
       <div class="calc">
         <p class="post-kicker">${esc(project.tag || 'Tool')} &middot; Experimentation</p>
         <h1 class="post-title">${esc(project.title)}</h1>
-        <p class="calc-intro">Before running an A/B test, check it can actually detect the change you care about. Set your numbers to see how many people the test needs and how long it will take, or how small a change it can pick up in the time you have.</p>
+        <p class="calc-intro">Before running an A/B test, check it can actually detect the change you care about. Set your numbers to see how many customers the test needs and how long it will take, or how small a change it can pick up in the time you have.</p>
 
         <div class="calc-metric">
           <span class="calc-label">What do you want to find out?</span>
-          ${seg('goal', [['n', 'How many people, and for how long'], ['mde', 'The smallest lift I can detect']])}
+          ${seg('goal', [['n', 'How many customers, and for how long'], ['mde', 'The smallest lift I can detect']])}
         </div>
 
         <div class="calc-metric">
@@ -2141,7 +2141,7 @@
         <div class="calc-grid">
           <div class="calc-field" data-for="rate">
             <label class="calc-label" for="calc-rate">Current conversion rate</label>${input('rate', '%')}
-            <p class="calc-help">The share of people who convert today.</p>
+            <p class="calc-help">The share of customers who convert today.</p>
           </div>
           <div class="calc-field" data-for="mean">
             <label class="calc-label" for="calc-mean">Current average</label>${input('mean', '')}
@@ -2176,7 +2176,7 @@
             <p class="calc-help"><span id="calc-split-help"></span> <button type="button" class="calc-link" id="calc-even">Make even</button></p>
           </div>
           <div class="calc-field">
-            <label class="calc-label" for="calc-traffic">People entering the test per day</label>${input('traffic', 'a day')}
+            <label class="calc-label" for="calc-traffic">Customers entering the test per day</label>${input('traffic', 'a day')}
           </div>
           <div class="calc-field" data-for="mde">
             <label class="calc-label" for="calc-weeks-in">How long can it run?</label>
@@ -2185,7 +2185,7 @@
           </div>
           <div class="calc-field">
             <span class="calc-label">Adjust for data from before the test</span>${seg('cuped', [['true', 'On'], ['false', 'Off']])}
-            <p class="calc-help">Known as CUPED. It removes noise you can already predict, so the test needs fewer people.</p>
+            <p class="calc-help">Known as CUPED. It removes noise you can already predict, so the test needs fewer customers.</p>
           </div>
           <div class="calc-field" data-for="cuped">
             <label class="calc-label" for="calc-r">Correlation with the same metric before the test</label>${input('r', 'from 0 to 0.95', 0, ' max="0.95"')}
@@ -2194,7 +2194,7 @@
         </div>
 
         <div class="calc-result">
-          <div><div class="calc-n" id="calc-n">&ndash;</div><p class="calc-sub" id="calc-n-label">People in total</p></div>
+          <div><div class="calc-n" id="calc-n">&ndash;</div><p class="calc-sub" id="calc-n-label">Customers in total</p></div>
           <div class="calc-stats">
             <div class="calc-stat"><b id="calc-nc">&ndash;</b><p class="calc-sub">Control</p></div>
             <div class="calc-stat"><b id="calc-nv">&ndash;</b><p class="calc-sub" id="calc-nv-label">Variant</p></div>
@@ -2211,9 +2211,9 @@
         <div class="post-body">
           <figure class="fig">
             <p class="fig-k">Fig. 1 &middot; Change over lift</p>
-            <p class="fig-t">Smaller lifts need far more people</p>
+            <p class="fig-t">Smaller lifts need far more customers</p>
             <div class="fig-wrap"><div class="fig-chart" id="calc-chart"></div><div class="fig-tip"></div></div>
-            <figcaption><span><em>Fig. 1</em> &mdash; <span id="calc-fig-cap">Total people needed across a range of lifts, with your current settings marked.</span></span></figcaption>
+            <figcaption><span><em>Fig. 1</em> &mdash; <span id="calc-fig-cap">Total customers needed across a range of lifts, with your current settings marked.</span></span></figcaption>
           </figure>
         </div>
 
@@ -2221,8 +2221,8 @@
           <p>How it&rsquo;s worked out: a standard two-sided test. For conversion rates it compares two proportions; for averages it assumes the metric is roughly normally distributed and uses your standard deviation for every group.</p>
           <p>Groups can be different sizes. You set the control&rsquo;s share, and the rest is split equally across the variants. Each variant is compared with the control.</p>
           <p>With more than one variant, the Bonferroni correction divides the allowance for false positives across the comparisons, so each one needs more confidence. It&rsquo;s slightly cautious, which suits planning. Durations are rounded up to whole weeks, because behaviour often differs by day of the week.</p>
-          <p>To find the smallest lift you can detect, it works backwards: it searches for the lift where the people you&rsquo;ll get are exactly enough, and rounds up.</p>
-          <p>Adjusting for data from before the test (CUPED) uses each person&rsquo;s value of the same metric from before the test to remove noise that was predictable anyway. The people needed shrink by the square of the correlation, so 0.5 means 25% fewer. You&rsquo;ll need that earlier data for everyone in the test, and the analysis has to use the same adjustment.</p>
+          <p>To find the smallest lift you can detect, it works backwards: it searches for the lift where the customers you&rsquo;ll get are exactly enough, and rounds up.</p>
+          <p>Adjusting for data from before the test (CUPED) uses each customer&rsquo;s value of the same metric from before the test to remove noise that was predictable anyway. The customers needed shrink by the square of the correlation, so 0.5 means 25% fewer. You&rsquo;ll need that earlier data for everyone in the test, and the analysis has to use the same adjustment.</p>
         </div>
       </div>`;
 
@@ -2278,9 +2278,9 @@
       return st.liftMode === 'rel' ? 1000 : st.mean * 10;
     }
 
-    // Smallest lift the available people can detect: search between a tiny lift and the largest
-    // possible one, keeping the smallest that needs no more people than the test will get.
-    // People needed fall steadily as the lift grows, so halving the gap each time converges.
+    // Smallest lift the available customers can detect: search between a tiny lift and the largest
+    // possible one, keeping the smallest that needs no more customers than the test will get.
+    // Customers needed fall steadily as the lift grows, so halving the gap each time converges.
     function solveMde() {
       const N = peopleAvailable();
       if (!(N > 0)) return null;
@@ -2361,7 +2361,7 @@
       const x = L => m.l + (L - xLo) / (xHi - xLo) * (W - m.l - m.r);
       const y = n => H - m.b - n / top * (H - m.t - m.b);
       const svg = sv('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img',
-        'aria-label': `Total people needed, from ${fmtInt(pts[0][1])} at a ${fmtNum(xLo)}${u} lift to ${fmtInt(pts[pts.length - 1][1])} at ${fmtNum(xHi)}${u}` }, box);
+        'aria-label': `Total customers needed, from ${fmtInt(pts[0][1])} at a ${fmtNum(xLo)}${u} lift to ${fmtInt(pts[pts.length - 1][1])} at ${fmtNum(xHi)}${u}` }, box);
       for (let v = 0; v <= top + 1e-9; v += step) {
         sv('line', { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), stroke: v ? 'var(--f-rule)' : 'var(--f-ink)', 'stroke-width': 1 }, svg);
         svText(svg, 'f-ax', m.l - 8, y(v) + 3, fmtInt(v), 'end');
@@ -2409,11 +2409,11 @@
       }
       if (!st.evenSplit && !(st.control > 0 && st.control < 100)) return 'The control’s share of traffic needs to be above 0% and below 100%.';
       if (isMde()) {
-        if (!(st.traffic > 0)) return 'The number of people entering the test each day needs to be above zero.';
+        if (!(st.traffic > 0)) return 'The number of customers entering the test each day needs to be above zero.';
         if (!(st.weeks > 0)) return 'How long it can run needs to be above zero.';
       }
       if (!cupedOk()) return 'The correlation needs to be between 0 and 0.95.';
-      if (sol && sol.none) return `Even a very large lift wouldn’t be detectable with ${fmtInt(sol.N)} people. Run it for longer, send more people into the test, or use fewer groups.`;
+      if (sol && sol.none) return `Even a very large lift wouldn’t be detectable with ${fmtInt(sol.N)} customers. Run it for longer, send more customers into the test, or use fewer groups.`;
       return 'Check the numbers above.';
     }
 
@@ -2450,57 +2450,57 @@
         ? `Each of the ${mVar} comparisons uses ${fmtNum(100 - (100 - st.conf) / mVar)}% confidence.`
         : `Without it, the chance of at least one false win rises to about ${fmtNum((1 - Math.pow(st.conf / 100, mVar)) * 100)}%.`;
       $('calc-r-help').textContent = cupedOk() && st.cuped
-        ? (st.r > 0 ? `At ${fmtNum(st.r)}, the test needs ${fmtNum(st.r * st.r * 100)}% fewer people. To find yours, correlate each person’s value over a few weeks with their value over the few weeks before.`
+        ? (st.r > 0 ? `At ${fmtNum(st.r)}, the test needs ${fmtNum(st.r * st.r * 100)}% fewer customers. To find yours, correlate each customer’s value over a few weeks with their value over the few weeks before.`
                     : 'At 0, data from before the test doesn’t help.')
-        : 'Use the correlation between each person’s value before the test and during it.';
+        : 'Use the correlation between each customer’s value before the test and during it.';
       $('calc-fig-cap').textContent = isMde()
-        ? 'Total people needed across a range of lifts. The marked point is the smallest lift your test can detect with the people it will get.'
-        : 'Total people needed across a range of lifts, with your current settings marked.';
+        ? 'Total customers needed across a range of lifts. The marked point is the smallest lift your test can detect with the customers it will get.'
+        : 'Total customers needed across a range of lifts, with your current settings marked.';
 
       const sentence = $('calc-sentence'), note = $('calc-note');
       $('calc-nv-label').textContent = mVar === 1 ? 'Variant' : 'Each variant';
       const cupedText = st.cuped && st.r > 0
-        ? ` That&rsquo;s after adjusting for data from before the test, which cuts the people needed by ${fmtNum(st.r * st.r * 100)}%.` : '';
+        ? ` That&rsquo;s after adjusting for data from before the test, which cuts the customers needed by ${fmtNum(st.r * st.r * 100)}%.` : '';
       const confText = `with ${st.conf}% confidence and ${st.power}% power`;
       plan = null;
 
       if (isMde()) {
         const sol = solveMde();
         if (!sol || sol.none) {
-          setResult('–', 'Smallest lift you can detect', '–', '–', '–', 'People in the test');
+          setResult('–', 'Smallest lift you can detect', '–', '–', '–', 'Customers in the test');
           sentence.textContent = '';
           note.textContent = inputProblem(sol);
         } else {
           const { m, c, v } = shares();
           const nc = Math.floor(sol.N * c), nv = Math.floor(sol.N * v);
           setResult(fmtNum(sol.L) + (st.liftMode === 'rel' ? '%' : (isRate() ? 'pp' : '')), 'Smallest lift you can detect',
-            fmtInt(nc), fmtInt(nv), fmtInt(sol.N), `People over ${fmtNum(st.weeks)} ${st.weeks === 1 ? 'week' : 'weeks'}`);
-          sentence.innerHTML = `With ${fmtInt(st.traffic)} people a day for ${fmtNum(st.weeks)} ${st.weeks === 1 ? 'week' : 'weeks'} (${fmtInt(sol.N)} people), ${confText}, the smallest change you can reliably detect is a ${liftWords(sol.L)}: ${fromTo(sol.L)}. If the real effect is smaller than that, the test will probably miss it.${cupedText}`;
+            fmtInt(nc), fmtInt(nv), fmtInt(sol.N), `Customers over ${fmtNum(st.weeks)} ${st.weeks === 1 ? 'week' : 'weeks'}`);
+          sentence.innerHTML = `With ${fmtInt(st.traffic)} customers a day for ${fmtNum(st.weeks)} ${st.weeks === 1 ? 'week' : 'weeks'} (${fmtInt(sol.N)} customers), ${confText}, the smallest change you can reliably detect is a ${liftWords(sol.L)}: ${fromTo(sol.L)}. If the real effect is smaller than that, the test will probably miss it.${cupedText}`;
           // Flag results that are technically right but too big to be useful
           const base = isRate() ? st.rate / 100 : st.mean, relChange = (target(sol.L) / base - 1) * 100;
           note.textContent = relChange > 50
-            ? `That’s a ${fmtNum(relChange)}% change, far bigger than most tests ever see. As set up, this test is too small to tell you much: run it for longer, send more people into it, or use fewer groups.`
+            ? `That’s a ${fmtNum(relChange)}% change, far bigger than most tests ever see. As set up, this test is too small to tell you much: run it for longer, send more customers into it, or use fewer groups.`
             : (st.weeks % 1 ? 'Rounding to whole weeks keeps every day of the week equally represented.' : '');
           plan = { mde: sol, nc, nv, m };
         }
       } else {
         const res = compute(st.lift);
         if (!res) {
-          setResult('–', 'People in total', '–', '–', '–', 'To run');
+          setResult('–', 'Customers in total', '–', '–', '–', 'To run');
           sentence.textContent = '';
           note.textContent = inputProblem();
         } else {
           const days = st.traffic > 0 ? Math.ceil(res.total / st.traffic) : NaN;
           const weeks = Math.max(1, Math.ceil(days / 7));
-          setResult(fmtInt(res.total), 'People in total', fmtInt(res.nc), fmtInt(res.nv),
+          setResult(fmtInt(res.total), 'Customers in total', fmtInt(res.nc), fmtInt(res.nv),
             isFinite(days) ? (weeks === 1 ? '1 week' : weeks + ' weeks') : '–',
             isFinite(days) ? `To run · ${days === 1 ? '1 day' : fmtInt(days) + ' days'} minimum` : 'To run');
           let base = isRate()
             ? `To detect a ${liftWords(st.lift)} on a ${fmtNum(st.rate)}% conversion rate (${fromTo(st.lift)})`
             : `To detect a ${liftWords(st.lift)} on an average of ${fmtNum(st.mean)} (to ${fmtNum(target(st.lift))}), with a standard deviation of ${fmtNum(st.sd)}`;
-          let text = `${base}, ${confText}, the test needs ${fmtInt(res.total)} people: ${fmtInt(res.nc)} in the control and ${fmtInt(res.nv)} in ${mVar === 1 ? 'the variant' : 'each of the ' + mVar + ' variants'}.`;
+          let text = `${base}, ${confText}, the test needs ${fmtInt(res.total)} customers: ${fmtInt(res.nc)} in the control and ${fmtInt(res.nv)} in ${mVar === 1 ? 'the variant' : 'each of the ' + mVar + ' variants'}.`;
           if (isFinite(days)) {
-            text += ` At ${fmtInt(st.traffic)} people a day, that&rsquo;s ${days === 1 ? '1 day' : fmtInt(days) + ' days'}. Round up to ${weeks === 1 ? '1 full week' : weeks + ' full weeks'}, so every day of the week counts equally.`;
+            text += ` At ${fmtInt(st.traffic)} customers a day, that&rsquo;s ${days === 1 ? '1 day' : fmtInt(days) + ' days'}. Round up to ${weeks === 1 ? '1 full week' : weeks + ' full weeks'}, so every day of the week counts equally.`;
           }
           sentence.innerHTML = text + cupedText;
           note.textContent = isFinite(days) && days > 90
@@ -2537,10 +2537,10 @@
       const { m, c, v } = shares();
       const plain = s => s.replace(/&rsquo;/g, '’');
       const lines = ['Sample size plan', ''];
-      lines.push('Question: ' + (isMde() ? 'what’s the smallest lift this test can detect?' : 'how many people does this test need, and for how long?'));
+      lines.push('Question: ' + (isMde() ? 'what’s the smallest lift this test can detect?' : 'how many customers does this test need, and for how long?'));
       lines.push('Metric: ' + (isRate() ? `conversion rate, currently ${fmtNum(st.rate)}%` : `average, currently ${fmtNum(st.mean)} (standard deviation ${fmtNum(st.sd)})`));
       if (!isMde()) lines.push(`Smallest lift worth detecting: ${liftWords(st.lift)} (${fromTo(st.lift)})`);
-      else lines.push(`Run time: ${fmtNum(st.weeks)} ${st.weeks === 1 ? 'week' : 'weeks'} at ${fmtInt(st.traffic)} people a day`);
+      else lines.push(`Run time: ${fmtNum(st.weeks)} ${st.weeks === 1 ? 'week' : 'weeks'} at ${fmtInt(st.traffic)} customers a day`);
       lines.push(`Confidence: ${st.conf}%  ·  Power: ${st.power}%`);
       lines.push(`Groups: ${st.groups} (control ${fmtNum(c * 100)}%, ${m === 1 ? 'variant' : 'each variant'} ${fmtNum(v * 100)}%)`);
       if (m > 1) lines.push('Correction for multiple comparisons: ' + (st.correct ? 'Bonferroni' : 'none'));
@@ -2549,11 +2549,11 @@
       if (isMde()) {
         const { mde, nc, nv } = plan;
         lines.push(`- Smallest lift you can detect: ${liftWords(mde.L)} (${fromTo(mde.L)})`);
-        lines.push(`- People in the test: ${fmtInt(mde.N)} (control ${fmtInt(nc)}, ${m === 1 ? 'variant' : 'each variant'} ${fmtInt(nv)})`);
+        lines.push(`- Customers in the test: ${fmtInt(mde.N)} (control ${fmtInt(nc)}, ${m === 1 ? 'variant' : 'each variant'} ${fmtInt(nv)})`);
         lines.push('- A real effect smaller than this will probably be missed.');
       } else {
         const { res, days, weeks } = plan;
-        lines.push(`- People needed: ${fmtInt(res.total)} (control ${fmtInt(res.nc)}, ${m === 1 ? 'variant' : 'each variant'} ${fmtInt(res.nv)})`);
+        lines.push(`- Customers needed: ${fmtInt(res.total)} (control ${fmtInt(res.nc)}, ${m === 1 ? 'variant' : 'each variant'} ${fmtInt(res.nv)})`);
         if (isFinite(days)) lines.push(`- Run time: ${fmtInt(days)} ${days === 1 ? 'day' : 'days'} at ${fmtInt(st.traffic)} a day, rounded up to ${weeks} ${weeks === 1 ? 'week' : 'weeks'}`);
       }
       lines.push('', 'Open these settings: ' + shareUrl());
