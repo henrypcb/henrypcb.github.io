@@ -27,11 +27,13 @@
     "live": true
   },
   {
-    "slug": "placeholder-three",
-    "title": "Duis aute irure",
-    "summary": "Excepteur sint occaecat cupidatat non proident.",
-    "tag": "In progress",
-    "size": "s"
+    "slug": "customer-problems",
+    "title": "Make sense of customer problems",
+    "summary": "Jot down what customers struggle with and watch the notes group into themes, ranked by how many each one affects.",
+    "tag": "Tool",
+    "size": "s",
+    "art": "clusters",
+    "live": true
   },
   {
     "slug": "sample-size",

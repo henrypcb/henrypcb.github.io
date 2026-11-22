@@ -935,6 +935,44 @@
   .carousel-slide img:focus { outline: none; }
   .carousel-slide img:focus-visible { outline: 2px solid var(--black); outline-offset: -2px; }
 
+  /* ─── CUSTOMER PROBLEMS ─────────────────────────────── */
+  .cp-add { margin-top: 34px; padding: 26px 0 6px; border-top: 1px solid var(--border); }
+  .cp .cp-text { min-height: 96px; }
+  .cp-add-row { display: grid; grid-template-columns: 1fr 1.4fr; gap: 28px; margin-top: 22px; align-items: end; }
+  .cp-add-row .calc-input input { font-size: 18px; }
+  .cp-opt { text-transform: none; letter-spacing: 0; }
+  .cp-status { font-size: 12px; color: var(--gray); line-height: 1.5; }
+  .cp-bar { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; flex-wrap: wrap; margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .cp-count { font-size: 13px; color: var(--black); }
+  .cp-detail { display: flex; align-items: baseline; gap: 14px; }
+  .cp-detail .calc-label { margin: 0; }
+  .cp-tools { margin-top: 16px; }
+  .cp-themes { margin-top: 10px; }
+  .cp-theme { padding: 26px 0 20px; border-top: 1px solid var(--border); }
+  .cp-theme ul { list-style: none; margin-top: 14px; }
+  .cp-rank { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gray); }
+  .cp-name { font-family: Georgia, serif; font-weight: 400; font-size: 22px; line-height: 1.3; margin: 8px 0 6px; }
+  .cp-name-in { font: inherit; font-size: 22px; width: 100%; background: none; border: none; border-bottom: 1px solid var(--black); color: var(--black); padding: 2px 0; outline: none; }
+  .cp-sum { font-size: 14px; line-height: 1.6; color: #555; margin-bottom: 6px; max-width: 620px; }
+  .cp-stats { font-size: 12px; color: var(--gray); }
+  .cp-stats .calc-link { margin-left: 12px; font-size: 12px; }
+  .cp-help { font-size: 12px; color: var(--gray); margin-top: 6px; }
+  .cp-note { padding: 10px 0 10px 16px; border-left: 1px solid var(--border); margin-bottom: 4px; }
+  .cp-note:first-child { border-left-color: var(--black); }
+  .cp-quote { font-size: 14px; line-height: 1.6; color: var(--black); }
+  .cp-meta { font-size: 11px; color: var(--gray); margin-top: 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+  .cp-move select { font: inherit; font-size: 11px; color: var(--gray); background: none; border: none; border-bottom: 1px solid var(--border); padding: 1px 0; max-width: 220px; cursor: pointer; }
+  .cp-move select:hover, .cp-move select:focus-visible { color: var(--black); border-bottom-color: var(--black); }
+  .cp-del { font: inherit; font-size: 11px; color: var(--gray); background: none; border: none; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+  .cp-del:hover, .cp-del:focus-visible { color: var(--black); }
+  .cp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .cp-waiting { opacity: 0.75; }
+  html.dark body .cp-sum { color: #bbb; }
+  @media (max-width: 640px) {
+    .cp-add-row { grid-template-columns: 1fr; gap: 20px; }
+    .cp-name, .cp-name-in { font-size: 19px; }
+  }
+
   /* ─── NOT FOUND ───────────────────────────────────── */
   .notfound-title { font-family: Georgia, serif; font-weight: 400; font-size: 32px; margin-bottom: 16px; }
   .notfound p { color: var(--gray); line-height: 1.6; }
@@ -2043,6 +2081,18 @@
         ${e('M20,60 C60,60 80,30 120,30')}${e('M20,60 C60,60 80,90 120,90')}${e('M120,30 C170,30 190,60 240,60', 1)}${e('M120,90 C170,90 190,60 240,60')}
         ${e('M120,30 C140,50 140,70 120,90')}${e('M240,60 L360,60', 1)}${e('M240,60 C280,60 300,100 340,104')}
         ${n(20, 60, 5)}${n(120, 30, 7)}${n(120, 90, 7)}${n(240, 60, 7)}${n(360, 60, 9, 1)}${n(340, 104, 5)}
+      </svg>`;
+    }
+    if (kind === 'clusters') {
+      const pts = [[40, 40], [58, 62], [32, 72], [70, 34], [52, 92],
+                   [178, 30], [196, 54], [168, 66], [210, 38],
+                   [318, 58], [340, 80], [300, 86], [356, 52], [330, 30], [312, 108]];
+      const dots = pts.map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${i < 5 ? 4.5 : 4}" fill="var(${i < 5 || i > 8 ? '--black' : '--gray'})"/>`).join('');
+      return `<svg viewBox="0 0 400 130" preserveAspectRatio="xMinYMid meet" aria-hidden="true">
+        <circle cx="50" cy="62" r="44" fill="none" stroke="var(--gray)" stroke-width="1.2" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>
+        <circle cx="189" cy="47" r="34" fill="none" stroke="var(--gray)" stroke-width="1.2" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>
+        <circle cx="328" cy="70" r="52" fill="none" stroke="var(--black)" stroke-width="1.2" vector-effect="non-scaling-stroke"/>
+        ${dots}
       </svg>`;
     }
     if (kind !== 'curves') return '';
@@ -4183,11 +4233,522 @@
     buildAll();
   }
 
+  // ── Customer problems: notes grouped into themes, in the browser ──
+  // Meaning vectors come from a small model in assets/ml (loaded only when someone adds a note).
+  // Sample notes ship with their vectors, so a first visit downloads nothing extra.
+  function renderProblems(root, project) {
+    const STORE = 'customer-problems-v1';
+    const SEV = { 1: 'Annoying', 2: 'Gets in the way', 3: 'Stops them' };
+    const MAX_LEN = 500;
+    let notes = [], renames = [], detail = 0, nextId = 1, mode = 'meaning', undo = null;
+    let modelState = 'idle';   // idle | loading | ready | failed
+    let embedMod = null, aiReady = false, lastThemes = [];
+
+    // ── Saving in this browser only ──
+    const save = () => {
+      try {
+        localStorage.setItem(STORE, JSON.stringify({ notes: notes.map(n => ({ ...n, v: n.v ? n.v.map(x => +x.toFixed(4)) : null })), renames, detail, nextId }));
+      } catch (e) {}
+    };
+    const restore = () => {
+      try {
+        const s = JSON.parse(localStorage.getItem(STORE) || 'null');
+        if (!s || !Array.isArray(s.notes)) return false;
+        notes = s.notes.filter(n => n && typeof n.text === 'string').map(n => ({
+          id: +n.id, text: n.text.slice(0, MAX_LEN), who: String(n.who || '').slice(0, 60), sev: [1, 2, 3].includes(+n.sev) ? +n.sev : 2,
+          v: Array.isArray(n.v) && n.v.length === 384 ? n.v : null, pin: n.pin == null ? null : n.pin
+        }));
+        renames = Array.isArray(s.renames) ? s.renames.filter(r => r && r.name && Array.isArray(r.anchors)) : [];
+        detail = Math.max(-3, Math.min(3, +s.detail || 0));
+        nextId = Math.max(+s.nextId || 1, ...notes.map(n => n.id + 1), 1);
+        return true;
+      } catch (e) { return false; }
+    };
+    async function loadSample() {
+      const list = await fetch('/assets/problems/sample.json').then(r => r.json());
+      notes = list.map((s, i) => ({ id: i + 1, text: s.text, who: s.who, sev: s.sev, v: s.v, pin: null }));
+      renames = []; detail = 0; nextId = notes.length + 1;
+    }
+
+    // ── Words: for theme keywords, and for grouping if the model can't load ──
+    const STOP = new Set(`i me my we our you your it its is are was were be been am do does did doing have has had a an the and or but if so to of in on at by for with about from up down out over after before into than then too very can can't cant could would should will just not no don't dont i'm im i'd id i've ive what how why when where which who this that these those there here all any each every more most some such only own same other as much many get got make made let please want like need keep really actually also even still one way thing things lot bit it's isn't doesn't didn't won't see know help app use look find give take took time`.split(' '));
+    const stem = w => { for (const s of ['ing', 'ed', 'es', 's', 'ly']) if (w.endsWith(s) && w.length - s.length >= 3) return w.slice(0, -s.length); return w; };
+    const words = t => (t.toLowerCase().match(/[a-z£%0-9’']+/g) || []).map(w => w.replace(/[’']/g, '\'')).filter(w => !STOP.has(w) && w.length > 2).map(stem);
+
+    function lexicalVectors(list) {
+      const docs = list.map(n => words(n.text)), df = new Map();
+      docs.forEach(d => new Set(d).forEach(w => df.set(w, (df.get(w) || 0) + 1)));
+      const vocab = [...df.keys()], idx = new Map(vocab.map((w, i) => [w, i]));
+      return docs.map(d => {
+        const v = new Float32Array(vocab.length);
+        d.forEach(w => { v[idx.get(w)] += Math.log(1 + list.length / df.get(w)); });
+        const norm = Math.hypot(...v) || 1;
+        return Array.from(v, x => x / norm);
+      });
+    }
+    const dot = (a, b) => { let s = 0; for (let i = 0; i < a.length; i++) s += a[i] * b[i]; return s; };
+
+    // ── Grouping: complete-linkage clustering, with the number of themes picked by silhouette ──
+    // Complete linkage only joins two groups when even their least similar notes are close,
+    // which stops one catch-all theme from swallowing everything.
+    // (how much closer each note is to its own theme than to the next nearest one)
+    function group(list, vecs) {
+      const n = list.length;
+      if (n === 0) return [];
+      if (n === 1) return [[0]];
+      const S = vecs.map(a => vecs.map(b => dot(a, b)));
+      let clusters = list.map((_, i) => [i]);
+      const byK = new Map([[n, clusters.map(c => c.slice())]]);
+      const link = (a, b) => { let s = Infinity; for (const i of a) for (const j of b) if (S[i][j] < s) s = S[i][j]; return s; };
+      while (clusters.length > 1) {
+        let best = -Infinity, bi = 0, bj = 1;
+        for (let i = 0; i < clusters.length; i++) for (let j = i + 1; j < clusters.length; j++) {
+          const s = link(clusters[i], clusters[j]);
+          if (s > best) { best = s; bi = i; bj = j; }
+        }
+        clusters[bi] = clusters[bi].concat(clusters[bj]);
+        clusters.splice(bj, 1);
+        byK.set(clusters.length, clusters.map(c => c.slice()));
+      }
+      const silhouette = cl => {
+        if (cl.length < 2 || cl.length >= n) return -1;
+        const lab = new Array(n);
+        cl.forEach((c, k) => c.forEach(i => { lab[i] = k; }));
+        let total = 0;
+        for (let i = 0; i < n; i++) {
+          const own = cl[lab[i]];
+          if (own.length === 1) continue;   // a lone note scores 0
+          const a = own.reduce((s, j) => s + (j === i ? 0 : 1 - S[i][j]), 0) / (own.length - 1);
+          let b = Infinity;
+          cl.forEach((c, k) => { if (k !== lab[i]) b = Math.min(b, c.reduce((s, j) => s + 1 - S[i][j], 0) / c.length); });
+          total += (b - a) / Math.max(a, b);
+        }
+        return total / n;
+      };
+      // A theme holding most of the notes can't be acted on, so only consider splits where
+      // no theme has more than 40% of them; among those, pick the most cleanly separated.
+      let bestK = 1, bestS = -Infinity;
+      if (n === 2) bestK = S[0][1] > 0.5 ? 1 : 2;
+      else {
+        const ks = [];
+        for (let k = 2; k <= Math.min(12, n - 1); k++) ks.push(k);
+        const cap = Math.max(3, Math.ceil(0.4 * n));
+        const ok = ks.filter(k => Math.max(...byK.get(k).map(c => c.length)) <= cap);
+        (ok.length ? ok : ks).forEach(k => { const s = silhouette(byK.get(k)); if (s > bestS) { bestS = s; bestK = k; } });
+      }
+      const k = Math.max(1, Math.min(n, bestK + detail));
+      return byK.get(k);
+    }
+
+    // Builds the themes shown on screen from the current notes
+    function themes() {
+      const placed = notes.filter(n => mode === 'words' || n.v);
+      const free = placed.filter(n => n.pin == null);
+      const vecs = mode === 'words' ? lexicalVectors(placed) : placed.map(n => n.v);
+      const vecOf = new Map(placed.map((n, i) => [n.id, vecs[i]]));
+      let groups = group(free, free.map(n => vecOf.get(n.id))).map(g => g.map(i => free[i]));
+      // Notes moved by hand: "solo" gets its own theme; otherwise join the theme of the note it was moved next to
+      const pinned = placed.filter(n => n.pin != null);
+      pinned.forEach(n => {
+        if (n.pin === 'solo') { groups.push([n]); return; }
+        let target = notes.find(m => m.id === n.pin), hops = 0;
+        while (target && target.pin != null && target.pin !== 'solo' && hops++ < 6) target = notes.find(m => m.id === target.pin);
+        const g = target && groups.find(gr => gr.includes(target));
+        if (g) g.push(n); else groups.push([n]);
+      });
+      const out = groups.filter(g => g.length).map(g => {
+        const ids = g.map(n => n.id);
+        // The most typical note: closest on average to the rest of its theme
+        let medoid = g[0], bestSim = -Infinity;
+        g.forEach(a => { const s = g.reduce((t, b) => t + dot(vecOf.get(a.id), vecOf.get(b.id)), 0); if (s > bestSim) { bestSim = s; medoid = a; } });
+        const people = new Set(g.map(n => (n.who || '').trim().toLowerCase() || 'anon-' + n.id)).size;
+        const sev = g.reduce((s, n) => s + n.sev, 0) / g.length;
+        return { ids, notes: g, medoid, people, sev, score: people * sev, keywords: [] };
+      });
+      // Keywords: words common in this theme but rarer in the others
+      const tf = out.map(t => { const m = new Map(); t.notes.forEach(n => new Set(words(n.text)).forEach(w => m.set(w, (m.get(w) || 0) + 1))); return m; });
+      out.forEach((t, k) => {
+        t.keywords = [...tf[k].entries()]
+          .filter(([w, c]) => c > 1)   // a word has to recur to say something about the theme
+          .map(([w, c]) => [w, c * Math.log(1 + out.length / tf.filter(m => m.has(w)).length)])
+          .sort((a, b) => b[1] - a[1]).slice(0, 3).map(([w]) => w);
+      });
+      // Names given by hand or by on-device AI stick to the theme holding most of the notes they were given to
+      const taken = new Set();
+      renames.slice().reverse().forEach(r => {
+        let best = null, bestCount = 0;
+        out.forEach(t => { if (taken.has(t)) return; const c = r.anchors.filter(id => t.ids.includes(id)).length; if (c > bestCount) { bestCount = c; best = t; } });
+        if (best && bestCount * 2 >= Math.min(r.anchors.length, best.ids.length) && bestCount > 0) { best.name = r.name; best.summary = r.summary || ''; taken.add(best); }
+      });
+      out.sort((a, b) => b.score - a.score || b.notes.length - a.notes.length);
+      return out;
+    }
+
+    // ── Page ──
+    root.innerHTML = `
+      <div class="calc cp">
+        <p class="post-kicker">${esc(project.tag || 'Tool')} &middot; User research</p>
+        <h1 class="post-title">${esc(project.title)}</h1>
+        <p class="calc-intro">Jot down the problems customers tell you about, in their words. As you add them, they group into themes, ranked by how many customers each one affects and how much it hurts. Everything stays in your browser.</p>
+
+        <div class="cp-add">
+          <label class="calc-label" for="cp-text">What&rsquo;s the problem, in the customer&rsquo;s words?</label>
+          <textarea class="f-text cp-text" id="cp-text" maxlength="${MAX_LEN * 20}" placeholder="For example: I can&rsquo;t tell what I&rsquo;m paying in fees."></textarea>
+          <p class="calc-help">Paste several at once, one per line.</p>
+          <div class="cp-add-row">
+            <div class="cp-who-wrap">
+              <label class="calc-label" for="cp-who">Who said it <span class="cp-opt">(optional)</span></label>
+              <div class="calc-input"><input id="cp-who" type="text" maxlength="60" autocomplete="off" placeholder="Name or ID"></div>
+            </div>
+            <div>
+              <span class="calc-label">How much does it hurt?</span>
+              <div class="seg" id="cp-sev">${[1, 2, 3].map(s => `<button type="button" data-v="${s}" class="${s === 2 ? 'on' : ''}" aria-pressed="${s === 2}">${SEV[s]}</button>`).join('')}</div>
+            </div>
+          </div>
+          <div class="f-actions"><button type="button" class="f-btn" id="cp-add">Add</button><span class="cp-status" id="cp-status" aria-live="polite"></span></div>
+        </div>
+
+        <div class="cp-bar">
+          <p class="cp-count" id="cp-count"></p>
+          <div class="cp-detail">
+            <span class="calc-label">Themes</span>
+            <div class="seg seg-small" id="cp-detail">
+              <button type="button" data-d="-1">Fewer</button><button type="button" data-d="0">Auto</button><button type="button" data-d="1">More</button>
+            </div>
+          </div>
+        </div>
+        <div class="f-actions cp-tools">
+          <button type="button" class="f-btn" id="cp-copy">Copy as findings</button>
+          <button type="button" class="calc-link" id="cp-ai" hidden>Name themes with on-device AI</button>
+          <button type="button" class="calc-link" id="cp-clear">Start with a blank board</button>
+          <button type="button" class="calc-link" id="cp-sample" hidden>Load the sample notes</button>
+          <button type="button" class="calc-link" id="cp-undo" hidden>Undo</button>
+        </div>
+
+        <div class="post-body">
+          <figure class="fig" id="cp-fig">
+            <p class="fig-k">Fig. 1 &middot; Where to start</p>
+            <p class="fig-t">Which problems to fix first</p>
+            <div class="fig-wrap"><div class="fig-chart" id="cp-chart"></div><div class="fig-tip"></div></div>
+            <figcaption><span><em>Fig. 1</em> &mdash; Each circle is a theme. Further right means more customers have it; higher means it hurts more; bigger means more notes. Start top right.</span></figcaption>
+          </figure>
+        </div>
+
+        <div id="cp-themes" class="cp-themes"></div>
+
+        <div class="calc-how">
+          <p>How it works: a small language model turns each note into a list of numbers that captures its meaning, so notes that mean similar things end up close together, even when they use different words. Notes that sit close together become a theme, and the number of themes is chosen where they separate most cleanly. &ldquo;Fewer&rdquo; and &ldquo;More&rdquo; adjust that.</p>
+          <p>It&rsquo;s a first pass, not a verdict. Move any note to a better theme and rename themes as you go; your changes stick when you add more notes. If your browser has Chrome&rsquo;s built-in AI ready, you can also ask it to name and summarise the themes, on your device.</p>
+          <p>Nothing you type leaves your browser. The model (about 38&nbsp;MB) is downloaded from this site once, the first time you add a note, and your notes are saved only on this device.</p>
+        </div>
+      </div>`;
+
+    const $ = id => root.querySelector('#' + id);
+    const textEl = $('cp-text'), whoEl = $('cp-who'), statusEl = $('cp-status');
+    let sev = 2;
+
+    function setStatus(msg) { statusEl.textContent = msg; }
+
+    // ── Model: fetched only when someone is about to add their own note ──
+    function prepareModel() {
+      if (modelState === 'loading' || modelState === 'ready' || mode === 'words') return;
+      modelState = 'loading';
+      setStatus('Getting the grouping model ready. It downloads once, about 38 MB.');
+      import('/assets/ml/embed.mjs').then(m => { embedMod = m; return m.load(); }).then(() => {
+        modelState = 'ready';
+        if (!root.isConnected) return;
+        setStatus('');
+        embedPending();
+      }).catch(() => {
+        modelState = 'failed';
+        if (!root.isConnected) return;
+        mode = 'words';
+        setStatus('The meaning model couldn’t load here, so notes are grouped by shared words instead.');
+        render();
+      });
+    }
+
+    let embedding = false, embedAgain = false;
+    async function embedPending() {
+      if (embedding) { embedAgain = true; return; }   // one batch at a time; pick up new notes after
+      const todo = notes.filter(n => !n.v);
+      if (!todo.length || modelState !== 'ready') return;
+      embedding = true;
+      setStatus(todo.length === 1 ? 'Grouping your note…' : `Grouping ${todo.length} notes…`);
+      try {
+        const vecs = await embedMod.embed(todo.map(n => n.text));
+        todo.forEach((n, i) => { n.v = vecs[i]; });
+        save();
+        embedding = false;
+        if (!root.isConnected) return;
+        setStatus('');
+        render();
+        if (embedAgain) { embedAgain = false; embedPending(); }
+      } catch (e) {
+        embedding = false;
+        mode = 'words';
+        setStatus('The meaning model couldn’t run here, so notes are grouped by shared words instead.');
+        render();
+      }
+    }
+
+    function addNotes() {
+      const lines = textEl.value.split('\n').map(s => s.trim()).filter(Boolean);
+      if (!lines.length) { textEl.focus(); return; }
+      const who = whoEl.value.trim().slice(0, 60);
+      lines.forEach(t => notes.push({ id: nextId++, text: t.slice(0, MAX_LEN), who, sev, v: null, pin: null }));
+      textEl.value = '';
+      undo = null;
+      save();
+      render();
+      if (mode === 'words') return;
+      if (modelState === 'ready') embedPending(); else prepareModel();
+    }
+
+    // ── Chart: customers affected against how much it hurts ──
+    function drawChart() {
+      const box = $('cp-chart');
+      box.innerHTML = '';
+      $('cp-fig').hidden = lastThemes.length < 2;   // show the figure before measuring it
+      const W = Math.round(box.clientWidth);
+      if (!W || lastThemes.length < 2) return;
+      const narrow = W < 520, H = narrow ? 260 : 300, m = { l: 56, r: 24, t: 20, b: 40 };
+      const maxP = Math.max(2, ...lastThemes.map(t => t.people));
+      const x = p => m.l + (p / (maxP + 0.5)) * (W - m.l - m.r);
+      const y = s => H - m.b - ((s - 1) / 2) * (H - m.t - m.b);
+      const maxN = Math.max(...lastThemes.map(t => t.notes.length));
+      const svg = sv('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img',
+        'aria-label': 'Themes by customers affected and how much they hurt. ' + lastThemes.map((t, i) => `${i + 1}. ${label(t)}: ${t.people} ${t.people === 1 ? 'customer' : 'customers'}, ${hurtWord(t.sev)}`).join('; ') }, box);
+      [1, 2, 3].forEach(s => {
+        sv('line', { x1: m.l, x2: W - m.r, y1: y(s), y2: y(s), stroke: s === 1 ? 'var(--f-ink)' : 'var(--f-rule)', 'stroke-width': 1 }, svg);
+        svText(svg, 'f-ax', m.l - 8, y(s) + 3, narrow ? ['', 'Annoys', 'In the way', 'Stops'][s] : SEV[s].replace('Gets in the way', 'In the way'), 'end');
+      });
+      const step = maxP > 10 ? Math.ceil(maxP / 5) : 1;
+      for (let p = 0; p <= maxP; p += step) svText(svg, 'f-ax', x(p), H - 18, String(p), 'middle');
+      svText(svg, 'f-ax', W - m.r, H - 4, 'CUSTOMERS AFFECTED →', 'end');
+      const wrap = box.parentNode;
+      // Themes with the same reach and hurt would sit on top of each other, so nudge them apart sideways
+      const spots = lastThemes.map(t => ({ t, cx: x(t.people), cy: y(t.sev), r: 7 + 10 * Math.sqrt(t.notes.length / maxN) }));
+      spots.forEach((p, k) => {
+        const home = p.cx, step = p.r + 4, placed = spots.slice(0, k);
+        const clear = cx => cx - p.r >= m.l - 6 && cx + p.r <= W - 2 && placed.every(q => Math.hypot(q.cx - cx, q.cy - p.cy) >= q.r + p.r + 2);
+        for (let j = 0; j <= 24; j++) {
+          const cx = home + (j % 2 ? 1 : -1) * Math.ceil(j / 2) * step;   // in place, then right, left, further right…
+          if (clear(cx)) { p.cx = cx; break; }
+        }
+      });
+      spots.slice().reverse().forEach(({ t, cx, cy, r }) => {
+        const i = lastThemes.indexOf(t);
+        const c = sv('circle', { cx, cy, r, fill: i === 0 ? 'var(--f-ink)' : 'var(--f-wash)', stroke: 'var(--f-ink)', 'stroke-width': 1, opacity: 0.92 }, svg);
+        svText(svg, 'f-num', cx, cy + 4, String(i + 1), 'middle', `font-size:11px;fill:${i === 0 ? 'var(--f-bg)' : 'var(--f-ink)'};pointer-events:none`);
+        c.addEventListener('mousemove', e => showTip(wrap, `<b style="font-weight:400">${i + 1}. ${esc(label(t))}</b><br>${t.notes.length} ${t.notes.length === 1 ? 'note' : 'notes'} · ${t.people} ${t.people === 1 ? 'customer' : 'customers'}`, e.clientX - svg.getBoundingClientRect().left, Math.max(0, cy - 60)));
+        c.addEventListener('mouseleave', () => hideTip(wrap));
+        c.style.cursor = 'pointer';
+        c.addEventListener('click', () => { const el = root.querySelector(`[data-theme="${i}"]`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+      });
+    }
+
+    const hurtWord = s => s >= 2.5 ? 'mostly stops them' : s >= 1.5 ? 'mostly gets in the way' : 'mostly annoying';
+    const clip = (s, n) => {
+      if (s.length <= n) return s;
+      const cut = s.slice(0, n - 1), sp = cut.lastIndexOf(' ');
+      return (sp > n * 0.6 ? cut.slice(0, sp) : cut).replace(/[\s,;:–—-]+$/, '') + '…';   // end on a whole word
+    };
+    const label = t => t.name || clip(t.medoid.text.replace(/[.!?]+$/, ''), 60);
+
+    // ── Themes list ──
+    function render() {
+      if (!root.isConnected) return;
+      lastThemes = themes();
+      const waiting = notes.filter(n => mode !== 'words' && !n.v);
+      const people = new Set(notes.map(n => (n.who || '').trim().toLowerCase() || 'anon-' + n.id)).size;
+      $('cp-count').textContent = notes.length
+        ? `${fmtInt(notes.length)} ${notes.length === 1 ? 'note' : 'notes'} from ${fmtInt(people)} ${people === 1 ? 'customer' : 'customers'} · ${lastThemes.length} ${lastThemes.length === 1 ? 'theme' : 'themes'}`
+        : 'No notes yet. Add one above to start.';
+      root.querySelectorAll('#cp-detail button').forEach(b => { const on = +b.dataset.d === Math.sign(detail); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+      $('cp-copy').disabled = !lastThemes.length;
+      $('cp-ai').hidden = !aiReady || lastThemes.length < 1;
+      $('cp-sample').hidden = notes.length > 0;
+      $('cp-clear').hidden = notes.length === 0;
+      $('cp-undo').hidden = !undo;
+
+      const options = t => lastThemes.map((o, j) => o === t ? '' : `<option value="t${j}">${j + 1}. ${esc(clip(label(o), 40))}</option>`).join('');
+      const noteHtml = (n, t) => `
+        <li class="cp-note">
+          <p class="cp-quote">&ldquo;${esc(n.text)}&rdquo;</p>
+          <p class="cp-meta">${n.who ? esc(n.who) + ' &middot; ' : ''}${SEV[n.sev]}
+            ${t ? `<label class="cp-move"><span class="cp-sr">Move this note to</span><select data-move="${n.id}"><option value="">Move to&hellip;</option>${options(t)}<option value="solo">Its own theme</option></select></label>` : ''}
+            <button type="button" class="cp-del" data-del="${n.id}" aria-label="Delete this note">Delete</button></p>
+        </li>`;
+      $('cp-themes').innerHTML =
+        (waiting.length ? `<section class="cp-theme cp-waiting"><p class="cp-rank">Just added</p><p class="cp-help">${modelState === 'failed' ? 'Grouping…' : 'These join a theme as soon as the model is ready.'}</p><ul>${waiting.map(n => noteHtml(n, null)).join('')}</ul></section>` : '') +
+        lastThemes.map((t, i) => `
+          <section class="cp-theme" data-theme="${i}">
+            <div class="cp-head">
+              <p class="cp-rank">${String(i + 1).padStart(2, '0')}${t.keywords.length ? ` &middot; ${t.keywords.map(esc).join(', ')}` : ''}</p>
+              <h3 class="cp-name" data-name="${i}">${esc(label(t))}</h3>
+              ${t.summary ? `<p class="cp-sum">${esc(t.summary)}</p>` : ''}
+              <p class="cp-stats">${t.notes.length} ${t.notes.length === 1 ? 'note' : 'notes'} &middot; ${t.people} ${t.people === 1 ? 'customer' : 'customers'} &middot; ${hurtWord(t.sev)}
+                <button type="button" class="calc-link cp-rename" data-rename="${i}">Rename</button></p>
+            </div>
+            <ul>${t.notes.slice().sort((a, b) => (a === t.medoid ? -1 : b === t.medoid ? 1 : b.sev - a.sev)).map(n => noteHtml(n, t)).join('')}</ul>
+          </section>`).join('');
+      drawChart();
+    }
+
+    function startRename(i) {
+      const t = lastThemes[i], h = root.querySelector(`[data-name="${i}"]`);
+      if (!t || !h) return;
+      h.innerHTML = `<input class="cp-name-in" type="text" maxlength="80" value="${esc(t.name || '')}" placeholder="${esc(label(t))}" aria-label="Theme name">`;
+      const inp = h.querySelector('input');
+      inp.focus(); inp.select();
+      let done = false;
+      const finish = keep => {
+        if (done) return; done = true;
+        const name = inp.value.trim();
+        if (keep) {
+          renames = renames.filter(r => !(r.anchors.filter(id => t.ids.includes(id)).length * 2 >= r.anchors.length));
+          if (name) renames.push({ name, anchors: t.ids.slice() });
+          save();
+        }
+        render();
+      };
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') finish(true); if (e.key === 'Escape') finish(false); });
+      inp.addEventListener('blur', () => finish(true));
+    }
+
+    // ── On-device AI (Chrome's built-in model), offered only if it's already on this device ──
+    async function checkAi() {
+      try {
+        if (!('LanguageModel' in self)) return;
+        const a = await LanguageModel.availability({ expectedInputs: [{ type: 'text', languages: ['en'] }], expectedOutputs: [{ type: 'text', languages: ['en'] }] });
+        aiReady = a === 'available';   // never 'downloadable': we don't trigger a download
+        if (root.isConnected) render();
+      } catch (e) {}
+    }
+    async function nameWithAi(btn) {
+      btn.disabled = true; btn.textContent = 'Naming themes…';
+      try {
+        const session = await LanguageModel.create({ expectedInputs: [{ type: 'text', languages: ['en'] }], expectedOutputs: [{ type: 'text', languages: ['en'] }] });
+        const payload = lastThemes.map((t, i) => ({ id: i, notes: t.notes.slice(0, 8).map(n => n.text) }));
+        const schema = { type: 'object', properties: { themes: { type: 'array', items: { type: 'object', properties: {
+          id: { type: 'integer' }, name: { type: 'string' }, summary: { type: 'string' } }, required: ['id', 'name', 'summary'] } } }, required: ['themes'] };
+        const prompt = 'You are helping a product team understand customer problems. Each theme below is a group of customer notes. ' +
+          'For each theme, write a short plain-English name for the underlying problem (at most 6 words, no quotation marks) and a one-sentence summary of what customers are struggling with. ' +
+          'Only describe what the notes say.\n\n' + JSON.stringify(payload);
+        const res = JSON.parse(await session.prompt(prompt, { responseConstraint: schema }));
+        session.destroy && session.destroy();
+        (res.themes || []).forEach(r => {
+          const t = lastThemes[r.id];
+          if (!t || !r.name) return;
+          renames = renames.filter(x => !(x.anchors.filter(id => t.ids.includes(id)).length * 2 >= x.anchors.length));
+          renames.push({ name: String(r.name).slice(0, 80), summary: String(r.summary || '').slice(0, 240), anchors: t.ids.slice() });
+        });
+        save();
+        btn.textContent = 'Name themes with on-device AI';
+        render();
+      } catch (e) {
+        btn.textContent = 'Couldn’t name them this time';
+        setTimeout(() => { btn.textContent = 'Name themes with on-device AI'; btn.disabled = false; }, 2500);
+        return;
+      }
+      btn.disabled = false;
+    }
+
+    // ── Copy as findings ──
+    function findings() {
+      const people = new Set(notes.map(n => (n.who || '').trim().toLowerCase() || 'anon-' + n.id)).size;
+      const lines = ['Customer problems: findings', '',
+        `${fmtInt(notes.length)} notes from ${fmtInt(people)} customers, grouped into ${lastThemes.length} themes. Ranked by customers affected and how much it hurts.`, ''];
+      lastThemes.forEach((t, i) => {
+        lines.push(`${i + 1}. ${label(t)} (${t.people} ${t.people === 1 ? 'customer' : 'customers'}, ${hurtWord(t.sev)})`);
+        if (t.summary) lines.push('   ' + t.summary);
+        t.notes.slice().sort((a, b) => (a === t.medoid ? -1 : b === t.medoid ? 1 : b.sev - a.sev)).slice(0, 3)
+          .forEach(n => lines.push(`   “${n.text}”${n.who ? ' — ' + n.who : ''}`));
+        lines.push('');
+      });
+      return lines.join('\n').trim();
+    }
+    async function copyText(text) {
+      try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      let ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+      ta.remove(); return ok;
+    }
+
+    // ── Events ──
+    textEl.addEventListener('focus', () => { if (mode !== 'words') prepareModel(); });
+    textEl.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); addNotes(); } });
+    $('cp-add').addEventListener('click', addNotes);
+    root.querySelectorAll('#cp-sev button').forEach(b => b.addEventListener('click', () => {
+      sev = +b.dataset.v;
+      root.querySelectorAll('#cp-sev button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); });
+    }));
+    root.querySelectorAll('#cp-detail button').forEach(b => b.addEventListener('click', () => {
+      const d = +b.dataset.d;
+      detail = d === 0 ? 0 : Math.max(-3, Math.min(3, detail + d));
+      save(); render();
+    }));
+    $('cp-themes').addEventListener('change', e => {
+      const sel = e.target.closest('select[data-move]');
+      if (!sel || !sel.value) return;
+      const n = notes.find(x => x.id === +sel.dataset.move);
+      if (!n) return;
+      if (sel.value === 'solo') n.pin = 'solo';
+      else { const t = lastThemes[+sel.value.slice(1)]; if (t) n.pin = t.medoid.id === n.id ? null : t.medoid.id; }
+      save(); render();
+    });
+    $('cp-themes').addEventListener('click', e => {
+      const del = e.target.closest('[data-del]');
+      if (del) {
+        const id = +del.dataset.del;
+        undo = { notes: notes.map(n => ({ ...n })), renames: renames.slice() };
+        notes = notes.filter(n => n.id !== id);
+        notes.forEach(n => { if (n.pin === id) n.pin = null; });
+        save(); render(); return;
+      }
+      const rn = e.target.closest('[data-rename]');
+      if (rn) startRename(+rn.dataset.rename);
+    });
+    $('cp-copy').addEventListener('click', async e => {
+      const btn = e.currentTarget;
+      btn.textContent = await copyText(findings()) ? 'Copied' : 'Couldn’t copy';
+      setTimeout(() => { btn.textContent = 'Copy as findings'; }, 2000);
+    });
+    $('cp-ai').addEventListener('click', e => nameWithAi(e.currentTarget));
+    $('cp-clear').addEventListener('click', () => {
+      undo = { notes: notes.map(n => ({ ...n })), renames: renames.slice() };
+      notes = []; renames = [];
+      save(); render(); textEl.focus();
+    });
+    $('cp-undo').addEventListener('click', () => {
+      if (!undo) return;
+      notes = undo.notes; renames = undo.renames; undo = null;
+      nextId = Math.max(nextId, ...notes.map(n => n.id + 1));
+      save(); render();
+    });
+    $('cp-sample').addEventListener('click', async () => {
+      try { await loadSample(); save(); render(); } catch (e) { setStatus('The sample notes couldn’t load. Try again in a moment.'); }
+    });
+
+    projectRedraw = drawChart;
+    (async () => {
+      if (!restore()) { try { await loadSample(); } catch (e) { notes = []; } }
+      if (!root.isConnected) return;
+      render();
+      if (notes.some(n => !n.v)) prepareModel();
+      checkAi();
+    })();
+  }
+
   // Live projects and the function that draws each one
   const PROJECT_VIEWS = {
     'sample-size': renderSampleSize,
     'causal-method-finder': renderMethodFinder,
     'markov-attribution': renderMarkov,
+    'customer-problems': renderProblems,
     'growth-model': renderGrowthModel,
   };
 
