@@ -516,40 +516,51 @@
     .mk-corner { font-size: 8px; letter-spacing: 0.04em; }
   }
   /* Growth model tool */
-  .gm { max-width: 1000px; }
-  .gm-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; margin: 40px 0 44px; align-items: start; }
-  .gm-viz { position: sticky; top: 96px; }
-  .gm-viz .post-body .fig { margin: 0; }
-  .gm-step { display: grid; grid-template-columns: 22px minmax(0, 1fr) 132px 22px; gap: 12px; align-items: end; padding: 6px 0; }
+  .gm { max-width: 1040px; }
+  .gm-mapwrap { margin: 36px 0 8px; }
+  .gm-mapwrap .fig { margin: 0; }
+  .gm-map { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+  .gm-map svg { display: block; overflow: visible; }
+  .gm-map text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  .gm-map .f-up { font-size: 11px; }
+  .gm-map .f-num { font-size: 11px; }
+  .gm-map .f-it { font-size: 13px; }
+  .gm-b { fill: none; stroke: var(--f-mid); opacity: 0.3; transition: opacity 0.2s; }
+  .gm-b-new { opacity: 0.16; }
+  .gm-b-limit { stroke: var(--f-ink); opacity: 0.5; }
+  .gm-b-loop { stroke: var(--f-ink); opacity: 0.14; stroke-linejoin: round; }
+  .gm-build { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 56px; margin: 40px 0 44px; align-items: start; }
+  .gm-step { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto 92px 20px; gap: 12px; align-items: end; padding: 6px 0; }
   .gm-idx { font-size: 10px; letter-spacing: 0.12em; color: var(--gray); padding-bottom: 12px; }
   .gm-name { font: inherit; font-size: 15px; color: var(--black); background: none; border: 0; border-bottom: 1px solid var(--border); padding: 10px 0 8px; outline: none; min-width: 0; width: 100%; transition: border-color 0.2s; }
   .gm-name:focus { border-bottom-color: var(--black); }
-  .gm-num input { font-size: 22px !important; padding: 2px 0 6px !important; text-align: right; }
+  .gm-after { font-size: 12px; color: var(--gray); padding-bottom: 11px; white-space: nowrap; }
+  .gm-sel { font: inherit; font-size: 13px; color: var(--black); background: none; border: 0; border-bottom: 1px solid var(--border); padding: 2px 0; max-width: 120px; cursor: pointer; }
+  .gm-sel:focus { outline: none; border-bottom-color: var(--black); }
+  .gm-sel option { color: #000; }
+  .gm-num input { font-size: 20px !important; padding: 2px 0 6px !important; text-align: right; }
   .gm-del { background: none; border: 0; color: var(--gray); font-size: 18px; line-height: 1; padding: 0 0 12px; cursor: pointer; }
   .gm-del:hover { color: var(--black); }
   .gm-add { margin: 14px 0 0 34px; }
-  .gm-step + .calc-help { margin-left: 34px; }
-  .gm-loop { margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--border); }
-  .gm-check { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; }
-  .gm-check input { accent-color: var(--black); width: 14px; height: 14px; }
-  .gm-loop-name { margin-top: 12px; }
-  .gm-sentence { font-size: 14px; line-height: 2.4; color: #444; margin-top: 10px; }
-  .gm-sentence select { font: inherit; font-size: 14px; color: var(--black); background: none; border: 0; border-bottom: 1px solid var(--black); padding: 2px 2px 2px 0; max-width: 100%; cursor: pointer; }
-  .gm-sentence select option { color: #000; }
-  .gm-k { display: inline-flex; width: 64px; vertical-align: baseline; }
+  .gm-help { margin-left: 34px; }
+  .gm-warn { color: var(--black); }
+  .gm-col > .gm-add:last-of-type { margin-left: 0; }
+  .gm-loop-row { padding: 4px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+  .gm-loop-head { display: grid; grid-template-columns: minmax(0, 1fr) 20px; gap: 12px; align-items: end; }
+  .gm-sentence { font-size: 14px; line-height: 2.3; color: #444; margin-top: 6px; }
+  .gm-sentence .gm-sel { font-size: 14px; border-bottom-color: var(--black); }
+  .gm-k { display: inline-flex; width: 60px; vertical-align: baseline; }
   .gm-k input { font-size: 16px !important; padding: 0 !important; text-align: center; font-family: inherit !important; }
-  .gm-fig svg { max-width: 440px; }
-  .gm-fig .f-up { font-size: 12px; }
-  .gm-fig .f-num { font-size: 11.5px; }
-  .gm-fig .f-it { font-size: 13px; }
-  .gm-compound { font-size: 14px; line-height: 1.7; color: #444; }
+  .gm-goal { margin-top: 30px; }
+  .gm-goal-sel { font-family: Georgia, serif; font-size: 20px; max-width: 100%; padding-bottom: 6px; border-bottom-color: var(--black); }
+  .gm-compound { font-size: 14px; line-height: 1.7; color: #444; max-width: 560px; }
   .gm-result { margin-top: 8px; }
   .gm-insight { margin-top: 34px; }
   .gm-insight .calc-sentence { margin-top: 10px; }
   .gm-insight b { font-weight: 600; color: var(--black); }
   .gm-step-name { font-family: Georgia, serif; font-size: 30px; line-height: 1.2; letter-spacing: -0.01em; }
   .gm-levers { margin-top: 34px; max-width: 640px; }
-  .gm-lever { display: grid; grid-template-columns: minmax(90px, 160px) 1fr 82px; gap: 14px; align-items: center; padding: 7px 0; font-size: 13px; color: var(--gray); }
+  .gm-lever { display: grid; grid-template-columns: minmax(90px, 170px) 1fr 82px; gap: 14px; align-items: center; padding: 7px 0; font-size: 13px; color: var(--gray); }
   .gm-lever-bar { height: 8px; position: relative; }
   .gm-lever-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--gray); opacity: 0.6; }
   .gm-lever.on { color: var(--black); }
@@ -559,13 +570,14 @@
   .gm-actions { margin: 34px 0 30px; }
   html.dark body .gm-sentence, html.dark body .gm-compound { color: #cfcfcf; }
   @media (max-width: 900px) {
-    .gm-grid { grid-template-columns: 1fr; gap: 36px; }
-    .gm-viz { position: static; }
+    .gm-build { grid-template-columns: 1fr; gap: 36px; }
   }
   @media (max-width: 640px) {
-    .gm-step { grid-template-columns: 18px minmax(0, 1fr) 96px 18px; gap: 8px; }
-    .gm-num input { font-size: 20px !important; }
-    .gm-add, .gm-step + .calc-help { margin-left: 26px; }
+    .gm-step { grid-template-columns: 18px minmax(0, 1fr) 80px 18px; gap: 4px 8px; }
+    .gm-step .gm-name { grid-column: 2 / 5; }
+    .gm-step .gm-after { grid-column: 2 / 3; padding-bottom: 8px; }
+    .gm-step .gm-idx { grid-row: 1; }
+    .gm-add, .gm-help { margin-left: 26px; }
     .gm-step-name { font-size: 24px; }
     .gm-lever { grid-template-columns: 96px 1fr 64px; gap: 10px; font-size: 12px; }
   }
@@ -3356,92 +3368,143 @@
 
   // ── Tool: draw your growth model ──────────────────
   function renderGrowthModel(root, project) {
+    const MAX_STEPS = 10, MAX_LOOPS = 4;
     const DEFAULT = {
       entry: 10000,
-      steps: [['Visit', 100], ['Sign up', 30], ['Activate', 40], ['Become a regular', 50]],
-      loop: { on: true, from: 3, to: 0, k: 0.5, name: 'Invite a friend' }
+      steps: [
+        { id: 'a', name: 'Visit', from: null, rate: 100 },
+        { id: 'b', name: 'Sign up', from: 'a', rate: 30 },
+        { id: 'c', name: 'Activate', from: 'b', rate: 40 },
+        { id: 'd', name: 'Become a regular', from: 'c', rate: 50 },
+        { id: 'e', name: 'Share content', from: 'c', rate: 20 }
+      ],
+      loops: [
+        { name: 'Invite a friend', from: 'd', to: 'a', k: 0.5 },
+        { name: 'Content brings visits', from: 'e', to: 'a', k: 2 }
+      ],
+      goal: 'd'
     };
     const clone = o => JSON.parse(JSON.stringify(o));
     const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
     const num = v => { const n = parseFloat(String(v).replace(/,/g, '')); return isFinite(n) ? n : 0; };
     const commas = n => Math.round(n).toLocaleString('en-GB');
-    const MAX_STEPS = 8;
+    let nextId = 0;
+    const newId = () => { let id; do { id = 's' + (nextId++).toString(36); } while (model && model.steps.some(s => s.id === id)); return id; };
 
-    // The model lives in the link, so a URL reopens it
+    // ── The model lives in the link, so a URL reopens it
     const encode = m => {
-      const bytes = new TextEncoder().encode(JSON.stringify(m));
+      const bytes = new TextEncoder().encode(JSON.stringify(Object.assign({ v: 2 }, m)));
       let bin = ''; bytes.forEach(b => { bin += String.fromCharCode(b); });
       return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
     };
+    function clean(m) {
+      // Older links held a straight list of steps and a single loop
+      if (m.v !== 2 && Array.isArray(m.steps) && Array.isArray(m.steps[0])) {
+        const ids = m.steps.map((s, i) => 'o' + i);
+        const l = m.loop || {};
+        m = {
+          entry: m.entry,
+          steps: m.steps.map((s, i) => ({ id: ids[i], name: s[0], from: i ? ids[i - 1] : null, rate: s[1] })),
+          loops: l.on ? [{ name: l.name, from: ids[l.from] || ids[ids.length - 1], to: ids[l.to] || ids[0], k: l.k }] : [],
+          goal: ids[ids.length - 1]
+        };
+      }
+      if (!Array.isArray(m.steps) || m.steps.length < 2) return null;
+      const steps = [], seen = new Set();
+      m.steps.slice(0, MAX_STEPS).forEach((s, i) => {
+        const id = String(s.id || 'x' + i).replace(/[^a-z0-9]/gi, '').slice(0, 8) || 'x' + i;
+        if (seen.has(id)) return;
+        const from = i === 0 ? null : (seen.has(String(s.from)) ? String(s.from) : steps[steps.length - 1].id);
+        steps.push({ id, name: String(s.name || 'Step').slice(0, 40), from, rate: i === 0 ? 100 : clamp(num(s.rate), 0, 100) });
+        seen.add(id);
+      });
+      if (steps.length < 2) return null;
+      const loops = (Array.isArray(m.loops) ? m.loops : []).slice(0, MAX_LOOPS)
+        .filter(l => seen.has(String(l.from)) && seen.has(String(l.to)))
+        .map(l => ({ name: String(l.name || 'Loop').slice(0, 40), from: String(l.from), to: String(l.to), k: clamp(num(l.k), 0, 100) }));
+      return { entry: clamp(num(m.entry), 0, 1e9), steps, loops, goal: seen.has(String(m.goal)) ? String(m.goal) : steps[steps.length - 1].id };
+    }
     function decode(s) {
       try {
         const bin = atob(s.replace(/-/g, '+').replace(/_/g, '/'));
-        const m = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0))));
-        if (!Array.isArray(m.steps) || m.steps.length < 2) return null;
-        const steps = m.steps.slice(0, MAX_STEPS).map((s, i) => [String(s[0] || 'Step ' + (i + 1)).slice(0, 40), i === 0 ? 100 : clamp(num(s[1]), 0, 100)]);
-        const l = m.loop || {};
-        const last = steps.length - 1;
-        return {
-          entry: clamp(num(m.entry), 0, 1e9), steps,
-          loop: { on: !!l.on, from: clamp(Math.round(num(l.from)), 0, last), to: clamp(Math.round(num(l.to)), 0, last), k: clamp(num(l.k), 0, 100), name: String(l.name || 'Loop').slice(0, 40) }
-        };
+        return clean(JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0)))));
       } catch (e) { return null; }
     }
     const fromHash = () => { const h = location.hash.match(/[#&]m=([A-Za-z0-9_-]+)/); return h ? decode(h[1]) : null; };
-    const model = fromHash() || clone(DEFAULT);
+    let model = null;
+    model = fromHash() || clone(DEFAULT);
     let lift = 5;
 
-    // People reaching each step per month, with the loop fed back in
-    function flow(m, rates) {
-      const n = m.steps.length, r = rates || m.steps.map(s => s[1] / 100);
-      const L = m.loop, useLoop = L.on && L.from >= L.to && L.k > 0;
-      let gain = 0;
-      if (useLoop) { gain = L.k; for (let j = L.to + 1; j <= L.from; j++) gain *= r[j]; }
-      if (useLoop && gain >= 1) return { counts: null, gain, compounding: true };
-      const counts = new Array(n).fill(0);
-      let extra = 0;
-      for (let it = 0; it < 400; it++) {
-        let c = m.entry;
-        for (let j = 0; j < n; j++) {
-          if (j > 0) c *= r[j];
-          if (useLoop && j === L.to) c += extra;
-          counts[j] = c;
-        }
-        const next = useLoop ? L.k * counts[L.from] : 0;
-        if (Math.abs(next - extra) < 1e-9) break;
-        extra = next;
+    const idx = id => model.steps.findIndex(s => s.id === id);
+    const byId = id => model.steps.find(s => s.id === id);
+    const label = s => (s && s.name.trim()) || 'Untitled step';
+    const childrenOf = id => model.steps.filter(s => s.from === id);
+    // Is a a step on the way to b (or b itself)?
+    const leadsTo = (a, b) => { for (let s = byId(b); s; s = byId(s.from)) if (s.id === a) return true; return false; };
+
+    // ── Customers reaching each step per month: c = b + A·c
+    function solve(m, rates) {
+      const n = m.steps.length, at = {};
+      m.steps.forEach((s, i) => { at[s.id] = i; });
+      const A = Array.from({ length: n }, () => new Array(n).fill(0));
+      m.steps.forEach((s, i) => { if (s.from != null) A[i][at[s.from]] += (rates ? rates[i] : s.rate) / 100; });
+      m.loops.forEach(l => { if (l.k > 0) A[at[l.to]][at[l.from]] += l.k; });
+      // Spectral radius by power iteration: 1 or more means the loops take off
+      let v = new Array(n).fill(1), rho = 0;
+      for (let it = 0; it < 300; it++) {
+        const w = A.map(row => row.reduce((t, a, j) => t + a * v[j], 0));
+        const norm = Math.max(...w);
+        if (norm < 1e-12) { rho = 0; break; }
+        rho = norm / Math.max(...v);
+        v = w.map(x => x / norm);
       }
-      return { counts, gain, compounding: false, looped: useLoop ? extra : 0 };
+      if (rho >= 0.999) return { compounding: true, rho };
+      // Solve (I − A)c = b by elimination
+      const M = A.map((row, i) => row.map((a, j) => (i === j ? 1 : 0) - a).concat(i === 0 ? m.entry : 0));
+      for (let c = 0; c < n; c++) {
+        let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+        [M[c], M[p]] = [M[p], M[c]];
+        for (let r = 0; r < n; r++) if (r !== c) { const f = M[r][c] / M[c][c]; for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k]; }
+      }
+      const counts = M.map((row, i) => Math.max(0, row[n] / row[i]));
+      return { compounding: false, rho, counts };
     }
 
-    function levers(m) {
-      const base = flow(m);
+    function levers() {
+      const base = solve(model);
       if (base.compounding) return { base, list: [] };
-      const end = base.counts[base.counts.length - 1];
-      const list = m.steps.map((s, i) => {
+      const g = idx(model.goal), end = base.counts[g];
+      const list = model.steps.map((s, i) => {
         if (i === 0) return null;
-        const r = m.steps.map(x => x[1] / 100);
-        r[i] = Math.min(1, r[i] + lift / 100);
-        const f = flow(m, r);
-        return { i, gain: f.compounding ? Infinity : f.counts[f.counts.length - 1] - end, compounding: f.compounding, room: s[1] < 100 };
+        const r = model.steps.map(x => x.rate);
+        r[i] = Math.min(100, r[i] + lift);
+        const f = solve(model, r);
+        return { i, room: s.rate < 100, takesOff: f.compounding, gain: f.compounding ? Infinity : f.counts[g] - end };
       }).filter(Boolean);
       return { base, end, list };
     }
 
+    // ── Page
     root.innerHTML = `
       <div class="gm">
         <p class="post-kicker">${esc(project.tag || 'Tool')} &middot; Growth</p>
         <h1 class="post-title">${esc(project.title)}</h1>
-        <p class="calc-intro">Sketch how people move through your product, and where they bring others back in. The model shows the one step that most limits your growth: the place to look first.</p>
-        <div class="gm-grid">
-          <div class="gm-build">
-            <span class="calc-label">Your model</span>
+        <p class="calc-intro">Sketch how people move through your product: the paths they take, and the loops that bring others back in. The model shows the one step that most limits your growth: the place to look first.</p>
+        <div class="post-body gm-mapwrap"><figure class="fig gm-fig"><p class="fig-k">Your growth model</p><div class="gm-map" id="gm-diagram"></div><figcaption id="gm-cap"></figcaption></figure></div>
+        <div class="gm-build">
+          <div class="gm-col">
+            <span class="calc-label">Steps</span>
             <div id="gm-steps"></div>
             <button type="button" class="calc-link gm-add" id="gm-add">+ Add a step</button>
-            <div class="gm-loop" id="gm-loop"></div>
           </div>
-          <div class="gm-viz">
-            <div class="post-body"><figure class="fig mdiag gm-fig"><p class="fig-k">Your growth model</p><div id="gm-diagram"></div></figure></div>
+          <div class="gm-col">
+            <span class="calc-label">Loops</span>
+            <div id="gm-loops"></div>
+            <button type="button" class="calc-link gm-add" id="gm-add-loop">+ Add a loop</button>
+            <div class="gm-goal">
+              <label class="calc-label" for="gm-goal">Growth means more people who</label>
+              <select id="gm-goal" class="gm-sel gm-goal-sel"></select>
+            </div>
           </div>
         </div>
         <div class="calc-result gm-result" id="gm-result">
@@ -3457,30 +3520,33 @@
           <button type="button" class="calc-link" id="gm-reset">Start again</button>
         </div>
         <div class="calc-how">
-          <p>Each step shows the share of people from the step before who reach it. A loop sends new people back in: for example, regulars who invite friends. The model works out how many people reach each step in a typical month, with the loop included.</p>
-          <p>To find the rate-limiting step, it raises one step at a time by the same number of points and counts the extra people at the end. A step that converts few people gains the most from each point, and a step inside a loop gains twice: once directly, and again from the extra people the loop brings back.</p>
+          <p>Each step comes after another, and its % is the share of people from that step who reach it. A step can split into several paths. A loop sends new people back in: each person who reaches one step brings in a number of new people at another. The model works out how many people reach each step in a typical month, with every loop included.</p>
+          <p>To find the rate-limiting step, it raises one step at a time by the same number of points and counts the extra people who reach your goal. A step that converts few people gains the most from each point, and a step inside a loop gains twice: once directly, and again from the people the loop brings back.</p>
           <p>Based on the idea of finding the rate-limiting step from Matt Lerner&rsquo;s <em>Growth Levers and How to Find Them</em>. Your model stays in your browser and in the link.</p>
         </div>
       </div>`;
 
     const $ = s => root.querySelector(s);
-    const stepsEl = $('#gm-steps'), loopEl = $('#gm-loop');
+    const stepsEl = $('#gm-steps'), loopsEl = $('#gm-loops');
+    const opts = (sel, filter) => model.steps.filter(filter || (() => true))
+      .map(s => `<option value="${s.id}"${s.id === sel ? ' selected' : ''}>${esc(label(s))}</option>`).join('');
 
     function buildSteps() {
-      const last = model.steps.length - 1;
       stepsEl.innerHTML = model.steps.map((s, i) => `
         <div class="gm-step">
           <span class="gm-idx">${String(i + 1).padStart(2, '0')}</span>
-          <input class="gm-name" type="text" maxlength="40" value="${esc(s[0])}" data-i="${i}" aria-label="Step ${i + 1} name">
+          <input class="gm-name" type="text" maxlength="40" value="${esc(s.name)}" data-id="${s.id}" aria-label="Step ${i + 1} name">
           ${i === 0
-            ? `<div class="calc-input gm-num gm-entry"><input type="text" inputmode="numeric" autocomplete="off" value="${commas(model.entry)}" id="gm-entry" aria-label="People who reach the first step each month"></div>`
-            : `<div class="calc-input gm-num"><input type="number" inputmode="decimal" min="0" max="100" step="any" value="${s[1]}" data-i="${i}" class="gm-rate" aria-label="Share of people from the step before who reach ${esc(s[0])}"><span class="calc-unit">%</span></div>`}
-          ${i > 0 && model.steps.length > 2 ? `<button type="button" class="gm-del" data-i="${i}" aria-label="Remove ${esc(s[0])}">&times;</button>` : '<span class="gm-del-pad"></span>'}
-        </div>`).join('') + `<p class="calc-help">The first number is how many people reach the first step each month. Each % after it is the share of people from the step before.</p>`;
+            ? `<span class="gm-after">New each month</span><div class="calc-input gm-num"><input type="text" inputmode="numeric" autocomplete="off" value="${commas(model.entry)}" id="gm-entry" aria-label="New people reaching the first step each month"></div><span></span>`
+            : `<span class="gm-after">after <select class="gm-sel gm-from" data-id="${s.id}" aria-label="Step before ${esc(label(s))}">${opts(s.from, x => idx(x.id) < i)}</select></span>
+               <div class="calc-input gm-num"><input type="number" inputmode="decimal" min="0" max="100" step="any" value="${s.rate}" data-id="${s.id}" class="gm-rate" aria-label="Share who reach ${esc(label(s))}"><span class="calc-unit">%</span></div>
+               ${model.steps.length > 2 ? `<button type="button" class="gm-del" data-id="${s.id}" aria-label="Remove ${esc(label(s))}">&times;</button>` : '<span></span>'}`}
+        </div>`).join('') + `<p class="calc-help gm-help" id="gm-step-note">Each % is the share of people from the step before who reach this one.</p>`;
       $('#gm-add').hidden = model.steps.length >= MAX_STEPS;
 
-      stepsEl.querySelectorAll('.gm-name').forEach(el => el.addEventListener('input', () => { model.steps[+el.dataset.i][0] = el.value.slice(0, 40); buildLoop(); update(); }));
-      stepsEl.querySelectorAll('.gm-rate').forEach(el => el.addEventListener('input', () => { model.steps[+el.dataset.i][1] = clamp(num(el.value), 0, 100); update(); }));
+      stepsEl.querySelectorAll('.gm-name').forEach(el => el.addEventListener('input', () => { byId(el.dataset.id).name = el.value.slice(0, 40); refreshSelects(); update(); }));
+      stepsEl.querySelectorAll('.gm-rate').forEach(el => el.addEventListener('input', () => { byId(el.dataset.id).rate = clamp(num(el.value), 0, 100); update(); }));
+      stepsEl.querySelectorAll('.gm-from').forEach(el => el.addEventListener('change', () => { byId(el.dataset.id).from = el.value; update(); }));
       const entry = $('#gm-entry');
       entry.addEventListener('input', () => {
         const digits = entry.value.replace(/[^0-9]/g, '');
@@ -3490,92 +3556,150 @@
         try { const p = Math.max(0, entry.value.length - pos); entry.setSelectionRange(p, p); } catch (e) {}
         update();
       });
-      stepsEl.querySelectorAll('.gm-del').forEach(b => b.addEventListener('click', () => {
-        const i = +b.dataset.i;
-        model.steps.splice(i, 1);
-        const L = model.loop, last2 = model.steps.length - 1;
-        if (L.from >= i) L.from = Math.max(0, L.from - 1);
-        if (L.to > i) L.to -= 1;
-        L.from = Math.min(L.from, last2); L.to = Math.min(L.to, last2);
-        buildSteps(); buildLoop(); update();
-      }));
+      stepsEl.querySelectorAll('.gm-del').forEach(b => b.addEventListener('click', () => removeStep(b.dataset.id)));
     }
 
-    function buildLoop() {
-      const L = model.loop;
-      const opts = sel => model.steps.map((s, i) => `<option value="${i}"${i === sel ? ' selected' : ''}>${esc(s[0] || 'Step ' + (i + 1))}</option>`).join('');
-      loopEl.innerHTML = `
-        <label class="gm-check"><input type="checkbox" id="gm-loop-on"${L.on ? ' checked' : ''}> Add a loop</label>
-        <div class="gm-loop-body"${L.on ? '' : ' hidden'}>
-          <input class="gm-name gm-loop-name" type="text" maxlength="40" value="${esc(L.name)}" id="gm-loop-name" aria-label="Loop name">
-          <p class="gm-sentence">Each person who reaches
-            <select id="gm-from" aria-label="Step that brings people back">${opts(L.from)}</select>
-            brings in
-            <span class="calc-input gm-num gm-k"><input type="number" inputmode="decimal" min="0" step="0.05" value="${L.k}" id="gm-k" aria-label="New people brought in per person"></span>
-            new people a month, who start at
-            <select id="gm-to" aria-label="Step new people start at">${opts(L.to)}</select>.</p>
-          <p class="calc-note" id="gm-loop-note"></p>
-        </div>`;
-      $('#gm-loop-on').addEventListener('change', e => { L.on = e.target.checked; buildLoop(); update(); });
-      $('#gm-loop-name').addEventListener('input', e => { L.name = e.target.value.slice(0, 40); update(); });
-      $('#gm-from').addEventListener('change', e => { L.from = +e.target.value; update(); });
-      $('#gm-to').addEventListener('change', e => { L.to = +e.target.value; update(); });
-      $('#gm-k').addEventListener('input', e => { L.k = clamp(num(e.target.value), 0, 100); update(); });
+    function removeStep(id) {
+      const s = byId(id);
+      model.steps.forEach(x => { if (x.from === id) x.from = s.from; });
+      model.loops = model.loops.filter(l => l.from !== id && l.to !== id);
+      model.steps = model.steps.filter(x => x.id !== id);
+      if (model.goal === id) model.goal = model.steps[model.steps.length - 1].id;
+      buildSteps(); buildLoops(); update();
     }
+
+    function buildLoops() {
+      loopsEl.innerHTML = model.loops.map((l, i) => `
+        <div class="gm-loop-row">
+          <div class="gm-loop-head">
+            <input class="gm-name gm-lname" type="text" maxlength="40" value="${esc(l.name)}" data-i="${i}" aria-label="Loop ${i + 1} name">
+            <button type="button" class="gm-del gm-ldel" data-i="${i}" aria-label="Remove ${esc(l.name)}">&times;</button>
+          </div>
+          <p class="gm-sentence">Each person who reaches <select class="gm-sel gm-lfrom" data-i="${i}" aria-label="Step that brings people in">${opts(l.from)}</select>
+            brings in <span class="calc-input gm-num gm-k"><input type="number" inputmode="decimal" min="0" step="0.05" value="${l.k}" class="gm-lk" data-i="${i}" aria-label="New people brought in per person"></span>
+            new people a month, who start at <select class="gm-sel gm-lto" data-i="${i}" aria-label="Step new people start at">${opts(l.to)}</select>.</p>
+        </div>`).join('') || '<p class="calc-help">No loops yet. Add one if customers bring in other customers: by inviting them, sharing content, or reviews.</p>';
+      $('#gm-add-loop').hidden = model.loops.length >= MAX_LOOPS;
+      const L = el => model.loops[+el.dataset.i];
+      loopsEl.querySelectorAll('.gm-lname').forEach(el => el.addEventListener('input', () => { L(el).name = el.value.slice(0, 40); update(); }));
+      loopsEl.querySelectorAll('.gm-lfrom').forEach(el => el.addEventListener('change', () => { L(el).from = el.value; update(); }));
+      loopsEl.querySelectorAll('.gm-lto').forEach(el => el.addEventListener('change', () => { L(el).to = el.value; update(); }));
+      loopsEl.querySelectorAll('.gm-lk').forEach(el => el.addEventListener('input', () => { L(el).k = clamp(num(el.value), 0, 100); update(); }));
+      loopsEl.querySelectorAll('.gm-ldel').forEach(b => b.addEventListener('click', () => { model.loops.splice(+b.dataset.i, 1); buildLoops(); update(); }));
+    }
+
+    // Keep the dropdowns' step names in step with renamed steps, without rebuilding the inputs
+    function refreshSelects() {
+      root.querySelectorAll('select.gm-sel option').forEach(o => { const s = byId(o.value); if (s) o.textContent = label(s); });
+      buildGoal();
+    }
+    function buildGoal() { $('#gm-goal').innerHTML = opts(model.goal); }
+    $('#gm-goal').addEventListener('change', e => { model.goal = e.target.value; update(); });
 
     $('#gm-add').addEventListener('click', () => {
       if (model.steps.length >= MAX_STEPS) return;
-      model.steps.push(['New step', 50]);
-      buildSteps(); buildLoop(); update();
+      const last = model.steps[model.steps.length - 1];
+      model.steps.push({ id: newId(), name: 'New step', from: last.id, rate: 50 });
+      buildSteps(); buildLoops(); buildGoal(); update();
       const names = stepsEl.querySelectorAll('.gm-name');
       const el = names[names.length - 1]; el.focus(); el.select();
     });
+    $('#gm-add-loop').addEventListener('click', () => {
+      if (model.loops.length >= MAX_LOOPS) return;
+      model.loops.push({ name: 'New loop', from: model.goal, to: model.steps[0].id, k: 0.2 });
+      buildLoops(); update();
+      const names = loopsEl.querySelectorAll('.gm-lname');
+      const el = names[names.length - 1]; el.focus(); el.select();
+    });
 
-    // The diagram: one bar per step, sized by people, with the loop drawn back up
-    function diagram(res, limit) {
-      const m = model, n = m.steps.length, counts = res.counts;
-      const W = 360, rowH = 80, top = 10, barX = 0, barMax = 220;
-      const h = top + n * rowH + 8;
-      const max = Math.max(...counts, 1);
-      const T = (x, y, t, cls, anchor, style) => `<text class="${cls}" x="${x}" y="${y}" text-anchor="${anchor || 'start'}"${style ? ` style="${style}"` : ''}>${t}</text>`;
-      let b = '';
-      m.steps.forEach((s, i) => {
-        const y = top + i * rowH;
-        const w = Math.max(2, barMax * counts[i] / max);
-        const isLimit = limit === i, isLast = i === n - 1;
-        if (i > 0) {
-          const lost = counts[i - 1] * (1 - s[1] / 100);
-          b += T(barX, y - 8, `&darr; ${+s[1].toFixed(1)}%`, 'f-num', 'start', isLimit ? 'fill:var(--f-ink)' : '');
-          if (lost >= 0.5) b += T(barX + 70, y - 8, `${commas(lost)} leave`, 'f-num');
-        }
-        b += T(barX, y + 20, esc(s[0] || 'Step ' + (i + 1)), 'f-up', 'start', isLimit ? '' : 'fill:var(--f-soft)');
-        b += `<rect x="${barX}" y="${y + 30}" width="${w.toFixed(1)}" height="14" fill="${isLimit ? 'var(--f-ink)' : 'var(--f-mid)'}"/>`;
-        b += T(barX + w + 8, y + 42, commas(counts[i]), 'f-num', 'start', 'fill:var(--f-ink)');
-        if (isLimit) b += T(334, y - 8, 'rate-limiting step', 'f-it', 'end', 'fill:var(--f-ink)');
+    // ── The flow map: steps in columns, bands as wide as the people moving along them
+    function diagram(counts, limitId) {
+      const m = model, n = m.steps.length, at = {};
+      m.steps.forEach((s, i) => { at[s.id] = i; });
+      const depth = m.steps.map(() => 0);
+      m.steps.forEach((s, i) => { if (s.from) depth[i] = depth[at[s.from]] + 1; });
+      const cols = Math.max(...depth) + 1;
+      // Order steps so each branch sits together, children under their parent
+      const order = [];
+      const walk = id => { order.push(at[id]); childrenOf(id).forEach(c => walk(c.id)); };
+      walk(m.steps[0].id);
+      const colSum = new Array(cols).fill(0), colN = new Array(cols).fill(0);
+      order.forEach(i => { colSum[depth[i]] += counts[i]; colN[depth[i]]++; });
+      const GAP = 64, COLW = 180, NODEW = 8, X0 = 150, TOP = 54, MAXH = 150;
+      const scale = Math.min(MAXH / Math.max(...counts, 1), ...colSum.map((t, d) => (MAXH + 60 - GAP * (colN[d] - 1)) / Math.max(t, 1)));
+      const hOf = i => Math.max(2, counts[i] * scale);
+      const x = i => X0 + depth[i] * COLW;
+      const y = new Array(n).fill(0), colY = new Array(cols).fill(TOP);
+      order.forEach(i => { y[i] = colY[depth[i]]; colY[depth[i]] += hOf(i) + GAP; });
+      const bottom = Math.max(...m.steps.map((s, i) => y[i] + hOf(i)));
+      const t = v => Math.max(1.2, v * scale);
+
+      const T = (x, y, s, cls, anchor, style) => `<text class="${cls}" x="${x}" y="${y}" text-anchor="${anchor || 'start'}"${style ? ` style="${style}"` : ''}>${s}</text>`;
+      let bands = '', nodes = '', labels = '';
+      // Each step's left edge takes, in order: new arrivals (first step), its main path in, then loops
+      const inCursor = m.steps.map((s, i) => y[i]);
+      const outCursor = m.steps.map((s, i) => y[i]);
+      const band = (x1, y1, x2, y2, w, cls) => {
+        const dx = Math.max(30, (x2 - x1) / 2);
+        return `<path class="${cls}" d="M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}" stroke-width="${w.toFixed(1)}"/>`;
+      };
+      // New people arriving each month
+      const e = t(m.entry);
+      bands += band(X0 - 60, y[0] + e / 2, x(0), y[0] + e / 2, e, 'gm-b gm-b-new');
+      labels += T(X0 - 68, y[0] + e / 2 - 3, commas(m.entry), 'f-num', 'end', 'fill:var(--f-ink)');
+      labels += T(X0 - 68, y[0] + e / 2 + 12, 'new', 'f-num', 'end');
+      inCursor[0] += e;
+      // Main paths
+      order.forEach(i => {
+        const s = m.steps[i];
+        if (!s.from) return;
+        const p = at[s.from], flow = counts[p] * s.rate / 100, w = t(flow);
+        const y1 = outCursor[p] + w / 2, y2 = inCursor[i] + w / 2;
+        outCursor[p] += w; inCursor[i] += w;
+        bands += band(x(p) + NODEW, y1, x(i), y2, w, 'gm-b' + (s.id === limitId ? ' gm-b-limit' : ''));
+        // The share who carry on, on the path itself
+        labels += T(x(i) - 8, y2 - w / 2 - 5, `${+s.rate.toFixed(1)}%`, 'f-num', 'end', s.id === limitId ? 'fill:var(--f-ink)' : '');
       });
-      const L = m.loop;
-      if (L.on && L.k > 0 && L.from >= L.to) {
-        const y1 = top + L.from * rowH + 37, y2 = top + L.to * rowH + 37;
-        const x = W - 4, xb = 340;
-        const d = y1 === y2
-          ? `M ${xb} ${y1 + 6} C ${x + 14} ${y1 + 24}, ${x + 14} ${y1 - 24}, ${xb} ${y1 - 6}`
-          : `M ${xb} ${y1} L ${x - 10} ${y1} Q ${x} ${y1} ${x} ${y1 - 10} L ${x} ${y2 + 10} Q ${x} ${y2} ${x - 10} ${y2} L ${xb} ${y2}`;
-        b += `<path d="${d}" fill="none" stroke="var(--f-soft)" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#gm-arr)"/>`;
-        const my = (y1 + y2) / 2;
-        b += `<text class="f-num" transform="translate(${x + 14} ${my}) rotate(90)" text-anchor="middle">${esc(L.name || 'Loop')} &middot; +${commas(res.looped)}</text>`;
-      }
-      return `<svg viewBox="0 0 ${W + 26} ${h}" role="img" aria-label="Your growth model: ${m.steps.map((s, i) => esc(s[0]) + ' ' + commas(counts[i])).join(', ')}">
-        <defs><marker id="gm-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9" fill="none" stroke="var(--f-soft)" stroke-width="1.2"/></marker></defs>${b}</svg>`;
+      // Loops: each runs along its own lane beneath the map and back in
+      let lane = bottom + 40;
+      const fromUsed = {};
+      m.loops.forEach((l, li) => {
+        if (!(l.k > 0)) return;
+        const a = at[l.from], b = at[l.to], flow = l.k * counts[a], w = t(flow);
+        const j = fromUsed[a] = (fromUsed[a] || 0) + 1;
+        const sx = x(a) + COLW - 34 + (j - 1) * 12, sy = y[a] + hOf(a);
+        const ty = inCursor[b] + w / 2; inCursor[b] += w;
+        const tx = x(b), back = tx - 26, r = 12;
+        const ly = lane + w / 2;
+        const d = `M ${x(a) + NODEW} ${sy - w / 2} L ${sx - r} ${sy - w / 2} Q ${sx} ${sy - w / 2} ${sx} ${sy - w / 2 + r} L ${sx} ${ly - r} Q ${sx} ${ly} ${sx + (back < sx ? -r : r)} ${ly} L ${back + (back < sx ? r : -r)} ${ly} Q ${back} ${ly} ${back} ${ly - r} L ${back} ${ty + r} Q ${back} ${ty} ${back + r} ${ty} L ${tx} ${ty}`;
+        bands += `<path class="gm-b gm-b-loop" d="${d}" stroke-width="${w.toFixed(1)}"/>`;
+        labels += T(Math.min(sx, back) + Math.abs(sx - back) / 2, ly + w / 2 + 16, `${esc(l.name || 'Loop')} &middot; +${commas(flow)} a month`, 'f-num', 'middle');
+        lane += w + 34;
+      });
+      // Steps
+      m.steps.forEach((s, i) => {
+        const isLimit = s.id === limitId, isGoal = s.id === m.goal;
+        nodes += `<rect x="${x(i)}" y="${y[i]}" width="${NODEW}" height="${hOf(i).toFixed(1)}" fill="${isLimit || isGoal ? 'var(--f-ink)' : 'var(--f-mid)'}"/>`;
+        labels += T(x(i), y[i] - 24, esc(label(s)), 'f-up', 'start', isLimit || isGoal ? '' : 'fill:var(--f-soft)');
+        labels += T(x(i), y[i] - 9, commas(counts[i]) + (isGoal ? ' &middot; goal' : ''), 'f-num', 'start', 'fill:var(--f-ink)');
+        if (isLimit) labels += T(x(i), y[i] + hOf(i) + 17, 'rate-limiting step', 'f-it', 'start', 'fill:var(--f-ink)');
+      });
+      const W = X0 + (cols - 1) * COLW + 170, H = lane;
+      return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Your growth model: ${m.steps.map((s, i) => esc(label(s)) + ', ' + commas(counts[i]) + ' a month').join('; ')}">${bands}${nodes}${labels}</svg>`;
     }
 
     function update() {
-      const m = model, L = m.loop;
-      const { base, end, list } = levers(m);
-      const note = $('#gm-loop-note');
-      if (note) note.textContent = L.on && L.from < L.to ? 'A loop needs to start at or after the step people come back to.' : '';
+      const m = model;
+      const { base, end, list } = levers();
+      const over = m.steps.filter(p => childrenOf(p.id).reduce((t, c) => t + c.rate, 0) > 100.001);
+      $('#gm-step-note').textContent = over.length
+        ? `The paths after “${label(over[0])}” add up to more than 100%. Each person can only take one path.`
+        : 'Each % is the share of people from the step before who reach this one.';
+      $('#gm-step-note').classList.toggle('gm-warn', over.length > 0);
 
       if (base.compounding) {
-        $('#gm-diagram').innerHTML = `<p class="gm-compound">This loop brings back more people than it starts with, about ${base.gain.toFixed(2)} for every one, so it grows every cycle without limit. Real loops rarely sustain that: check the numbers, or lower how many people each person brings in.</p>`;
+        $('#gm-diagram').innerHTML = `<p class="gm-compound">Your loops bring back more people than they start with, so this model grows every month without limit. Real loops rarely sustain that: check the numbers, or lower how many people each person brings in.</p>`;
+        $('#gm-cap').innerHTML = '';
         $('#gm-out').innerHTML = '';
         $('#gm-result').hidden = true;
         save();
@@ -3584,46 +3708,62 @@
 
       const ranked = list.filter(x => x.room).sort((a, b) => b.gain - a.gain);
       const top = ranked[0];
-      const limit = top && top.gain > 0.5 ? top.i : -1;
-      $('#gm-diagram').innerHTML = diagram(base, limit);
+      const limit = top && top.gain > 0.5 ? m.steps[top.i] : null;
+      $('#gm-diagram').innerHTML = diagram(base.counts, limit && limit.id);
+      const mapEl = $('#gm-diagram');
+      const wide = mapEl.scrollWidth > mapEl.clientWidth + 2;
+      $('#gm-cap').innerHTML = `<span>Each band is as wide as the number of people moving along it each month. Bands that run underneath are loops, bringing new people back in.${wide ? ' Scroll sideways to see the whole model.' : ''}</span>`;
 
-      const endName = esc(m.steps[m.steps.length - 1][0] || 'the last step');
-      const maxGain = Math.max(...list.map(x => x.gain), 1);
+      const goal = byId(m.goal), goalName = esc(label(goal));
       $('#gm-result').hidden = false;
       $('#gm-end').textContent = commas(end);
-      $('#gm-end-label').innerHTML = `Reach &ldquo;${endName}&rdquo; each month`;
+      $('#gm-end-label').innerHTML = `Reach &ldquo;${goalName}&rdquo; each month`;
       $('#gm-lift-v').textContent = lift;
-      $('#gm-lift').value = lift;
+
       let out = '';
-      if (limit < 0) {
-        out += `<p class="calc-sentence">Every step is already at 100%, so there is no single step holding you back. Growth here comes from bringing more people in at the top.</p>`;
-      } else {
-        const s = m.steps[limit], prev = m.steps[limit - 1];
-        const inLoop = L.on && L.k > 0 && L.from >= L.to && limit > L.to && limit <= L.from;
-        const lowest = list.every(x => m.steps[x.i][1] >= s[1]);
-        const second = ranked[1];
-        const loopWhy = `It&rsquo;s also part of your &ldquo;${esc(L.name || 'loop')}&rdquo; loop, so each extra person brings more people back in.`;
-        const why = lowest
-          ? `Only ${+s[1].toFixed(1)}% of people get past it, the lowest of any step, so each point is worth more here.${inLoop ? ' ' + loopWhy : ''}`
-          : (inLoop ? loopWhy : `Each point here carries through to more people at the end than at any other step.`);
+      if (!limit) {
+        out += `<p class="calc-sentence">No single step is holding you back${list.every(x => !x.room) ? ': every step is already at 100%' : ''}. Growth here comes from bringing more people in at the start.</p>`;
+      } else if (top.takesOff) {
         out += `
           <div class="gm-insight">
             <span class="calc-label">Your rate-limiting step</span>
-            <p class="gm-step-name">${esc(prev[0])} &rarr; ${esc(s[0])}</p>
-            <p class="calc-sentence">Lifting it by ${lift} points brings about <b>${commas(top.gain)}</b> more people to &ldquo;${endName}&rdquo; each month${second && second.gain > 0.5 ? `, ${top.gain / second.gain >= 1.15 ? `${(top.gain / second.gain).toFixed(1)} times` : 'a little more than'} the next best step` : ''}. ${why}</p>
-          </div>
+            <p class="gm-step-name">${esc(label(byId(limit.from)))} &rarr; ${esc(label(limit))}</p>
+            <p class="calc-sentence">Lifting it by ${lift} points would tip your loops into growing on their own every month. Few changes are worth more, but check that your loop numbers are realistic first.</p>
+          </div>`;
+      } else {
+        const prev = byId(limit.from);
+        const loop = m.loops.find(l => l.k > 0 && leadsTo(l.to, limit.id) && leadsTo(limit.id, l.from));
+        const onPath = leadsTo(limit.id, m.goal);
+        const lowest = ranked.filter(x => x.gain > 0.5).every(x => m.steps[x.i].rate >= limit.rate);
+        const second = ranked[1];
+        const parts = [];
+        if (lowest) parts.push(`Only ${+limit.rate.toFixed(1)}% of people get past it, the lowest of the steps that matter, so each point is worth more here.`);
+        if (loop) parts.push(`It&rsquo;s part of your &ldquo;${esc(loop.name || 'loop')}&rdquo; loop, so each extra person brings more people back in.`);
+        if (!onPath) parts.push(`It isn&rsquo;t on the path to &ldquo;${goalName}&rdquo; itself: it helps by feeding a loop that brings more people in.`);
+        if (!parts.length) parts.push(`Each point here carries through to more people at your goal than at any other step.`);
+        out += `
+          <div class="gm-insight">
+            <span class="calc-label">Your rate-limiting step</span>
+            <p class="gm-step-name">${esc(label(prev))} &rarr; ${esc(label(limit))}</p>
+            <p class="calc-sentence">Lifting it by ${lift} points brings about <b>${commas(top.gain)}</b> more people to &ldquo;${goalName}&rdquo; each month${second && second.gain > 0.5 ? `, ${top.gain / second.gain >= 1.15 ? `${(top.gain / second.gain).toFixed(1)} times` : 'a little more than'} the next best step` : ''}. ${parts.join(' ')}</p>
+          </div>`;
+      }
+      if (limit) {
+        const finite = list.filter(x => x.room && isFinite(x.gain));
+        const maxGain = Math.max(1, ...finite.map(x => x.gain));
+        out += `
           <div class="gm-levers">
-            <span class="calc-label">Extra people each month, by step</span>
-            ${list.map(x => `
-              <div class="gm-lever${x.i === limit ? ' on' : ''}">
-                <span class="gm-lever-name">${esc(m.steps[x.i][0])}</span>
-                <span class="gm-lever-bar"><i style="width:${x.room ? (100 * Math.max(0, x.gain) / maxGain).toFixed(1) : 0}%"></i></span>
-                <span class="gm-lever-n">${x.room ? '+' + commas(x.gain) : 'at 100%'}</span>
-              </div>`).join('')}
+            <span class="calc-label">Extra people reaching &ldquo;${goalName}&rdquo; each month, by step</span>
+            ${list.map(x => {
+              const s = m.steps[x.i];
+              const text = !x.room ? 'at 100%' : (x.takesOff ? 'takes off' : '+' + commas(Math.max(0, x.gain)));
+              const w = !x.room ? 0 : (x.takesOff ? 100 : 100 * Math.max(0, x.gain) / maxGain);
+              return `<div class="gm-lever${s.id === limit.id ? ' on' : ''}"><span class="gm-lever-name">${esc(label(s))}</span><span class="gm-lever-bar"><i style="width:${w.toFixed(1)}%"></i></span><span class="gm-lever-n">${text}</span></div>`;
+            }).join('')}
           </div>
           <div class="gm-insight gm-next">
             <span class="calc-label">What to do next</span>
-            <p class="calc-sentence">Before changing anything, talk to five people who reached &ldquo;${esc(prev[0])}&rdquo; but never got to &ldquo;${esc(s[0])}&rdquo;. Ask what they expected to happen next, and what got in the way. Their answers tell you which change is worth testing.</p>
+            <p class="calc-sentence">Before changing anything, talk to five people who reached &ldquo;${esc(label(byId(limit.from)))}&rdquo; but never got to &ldquo;${esc(label(limit))}&rdquo;. Ask what they expected to happen next, and what got in the way. Their answers tell you which change is worth testing.</p>
             <p class="calc-note">A point isn&rsquo;t equally easy to win at every step. Use this to choose where to look, not what to build.</p>
           </div>`;
       }
@@ -3632,24 +3772,23 @@
     }
 
     function save() {
-      const url = location.pathname + '#m=' + encode(model);
-      try { history.replaceState(history.state, '', url); } catch (e) {}
+      try { history.replaceState(history.state, '', location.pathname + '#m=' + encode(model)); } catch (e) {}
     }
 
     $('#gm-lift').addEventListener('input', e => { lift = +e.target.value; update(); });
     $('#gm-share').addEventListener('click', async e => {
-      const btn = e.currentTarget, label = 'Copy link to this model';
+      const btn = e.currentTarget, text = 'Copy link to this model';
       try { await navigator.clipboard.writeText(location.origin + location.pathname + '#m=' + encode(model)); btn.textContent = 'Link copied'; }
       catch (err) { btn.textContent = 'Couldn’t copy'; }
-      setTimeout(() => { btn.textContent = label; }, 2000);
+      setTimeout(() => { btn.textContent = text; }, 2000);
     });
     $('#gm-reset').addEventListener('click', () => {
-      Object.assign(model, clone(DEFAULT));
-      lift = 5;
-      buildSteps(); buildLoop(); update();
+      model = clone(DEFAULT);
+      lift = 5; $('#gm-lift').value = 5;
+      buildSteps(); buildLoops(); buildGoal(); update();
     });
 
-    buildSteps(); buildLoop(); update();
+    buildSteps(); buildLoops(); buildGoal(); update();
   }
 
   // Live projects and the function that draws each one
