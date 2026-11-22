@@ -17,7 +17,7 @@
 <meta name="twitter:title" content="On walking without a destination — Henry">
 <meta name="twitter:description" content="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.">
 <script>
-  try { sessionStorage.setItem('redirect', location.pathname); } catch (e) {}
+  try { sessionStorage.setItem('redirect', location.pathname + location.search + location.hash); } catch (e) {}
   location.replace('/');
 </script>
 <noscript><meta http-equiv="refresh" content="0; url=/"></noscript>

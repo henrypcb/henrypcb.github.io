@@ -17,7 +17,7 @@
 <meta name="twitter:title" content="A short note on attention — Henry">
 <meta name="twitter:description" content="Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.">
 <script>
-  try { sessionStorage.setItem('redirect', location.pathname); } catch (e) {}
+  try { sessionStorage.setItem('redirect', location.pathname + location.search + location.hash); } catch (e) {}
   location.replace('/');
 </script>
 <noscript><meta http-equiv="refresh" content="0; url=/"></noscript>

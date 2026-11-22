@@ -46,7 +46,7 @@ def page(title, desc, path, kind="website", date=None):
 <meta name="twitter:title" content="{e(title)}">
 <meta name="twitter:description" content="{e(desc)}">
 <script>
-  try {{ sessionStorage.setItem('redirect', location.pathname); }} catch (e) {{}}
+  try {{ sessionStorage.setItem('redirect', location.pathname + location.search + location.hash); }} catch (e) {{}}
   location.replace('/');
 </script>
 <noscript><meta http-equiv="refresh" content="0; url=/"></noscript>

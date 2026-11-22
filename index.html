@@ -15,13 +15,11 @@
 
 <script>
   try { if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}
-  try {
-    const redirect = sessionStorage.getItem('redirect');
-    if (redirect) {
-      sessionStorage.removeItem('redirect');
-      history.replaceState(null, '', redirect);
-    }
-  } catch (e) {}
+  const redirect = sessionStorage.getItem('redirect');
+  if (redirect) {
+    sessionStorage.removeItem('redirect');
+    history.replaceState(null, '', redirect);
+  }
 </script>
 
 <style>
@@ -493,11 +491,10 @@
   .mk-c.none { color: var(--f-mid); background: none; }
   .mk-mx[data-sel] .mk-c:not(.on) { opacity: 0.45; }
   .mk-flow { margin-top: 28px; }
-  .mk-rm svg { display: block; width: 100%; max-width: 420px; height: auto; overflow: visible; }
-  .mdiag .mk-flow svg { display: block; width: 100%; max-width: none; height: auto; overflow: visible; }
+  .mk-flow svg, .mk-rm svg { display: block; width: 100%; max-width: 420px; height: auto; overflow: visible; }
   .mk-flow text, .mk-rm text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-  .mk-rm .f-num { font-size: 11px; }
-  .mk-flow .f-ax, .mk-flow .f-num { font-size: 12px; }
+  .mk-flow .f-ax, .mk-rm .f-num { font-size: 11px; }
+  .mk-flow .f-num { font-size: 11px; }
 
   .mk-toggles { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; }
   .mk-tog { font: inherit; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; background: none; color: var(--f-soft); border: 1px solid var(--f-rule); padding: 8px 11px; cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s; }
@@ -512,6 +509,60 @@
     .mk-rh { font-size: 11px; }
     .mk-c { height: 32px; font-size: 11px; }
     .mk-corner { font-size: 8px; letter-spacing: 0.04em; }
+  }
+  /* Growth model tool */
+  .gm { max-width: 1000px; }
+  .gm-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; margin: 40px 0 44px; align-items: start; }
+  .gm-viz { position: sticky; top: 96px; }
+  .gm-viz .post-body .fig { margin: 0; }
+  .gm-step { display: grid; grid-template-columns: 22px minmax(0, 1fr) 132px 22px; gap: 12px; align-items: end; padding: 6px 0; }
+  .gm-idx { font-size: 10px; letter-spacing: 0.12em; color: var(--gray); padding-bottom: 12px; }
+  .gm-name { font: inherit; font-size: 15px; color: var(--black); background: none; border: 0; border-bottom: 1px solid var(--border); padding: 10px 0 8px; outline: none; min-width: 0; width: 100%; transition: border-color 0.2s; }
+  .gm-name:focus { border-bottom-color: var(--black); }
+  .gm-num input { font-size: 22px !important; padding: 2px 0 6px !important; text-align: right; }
+  .gm-del { background: none; border: 0; color: var(--gray); font-size: 18px; line-height: 1; padding: 0 0 12px; cursor: pointer; }
+  .gm-del:hover { color: var(--black); }
+  .gm-add { margin: 14px 0 0 34px; }
+  .gm-step + .calc-help { margin-left: 34px; }
+  .gm-loop { margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--border); }
+  .gm-check { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; }
+  .gm-check input { accent-color: var(--black); width: 14px; height: 14px; }
+  .gm-loop-name { margin-top: 12px; }
+  .gm-sentence { font-size: 14px; line-height: 2.4; color: #444; margin-top: 10px; }
+  .gm-sentence select { font: inherit; font-size: 14px; color: var(--black); background: none; border: 0; border-bottom: 1px solid var(--black); padding: 2px 2px 2px 0; max-width: 100%; cursor: pointer; }
+  .gm-sentence select option { color: #000; }
+  .gm-k { display: inline-flex; width: 64px; vertical-align: baseline; }
+  .gm-k input { font-size: 16px !important; padding: 0 !important; text-align: center; font-family: inherit !important; }
+  .gm-fig svg { max-width: 440px; }
+  .gm-fig .f-up { font-size: 12px; }
+  .gm-fig .f-num { font-size: 11.5px; }
+  .gm-fig .f-it { font-size: 13px; }
+  .gm-compound { font-size: 14px; line-height: 1.7; color: #444; }
+  .gm-result { margin-top: 8px; }
+  .gm-insight { margin-top: 34px; }
+  .gm-insight .calc-sentence { margin-top: 10px; }
+  .gm-insight b { font-weight: 600; color: var(--black); }
+  .gm-step-name { font-family: Georgia, serif; font-size: 30px; line-height: 1.2; letter-spacing: -0.01em; }
+  .gm-levers { margin-top: 34px; max-width: 640px; }
+  .gm-lever { display: grid; grid-template-columns: minmax(90px, 160px) 1fr 82px; gap: 14px; align-items: center; padding: 7px 0; font-size: 13px; color: var(--gray); }
+  .gm-lever-bar { height: 8px; position: relative; }
+  .gm-lever-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--gray); opacity: 0.6; }
+  .gm-lever.on { color: var(--black); }
+  .gm-lever.on .gm-lever-bar i { background: var(--black); opacity: 1; }
+  .gm-lever-n { text-align: right; font-variant-numeric: tabular-nums; }
+  .gm-next { padding-top: 22px; border-top: 1px solid var(--border); max-width: 640px; }
+  .gm-actions { margin: 34px 0 30px; }
+  html.dark body .gm-sentence, html.dark body .gm-compound { color: #cfcfcf; }
+  @media (max-width: 900px) {
+    .gm-grid { grid-template-columns: 1fr; gap: 36px; }
+    .gm-viz { position: static; }
+  }
+  @media (max-width: 640px) {
+    .gm-step { grid-template-columns: 18px minmax(0, 1fr) 96px 18px; gap: 8px; }
+    .gm-num input { font-size: 20px !important; }
+    .gm-add, .gm-step + .calc-help { margin-left: 26px; }
+    .gm-step-name { font-size: 24px; }
+    .gm-lever { grid-template-columns: 96px 1fr 64px; gap: 10px; font-size: 12px; }
   }
   .cs-links { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--border); font-size: 13px; }
   .cs-links a { color: var(--black); text-underline-offset: 3px; }
@@ -761,27 +812,11 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.4);
-    background: none;
-    border: none;
-    padding: 0;
-    font-family: inherit;
     cursor: pointer;
     transition: color 0.2s;
   }
 
-  .lightbox-close:hover,
-  .lightbox-close:focus-visible { color: white; }
-  .lightbox-close:focus-visible { outline: 1px solid white; outline-offset: 4px; }
-
-  /* Keyboard focus: visible wherever the default ring was removed or missing */
-  .calc-range:focus-visible { outline: 1px solid var(--black); outline-offset: 10px; }
-  .carousel-slide img:focus { outline: none; }
-  .carousel-slide img:focus-visible { outline: 2px solid var(--black); outline-offset: -2px; }
-
-  /* ─── NOT FOUND ───────────────────────────────────── */
-  .notfound-title { font-family: Georgia, serif; font-weight: 400; font-size: 32px; margin-bottom: 16px; }
-  .notfound p { color: var(--gray); line-height: 1.6; }
-  .notfound a { color: var(--black); }
+  .lightbox-close:hover { color: white; }
 
   /* ─── FOOTER ──────────────────────────────────────── */
   footer {
@@ -1140,12 +1175,12 @@
 <body>
 
 <nav>
-  <a class="nav-brand" href="/" onclick="return navClick(event, 'home')">Henry</a>
+  <a class="nav-brand" href="#" onclick="show('home'); return false;">Henry</a>
   <ul class="nav-links">
-    <li><a href="/projects" onclick="return navClick(event, 'projects')" id="nav-projects">Projects</a></li>
-    <li><a href="/experience" onclick="return navClick(event, 'experience')" id="nav-experience">Experience</a></li>
-    <li><a href="/writing" onclick="return navClick(event, 'writing')" id="nav-writing">Writing</a></li>
-    <li><a href="/photography" onclick="return navClick(event, 'photography')" id="nav-photography">Photography</a></li>
+    <li><a href="#" onclick="show('projects'); return false;" id="nav-projects">Projects</a></li>
+    <li><a href="#" onclick="show('experience'); return false;" id="nav-experience">Experience</a></li>
+    <li><a href="#" onclick="show('writing'); return false;" id="nav-writing">Writing</a></li>
+    <li><a href="#" onclick="show('photography'); return false;" id="nav-photography">Photography</a></li>
   </ul>
   <button class="dark-toggle" id="dark-toggle" onclick="toggleDark()">Light</button>
 </nav>
@@ -1204,7 +1239,7 @@
       </ul>
       <div class="experience-role-row">
         <span class="experience-role">Data Scientist</span>
-        <span class="experience-dates">Oct 2023 — Oct 2025</span>
+        <span class="experience-dates">Oct 2023 — Sep 2025</span>
       </div>
       <ul class="experience-points">
         <li>Led the experimentation roadmap for a £100m lending portfolio. I decided what we tested across acquisition, activation and pricing, running over 30 A/B tests that grew loan volume by 35%.</li>
@@ -1219,15 +1254,15 @@
         <span class="experience-company-name">Klarna</span>
       </div>
       <div class="experience-role-row">
-        <span class="experience-role">Strategy Associate</span>
-        <span class="experience-dates">Apr 2022 — Apr 2023</span>
+        <span class="experience-role">Analyst II, Strategy &amp; Analytics</span>
+        <span class="experience-dates">May 2022 — Apr 2023</span>
       </div>
       <ul class="experience-points">
         <li>Shaped the growth roadmap for PriceRunner, Klarna&rsquo;s price comparison site, built on sizing the overlap between its customers and Klarna&rsquo;s. It led to a new five-person growth squad.</li>
         <li>Won C-suite approval to launch a product in two European markets that turned Pay in 3 and Pay Later purchases into longer-term loans, by showing the unmet need, building the commercial case and forecasting the revenue.</li>
       </ul>
       <div class="experience-role-row">
-        <span class="experience-role">Strategy Analyst</span>
+        <span class="experience-role">Analyst I, Strategy &amp; Analytics</span>
         <span class="experience-dates">Nov 2021 — Apr 2022</span>
       </div>
       <ul class="experience-points">
@@ -1331,15 +1366,8 @@
 </section>
 
 
-<section class="section notfound" id="notfound">
-  <h1 class="notfound-title">Page not found</h1>
-  <p>There&rsquo;s nothing at this address. It may have moved, or the link may be mistyped.</p>
-  <p><a href="/" onclick="return navClick(event, 'home')">Go to the home page &rarr;</a></p>
-</section>
-
-
-<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo, full size" hidden>
-  <button type="button" class="lightbox-close" id="lightbox-close">Close &times;</button>
+<div class="lightbox" id="lightbox">
+  <span class="lightbox-close" id="lightbox-close">Close &times;</span>
   <img id="lightbox-img" src="" alt="" />
 </div>
 
@@ -1349,21 +1377,11 @@
 
 <script>
   // ── Navigation ────────────────────────────────────
-  const VALID = ['home', 'projects', 'experience', 'writing', 'photography', 'notfound'];
+  const VALID = ['home', 'projects', 'experience', 'writing', 'photography'];
   let navTimer = null;
   let projectRedraw = null;
 
-  // Plain clicks move within the page; Cmd/Ctrl/Shift/middle-click keep the browser's
-  // own behaviour, so links open in a new tab or window as expected.
-  function navClick(e, route) {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button > 0) return true;
-    e.preventDefault();
-    show(route);
-    return false;
-  }
-
   function activate(id, animated) {
-    if (typeof closeLightbox === 'function' && !lightbox.hidden) closeLightbox(false);
     document.querySelectorAll('.section').forEach(s => s.classList.remove('visible', 'fade-out', 'fade-in'));
     const next = document.getElementById(id);
     next.classList.add('visible');
@@ -1373,8 +1391,7 @@
     if (navEl) navEl.classList.add('active');
     window.scrollTo(0, 0);
     if (id === 'photography') onPhotographyShown();
-    if (id === 'notfound') document.title = 'Page not found — Henry';
-    else if (id !== 'writing' && id !== 'projects') document.title = baseTitle;
+    if (id !== 'writing' && id !== 'projects') document.title = baseTitle;
     if (id === 'projects' && projectRedraw) projectRedraw();
     if (id === 'writing') drawFigures(document.getElementById('post-body'));
   }
@@ -1386,8 +1403,7 @@
     if (!VALID.includes(id)) { id = 'home'; slug = undefined; }
     if (id !== 'writing' && id !== 'projects') slug = undefined;
 
-    // The not-found page keeps the address that was asked for, so it's never pushed
-    if (push && id !== 'notfound') {
+    if (push) {
       const url = id === 'home' ? '/' : '/' + id + (slug ? '/' + slug : '');
       if (location.pathname !== url) history.pushState(null, '', url);
     }
@@ -1404,20 +1420,11 @@
     navTimer = setTimeout(() => activate(id, true), 300);
   }
 
-  // True while the address still matches what an async render was started for
-  function stillAt(base, slug) {
-    const here = location.pathname.replace(/\/+$/, '') || '/';
-    return here === (slug ? base + '/' + slug : base);
-  }
-
   function pathToSection() {
-    const path = location.pathname.replace(/^\/+|\/+$/g, '');
-    if (path === '' || path === 'index.html') return 'home';
-    const parts = path.split('/');
-    const [id, slug] = parts;
-    if (!VALID.includes(id) || id === 'home' || id === 'notfound') return 'notfound';
-    if (id === 'writing' || id === 'projects') return parts.length > 2 ? 'notfound' : (slug ? id + '/' + slug : id);
-    return parts.length > 1 ? 'notfound' : id;
+    const path = location.pathname.replace(/^\/+|\/+$/g, '') || 'home';
+    const [id, slug] = path.split('/');
+    if (!VALID.includes(id)) return 'home';
+    return (id === 'writing' || id === 'projects') && slug ? id + '/' + slug : id;
   }
 
   // ── Writing ───────────────────────────────────────
@@ -1744,9 +1751,7 @@
     ['All', ...new Set(posts.map(p => p[key]))].forEach(v => {
       const n = v === 'All' ? posts.length : posts.filter(p => p[key] === v).length;
       const b = document.createElement('button');
-      b.type = 'button';
       b.className = 'wf-option' + (wState[key] === v ? ' on' : '');
-      b.setAttribute('aria-pressed', wState[key] === v);
       b.innerHTML = `<span class="wf-name">${esc(v)}</span><span class="wf-n">${n}</span>`;
       b.onclick = () => { wState[key] = v; renderIndex(posts); };
       box.appendChild(b);
@@ -1788,13 +1793,12 @@
 
   async function renderWriting(slug) {
     const posts = await loadPosts();
-    if (!stillAt('/writing', slug)) return;   // the visitor moved on while this loaded
     const index = document.getElementById('writing-index');
     const article = document.getElementById('writing-post');
     const post = slug && posts.find(p => p.slug === slug);
 
-    if (slug && !post) { show('notfound', { push: false, animate: false }); return; }
     if (!post) {
+      if (slug) history.replaceState(null, '', '/writing');
       article.hidden = true;
       article.style.display = 'none';
       index.hidden = false;
@@ -1824,19 +1828,17 @@
 
     try {
       const md = await loadPiece(post.slug);
-      if (!stillAt('/writing', slug)) return;
       body.innerHTML = markdown(md);
       drawFigures(body);
       body.querySelectorAll('a[href^="/"]').forEach(a => a.addEventListener('click', e => {
-        const route = a.getAttribute('href').replace(/^\/+|\/+$/g, '');
-        if (/\.[a-z0-9]+$/i.test(route)) return;   // a file such as a PDF or photo: let the browser open it
-        if (navClick(e, route || 'home')) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        show(a.getAttribute('href').replace(/^\/+|\/+$/g, '') || 'home');
         window.scrollTo(0, 0);
       }));
       const mins = Math.max(1, Math.round(md.split(/\s+/).length / 220));
       meta.textContent = fmtDate(post.date) + ' · ' + mins + ' min read';
     } catch (err) {
-      if (!stillAt('/writing', slug)) return;
       body.innerHTML = '<p>Sorry, this piece couldn&rsquo;t be loaded.</p>';
     }
   }
@@ -1869,6 +1871,14 @@
         ${br(280, 88, 380, 88, 1)}
         ${dot(20, 70, 1)}${dot(150, 25)}${dot(150, 70, 1)}${dot(150, 115)}
         ${dot(280, 10)}${dot(280, 40)}${dot(280, 55)}${dot(280, 88, 1)}${dot(280, 106)}${dot(280, 130)}${dot(380, 88, 1, 6)}
+      </svg>`;
+    }
+    if (kind === 'loop') {
+      const bar = (y, w, ink) => `<rect x="20" y="${y}" width="${w}" height="9" fill="var(${ink ? '--black' : '--gray'})"/>`;
+      return `<svg viewBox="0 0 400 130" preserveAspectRatio="xMinYMid meet" aria-hidden="true">
+        ${bar(10, 300)}${bar(42, 190)}${bar(74, 96, 1)}${bar(106, 60)}
+        <path d="M 96 110 C 360 110, 360 110, 360 96 L 360 28 C 360 14, 360 14, 330 14" fill="none" stroke="var(--gray)" stroke-width="1.4" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>
+        <path d="M 338 8 L 328 14 L 338 20" fill="none" stroke="var(--gray)" stroke-width="1.4" vector-effect="non-scaling-stroke"/>
       </svg>`;
     }
     if (kind === 'chain') {
@@ -1922,14 +1932,13 @@
 
   async function renderProjects(slug) {
     const list = await loadProjects();
-    if (!stillAt('/projects', slug)) return;
     const index = document.getElementById('projects-index');
     const view = document.getElementById('project-view');
     const sec = document.getElementById('projects');
     const p = slug && list.find(x => x.slug === slug && x.live && PROJECT_VIEWS[x.slug]);
 
-    if (slug && !p) { show('notfound', { push: false, animate: false }); return; }
     if (!p) {
+      if (slug) history.replaceState(null, '', '/projects');
       view.hidden = true; view.style.display = 'none';
       index.hidden = false; index.style.display = '';
       sec.classList.remove('reading');
@@ -1979,8 +1988,29 @@
     return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
   }
 
+  // People per group for a two-sided test with equal groups
+  function nForRate(p1, lift, za, zb) {
+    const p2 = p1 * (1 + lift);
+    if (!(p1 > 0 && p1 < 1 && p2 > 0 && p2 < 1 && lift > 0)) return NaN;
+    const pbar = (p1 + p2) / 2;
+    const top = za * Math.sqrt(2 * pbar * (1 - pbar)) + zb * Math.sqrt(p1 * (1 - p1) + p2 * (1 - p2));
+    return Math.ceil(top * top / Math.pow(p2 - p1, 2));
+  }
+
+  function nForMean(mean, sd, lift, za, zb) {
+    const delta = Math.abs(mean * lift);
+    if (!(delta > 0 && sd > 0)) return NaN;
+    return Math.ceil(2 * Math.pow(za + zb, 2) * sd * sd / (delta * delta));
+  }
+
   const fmtInt = n => Math.round(n).toLocaleString('en-GB');
   const fmtNum = n => (+n.toFixed(2)).toLocaleString('en-GB', { maximumFractionDigits: 2 });
+  function fmtCompact(n) {
+    if (n >= 1e6) return (n / 1e6).toFixed(n < 1e7 ? 1 : 0).replace(/\.0$/, '') + 'm';
+    if (n >= 1e3) return (n / 1e3).toFixed(n < 1e4 ? 1 : 0).replace(/\.0$/, '') + 'k';
+    return String(Math.round(n));
+  }
+
   function renderSampleSize(root, project) {
     const st = { metric: 'rate', rate: 10, mean: 50, sd: 40, liftMode: 'rel', lift: 5, conf: 95, power: 80,
                  groups: 2, correct: true, control: 50, evenSplit: true, traffic: 5000 };
@@ -2165,18 +2195,17 @@
       }
       if (pts.length < 2) return;
       const narrow = W < 520, H = narrow ? 230 : 270;
+      const m = { l: 48, r: 20, t: 30, b: 30 };
       const xLo = pts[0][0], xHi = pts[pts.length - 1][0];
       const maxN = Math.max(...pts.map(p => p[1]));
       const step = niceStep(maxN / 3), top = step * Math.ceil(maxN / step);
-      // Axis labels are full numbers with commas, so make room for the widest one
-      const m = { l: Math.max(48, 16 + fmtInt(top).length * 6.5), r: 20, t: 30, b: 30 };
       const x = L => m.l + (L - xLo) / (xHi - xLo) * (W - m.l - m.r);
       const y = n => H - m.b - n / top * (H - m.t - m.b);
       const svg = sv('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img',
         'aria-label': `Total people needed, from ${fmtInt(pts[0][1])} at a ${fmtNum(xLo)}${u} lift to ${fmtInt(pts[pts.length - 1][1])} at ${fmtNum(xHi)}${u}` }, box);
       for (let v = 0; v <= top + 1e-9; v += step) {
         sv('line', { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), stroke: v ? 'var(--f-rule)' : 'var(--f-ink)', 'stroke-width': 1 }, svg);
-        svText(svg, 'f-ax', m.l - 8, y(v) + 3, fmtInt(v), 'end');
+        svText(svg, 'f-ax', m.l - 8, y(v) + 3, fmtCompact(v), 'end');
       }
       const xStep = niceStep((xHi - xLo) / (narrow ? 4 : 5));
       for (let L = Math.ceil(xLo / xStep) * xStep; L <= xHi + 1e-9; L += xStep) {
@@ -2206,20 +2235,6 @@
       hit.addEventListener('mouseleave', () => { cross.setAttribute('opacity', 0); dot.setAttribute('opacity', 0); hideTip(wrap); });
     }
 
-    // Says which number stops the calculation, checked in the order the fields appear
-    function inputProblem() {
-      if (isRate()) {
-        if (!(st.rate > 0 && st.rate < 100)) return 'The current conversion rate needs to be above 0% and below 100%.';
-      } else {
-        if (!(st.mean > 0)) return 'The current average needs to be above zero.';
-        if (!(st.sd > 0)) return 'The standard deviation needs to be above zero.';
-      }
-      if (!(st.lift > 0)) return 'The smallest lift worth detecting needs to be above zero.';
-      if (isRate() && !(target(st.lift) < 1)) return 'That lift takes the conversion rate to 100% or more. Choose a smaller lift.';
-      if (!st.evenSplit && !(st.control > 0 && st.control < 100)) return 'The control’s share of traffic needs to be above 0% and below 100%.';
-      return 'Check the numbers above.';
-    }
-
     function update() {
       const mVar = st.groups - 1;
       root.querySelectorAll('[data-for="rate"]').forEach(e => e.hidden = !isRate());
@@ -2234,8 +2249,8 @@
 
       // Split and correction
       const vShare = st.evenSplit ? 100 / st.groups : (100 - st.control) / mVar;
-      $('calc-split-help').textContent = !(vShare > 0 && vShare < 100) ? ''
-        : mVar === 1 ? `The variant gets ${fmtNum(vShare)}%.`
+      $('calc-split-help').textContent = mVar === 1
+        ? `The variant gets ${fmtNum(100 - st.control)}%.`
         : `Each of the ${mVar} variants gets ${fmtNum(vShare)}%.`;
       $('calc-even').hidden = st.evenSplit;
       $('calc-correct-help').textContent = st.correct
@@ -2249,7 +2264,9 @@
         ['calc-n', 'calc-nc', 'calc-nv', 'calc-weeks'].forEach(id => $(id).textContent = '–');
         $('calc-days').textContent = 'To run';
         sentence.textContent = '';
-        note.textContent = inputProblem();
+        note.textContent = isRate()
+          ? 'Check the numbers: the rate needs to be between 0 and 100%, and stay below 100% after the lift.'
+          : 'Check the numbers: the average, standard deviation and lift all need to be above zero.';
         drawChart();
         return;
       }
@@ -2948,27 +2965,23 @@
       </div>
       <div class="mk-flow" id="mk-flow" aria-live="polite"></div>`;
 
-    // Drawn at the figure's own width, so it lines up with the matrix above it:
-    // starts at the matrix's left edge, percentages end at its right edge
     function flowSvg(i) {
       const { T, defs } = kit();
-      const W = Math.max(280, Math.round(flow.clientWidth) || 480);
       const dests = MX_COLS.map((c, j) => [c, MX[i][j]]).filter(d => d[1] > 0).sort((a, b) => b[1] - a[1]);
       const gap = 30, top = 44, h = top + dests.length * gap;
       const sy = top + (dests.length - 1) * gap / 2;
-      const x0 = 7, dotX = Math.round(W * 0.52), span = dotX - x0;
-      let b = T(0, 16, 'FROM ' + MX_ROWS[i].toUpperCase(), 'f-up');
+      let b = T(15, 16, 'FROM ' + MX_ROWS[i].toUpperCase(), 'f-up');
       dests.forEach(([c, p], k) => {
         const y = top + k * gap;
         const w = Math.max(1, p * 11);
         const col = c === 'Conversion' ? 'var(--f-ink)' : 'var(--f-mid)';
-        b += `<path d="M ${x0 + 4} ${sy} C ${x0 + span * 0.45} ${sy}, ${x0 + span * 0.55} ${y}, ${dotX - 4} ${y}" fill="none" stroke="${col}" stroke-width="${w.toFixed(1)}" opacity="${c === 'Conversion' ? 1 : (c === 'Drop-off' ? 0.5 : 0.8)}"/>`;
-        b += `<circle cx="${dotX}" cy="${y}" r="${c === 'Conversion' ? 5 : 3.5}" fill="${c === 'Conversion' ? 'var(--f-ink)' : 'var(--f-mid)'}"/>`;
-        b += T(dotX + 14, y + 4, c, 'f-ax', 'start', c === 'Conversion' ? 'fill:var(--f-ink)' : '');
-        b += T(W, y + 4, pct(p, p < 0.1 ? 1 : 0), 'f-num', 'end', c === 'Conversion' ? 'fill:var(--f-ink)' : '');
+        b += `<path d="M 34 ${sy} C 120 ${sy}, 130 ${y}, 196 ${y}" fill="none" stroke="${col}" stroke-width="${w.toFixed(1)}" opacity="${c === 'Conversion' ? 1 : (c === 'Drop-off' ? 0.5 : 0.8)}"/>`;
+        b += `<circle cx="200" cy="${y}" r="${c === 'Conversion' ? 5 : 3.5}" fill="${c === 'Conversion' ? 'var(--f-ink)' : 'var(--f-mid)'}"/>`;
+        b += T(212, y + 4, c, 'f-ax', 'start', c === 'Conversion' ? 'fill:var(--f-ink)' : '');
+        b += T(350, y + 4, pct(p, p < 0.1 ? 1 : 0), 'f-num', 'end', c === 'Conversion' ? 'fill:var(--f-ink)' : '');
       });
-      b += `<circle cx="${x0}" cy="${sy}" r="6" fill="var(--f-ink)"/>`;
-      return `<svg width="${W}" height="${h}" viewBox="0 0 ${W} ${h}" role="img" aria-label="Where customers go next from ${MX_ROWS[i]}">${defs}${b}</svg>`;
+      b += `<circle cx="30" cy="${sy}" r="6" fill="var(--f-ink)"/>`;
+      return `<svg viewBox="0 0 360 ${h}" role="img" aria-label="Where customers go next from ${MX_ROWS[i]}">${defs}${b}</svg>`;
     }
 
     // Fig. 4: switch a channel off
@@ -2992,44 +3005,45 @@
       return `<svg viewBox="0 0 360 134" role="img" aria-label="Chance of converting: ${pct(BASE, 1)} with all channels, ${pct(WITHOUT[c], 1)} without ${c}.">${b}</svg>`;
     }
 
-    const results = figureHtml({ type: 'bars', title: 'Share of conversion credit, by channel', series: [], bar: ['Facebook | 28', 'Paid Search | 26', 'Instagram | 17', 'Online Video | 16', 'Online Display | 12'], unit: '%', highlight: 'Facebook', note: 'the most credit', caption: 'How the 17,639 sales are shared between channels. The figures are rounded, so they add up to 99% rather than 100%.', source: 'my analysis of the dataset' }, 5);
+    const results = figureHtml({ type: 'bars', title: 'Share of conversion credit, by channel', series: [], bar: ['Facebook | 28', 'Paid Search | 26', 'Instagram | 17', 'Online Video | 16', 'Online Display | 12'], unit: '%', highlight: 'Facebook', note: 'the most credit', caption: 'Share of the 17,639 conversions credited to each channel. Rounded, so they add to 99%.', source: 'the analysis' }, 5);
 
     root.innerHTML = `
       <div class="cs">
         <p class="post-kicker">${esc(project.tag || 'Case study')} &middot; Marketing attribution &middot; 2023</p>
-        <h1 class="post-title">Which marketing channels really lead to a sale?</h1>
-        <p class="calc-intro">Most people see a few ads before they buy something, yet the usual reports hand all the credit to the last one. I wanted a fairer answer, so I built a model that asks a simple question of each channel: if it disappeared, how many sales would we lose?</p>
+        <h1 class="post-title">Which channels really drive conversions?</h1>
+        <p class="calc-intro">Customers often see several ads before they buy, but standard reporting gives all the credit to the last one. I built a Markov chain model that credits each channel by how much the journey falls apart without it.</p>
         <p class="cs-tools">Python &middot; pandas &middot; NumPy</p>
         <div class="cs-stats">
-          <div class="cs-stat"><b>586,737</b><span>Ad views and clicks</span></div>
+          <div class="cs-stat"><b>586,737</b><span>Touchpoints</span></div>
           <div class="cs-stat"><b>240,108</b><span>Customers</span></div>
           <div class="cs-stat"><b>5</b><span>Channels</span></div>
-          <div class="cs-stat"><b>17,639</b><span>Sales</span></div>
+          <div class="cs-stat"><b>17,639</b><span>Conversions</span></div>
         </div>
         <div class="post-body" id="cs-body">
           <h2>The problem</h2>
-          <p>Picture someone who sees an Instagram ad, later notices a banner on a news site, then searches for the brand and buys. Most reporting looks only at the last click, so the search gets all the credit. Instagram and the banner did real work to get that person there, but on paper they look worthless.</p>
-          ${fig(1, 'Example', 'One journey, many touches', f1, 'One person&rsquo;s path to buying. Last-click reporting gives all the credit to the final step.')}
+          <p>A customer sees an Instagram ad, then a display banner, then searches and buys. Last-click reporting gives search all the credit, so the channels that started the journey look worthless.</p>
+          ${fig(1, 'Example', 'One journey, many touches', f1, 'An example journey. Last-click gives all the credit to the final touch.')}
 
           <h2>The data</h2>
-          <p>I used a public dataset from an online shop: 586,737 ad views and clicks from 240,108 customers, across five channels. For each customer, I lined up their ad views and clicks in time order to make one journey. Every journey ends one of two ways: a <em>conversion</em>, where they buy, or a <em>drop-off</em>, where they leave without buying.</p>
-          ${fig(2, 'Example', 'From rows to a journey', f2, 'One customer&rsquo;s rows, turned into their journey. Someone who never buys ends in a drop-off instead.')}
+          <p>A public eCommerce dataset of ad touchpoints across five channels. I sorted each customer&rsquo;s touchpoints by time into one journey, ending in a conversion or a drop-off.</p>
+          ${fig(2, 'Example', 'From rows to a journey', f2, 'An example customer. Journeys that never convert end in a drop-off.')}
 
           <h2>Journeys as a chain</h2>
-          <p>A Markov chain sounds technical, but the idea behind it is simple. For each channel, it asks: once someone has seen this, where do they go next? Count every step that every customer took and you get a table of those chances, called a <em>transition matrix</em>.</p>
-          ${fig(3, 'From the data', 'The transition matrix', f3, 'Read across a row to see where people go next from that point, in percentages that add up to 100. Hover over or tap a row to draw it below.')}
+          <p>A Markov chain asks one question of every channel: from here, where do customers go next? Counting every move in the data gives the transition matrix.</p>
+          ${fig(3, 'From the data', 'The transition matrix', f3, 'Each row is where customers are; each column is where they go next, in %. Rows add up to 100. Choose a row to draw it.')}
 
           <h2>Taking a channel away</h2>
-          <p>To work out what a channel is worth, I took it out of the model. Anyone who would have reached it leaves instead. How far the chance of buying falls is that channel&rsquo;s <em>removal effect</em>: the bigger the fall, the more the channel matters. I then shared the 17,639 sales between the channels in proportion to their removal effects.</p>
-          ${fig(4, 'From the data', 'Switch a channel off', f4, 'Pick a channel to take it out, and see how many fewer people buy.')}
+          <p>To value a channel, remove it and send its customers to a drop-off. The fall in the chance of converting is its removal effect. Sharing the 17,639 conversions out in proportion to these effects gives each channel its credit.</p>
+          ${fig(4, 'From the data', 'Switch a channel off', f4, 'Removal effects from the model. Choose a channel to remove it.')}
 
           <h2>What it found</h2>
-          <p>Facebook comes out on top, with Paid Search close behind. Between them they earn more than half the credit, and Instagram, Online Video and Online Display share the rest.</p>
+          <p>Facebook earns the most credit, closely followed by Paid Search. Together they take more than half.</p>
           ${results}
 
           <h2>Why it matters</h2>
-          <p>The credit comes from how real customers moved between channels, not from a rule picked in advance. That gives marketing teams a fairer picture of what each channel does, and firmer ground for deciding where the next pound of budget should go.</p>
+          <p>The credit comes from how customers actually move between channels, not from a fixed rule, which gives marketing teams firmer evidence for their channel mix.</p>
         </div>
+        <p class="cs-links"><a href="https://github.com/henrybellhouse/markovchains" target="_blank" rel="noopener">View the code on GitHub &rarr;</a></p>
       </div>`;
 
     const body = root.querySelector('#cs-body');
@@ -3057,13 +3071,311 @@
       body.querySelectorAll('.mk-tog').forEach(b => b.setAttribute('aria-pressed', b.dataset.c === c));
       rm.innerHTML = removalSvg(c);
       const effect = 1 - WITHOUT[c] / BASE;
-      rmLine.innerHTML = `Without ${c}, the chance that someone buys falls from ${pct(BASE, 1)} to ${pct(WITHOUT[c], 1)}. That&rsquo;s a ${pct(effect)} drop, so ${c}&rsquo;s removal effect is ${pct(effect)}.`;
+      rmLine.innerHTML = `Without ${c}, the chance of converting falls from ${pct(BASE, 1)} to ${pct(WITHOUT[c], 1)}. That ${pct(effect)} fall is its removal effect.`;
     };
     body.querySelectorAll('.mk-tog').forEach(b => b.addEventListener('click', () => pickChannel(b.dataset.c)));
     pickChannel('Facebook');
 
-    projectRedraw = () => { drawFigures(body); if (row >= 0) flow.innerHTML = flowSvg(row); };
+    projectRedraw = () => drawFigures(body);
     drawFigures(body);
+  }
+
+  // ── Tool: draw your growth model ──────────────────
+  function renderGrowthModel(root, project) {
+    const DEFAULT = {
+      entry: 10000,
+      steps: [['Visit', 100], ['Sign up', 30], ['Activate', 40], ['Become a regular', 50]],
+      loop: { on: true, from: 3, to: 0, k: 0.5, name: 'Invite a friend' }
+    };
+    const clone = o => JSON.parse(JSON.stringify(o));
+    const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+    const num = v => { const n = parseFloat(String(v).replace(/,/g, '')); return isFinite(n) ? n : 0; };
+    const commas = n => Math.round(n).toLocaleString('en-GB');
+    const MAX_STEPS = 8;
+
+    // The model lives in the link, so a URL reopens it
+    const encode = m => {
+      const bytes = new TextEncoder().encode(JSON.stringify(m));
+      let bin = ''; bytes.forEach(b => { bin += String.fromCharCode(b); });
+      return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    };
+    function decode(s) {
+      try {
+        const bin = atob(s.replace(/-/g, '+').replace(/_/g, '/'));
+        const m = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0))));
+        if (!Array.isArray(m.steps) || m.steps.length < 2) return null;
+        const steps = m.steps.slice(0, MAX_STEPS).map((s, i) => [String(s[0] || 'Step ' + (i + 1)).slice(0, 40), i === 0 ? 100 : clamp(num(s[1]), 0, 100)]);
+        const l = m.loop || {};
+        const last = steps.length - 1;
+        return {
+          entry: clamp(num(m.entry), 0, 1e9), steps,
+          loop: { on: !!l.on, from: clamp(Math.round(num(l.from)), 0, last), to: clamp(Math.round(num(l.to)), 0, last), k: clamp(num(l.k), 0, 100), name: String(l.name || 'Loop').slice(0, 40) }
+        };
+      } catch (e) { return null; }
+    }
+    const fromHash = () => { const h = location.hash.match(/[#&]m=([A-Za-z0-9_-]+)/); return h ? decode(h[1]) : null; };
+    const model = fromHash() || clone(DEFAULT);
+    let lift = 5;
+
+    // People reaching each step per month, with the loop fed back in
+    function flow(m, rates) {
+      const n = m.steps.length, r = rates || m.steps.map(s => s[1] / 100);
+      const L = m.loop, useLoop = L.on && L.from >= L.to && L.k > 0;
+      let gain = 0;
+      if (useLoop) { gain = L.k; for (let j = L.to + 1; j <= L.from; j++) gain *= r[j]; }
+      if (useLoop && gain >= 1) return { counts: null, gain, compounding: true };
+      const counts = new Array(n).fill(0);
+      let extra = 0;
+      for (let it = 0; it < 400; it++) {
+        let c = m.entry;
+        for (let j = 0; j < n; j++) {
+          if (j > 0) c *= r[j];
+          if (useLoop && j === L.to) c += extra;
+          counts[j] = c;
+        }
+        const next = useLoop ? L.k * counts[L.from] : 0;
+        if (Math.abs(next - extra) < 1e-9) break;
+        extra = next;
+      }
+      return { counts, gain, compounding: false, looped: useLoop ? extra : 0 };
+    }
+
+    function levers(m) {
+      const base = flow(m);
+      if (base.compounding) return { base, list: [] };
+      const end = base.counts[base.counts.length - 1];
+      const list = m.steps.map((s, i) => {
+        if (i === 0) return null;
+        const r = m.steps.map(x => x[1] / 100);
+        r[i] = Math.min(1, r[i] + lift / 100);
+        const f = flow(m, r);
+        return { i, gain: f.compounding ? Infinity : f.counts[f.counts.length - 1] - end, compounding: f.compounding, room: s[1] < 100 };
+      }).filter(Boolean);
+      return { base, end, list };
+    }
+
+    root.innerHTML = `
+      <div class="gm">
+        <p class="post-kicker">${esc(project.tag || 'Tool')} &middot; Growth</p>
+        <h1 class="post-title">${esc(project.title)}</h1>
+        <p class="calc-intro">Sketch how people move through your product, and where they bring others back in. The model shows the one step that most limits your growth: the place to look first.</p>
+        <div class="gm-grid">
+          <div class="gm-build">
+            <span class="calc-label">Your model</span>
+            <div id="gm-steps"></div>
+            <button type="button" class="calc-link gm-add" id="gm-add">+ Add a step</button>
+            <div class="gm-loop" id="gm-loop"></div>
+          </div>
+          <div class="gm-viz">
+            <div class="post-body"><figure class="fig mdiag gm-fig"><p class="fig-k">Your growth model</p><div id="gm-diagram"></div></figure></div>
+          </div>
+        </div>
+        <div class="calc-result gm-result" id="gm-result">
+          <div><div class="calc-n" id="gm-end"></div><p class="calc-sub" id="gm-end-label"></p></div>
+          <div>
+            <label class="calc-label" for="gm-lift">If one step improved by <span id="gm-lift-v">5</span> points</label>
+            <input class="calc-range" id="gm-lift" type="range" min="1" max="20" step="1" value="5">
+          </div>
+        </div>
+        <div class="gm-out" id="gm-out" aria-live="polite"></div>
+        <div class="f-actions gm-actions">
+          <button type="button" class="f-btn" id="gm-share">Copy link to this model</button>
+          <button type="button" class="calc-link" id="gm-reset">Start again</button>
+        </div>
+        <div class="calc-how">
+          <p>Each step shows the share of people from the step before who reach it. A loop sends new people back in: for example, regulars who invite friends. The model works out how many people reach each step in a typical month, with the loop included.</p>
+          <p>To find the rate-limiting step, it raises one step at a time by the same number of points and counts the extra people at the end. A step that converts few people gains the most from each point, and a step inside a loop gains twice: once directly, and again from the extra people the loop brings back.</p>
+          <p>Based on the idea of finding the rate-limiting step from Matt Lerner&rsquo;s <em>Growth Levers and How to Find Them</em>. Your model stays in your browser and in the link.</p>
+        </div>
+      </div>`;
+
+    const $ = s => root.querySelector(s);
+    const stepsEl = $('#gm-steps'), loopEl = $('#gm-loop');
+
+    function buildSteps() {
+      const last = model.steps.length - 1;
+      stepsEl.innerHTML = model.steps.map((s, i) => `
+        <div class="gm-step">
+          <span class="gm-idx">${String(i + 1).padStart(2, '0')}</span>
+          <input class="gm-name" type="text" maxlength="40" value="${esc(s[0])}" data-i="${i}" aria-label="Step ${i + 1} name">
+          ${i === 0
+            ? `<div class="calc-input gm-num gm-entry"><input type="text" inputmode="numeric" autocomplete="off" value="${commas(model.entry)}" id="gm-entry" aria-label="People who reach the first step each month"></div>`
+            : `<div class="calc-input gm-num"><input type="number" inputmode="decimal" min="0" max="100" step="any" value="${s[1]}" data-i="${i}" class="gm-rate" aria-label="Share of people from the step before who reach ${esc(s[0])}"><span class="calc-unit">%</span></div>`}
+          ${i > 0 && model.steps.length > 2 ? `<button type="button" class="gm-del" data-i="${i}" aria-label="Remove ${esc(s[0])}">&times;</button>` : '<span class="gm-del-pad"></span>'}
+        </div>`).join('') + `<p class="calc-help">The first number is how many people reach the first step each month. Each % after it is the share of people from the step before.</p>`;
+      $('#gm-add').hidden = model.steps.length >= MAX_STEPS;
+
+      stepsEl.querySelectorAll('.gm-name').forEach(el => el.addEventListener('input', () => { model.steps[+el.dataset.i][0] = el.value.slice(0, 40); buildLoop(); update(); }));
+      stepsEl.querySelectorAll('.gm-rate').forEach(el => el.addEventListener('input', () => { model.steps[+el.dataset.i][1] = clamp(num(el.value), 0, 100); update(); }));
+      const entry = $('#gm-entry');
+      entry.addEventListener('input', () => {
+        const digits = entry.value.replace(/[^0-9]/g, '');
+        model.entry = clamp(num(digits), 0, 1e9);
+        const pos = entry.value.length - entry.selectionStart;
+        entry.value = digits ? commas(model.entry) : '';
+        try { const p = Math.max(0, entry.value.length - pos); entry.setSelectionRange(p, p); } catch (e) {}
+        update();
+      });
+      stepsEl.querySelectorAll('.gm-del').forEach(b => b.addEventListener('click', () => {
+        const i = +b.dataset.i;
+        model.steps.splice(i, 1);
+        const L = model.loop, last2 = model.steps.length - 1;
+        if (L.from >= i) L.from = Math.max(0, L.from - 1);
+        if (L.to > i) L.to -= 1;
+        L.from = Math.min(L.from, last2); L.to = Math.min(L.to, last2);
+        buildSteps(); buildLoop(); update();
+      }));
+    }
+
+    function buildLoop() {
+      const L = model.loop;
+      const opts = sel => model.steps.map((s, i) => `<option value="${i}"${i === sel ? ' selected' : ''}>${esc(s[0] || 'Step ' + (i + 1))}</option>`).join('');
+      loopEl.innerHTML = `
+        <label class="gm-check"><input type="checkbox" id="gm-loop-on"${L.on ? ' checked' : ''}> Add a loop</label>
+        <div class="gm-loop-body"${L.on ? '' : ' hidden'}>
+          <input class="gm-name gm-loop-name" type="text" maxlength="40" value="${esc(L.name)}" id="gm-loop-name" aria-label="Loop name">
+          <p class="gm-sentence">Each person who reaches
+            <select id="gm-from" aria-label="Step that brings people back">${opts(L.from)}</select>
+            brings in
+            <span class="calc-input gm-num gm-k"><input type="number" inputmode="decimal" min="0" step="0.05" value="${L.k}" id="gm-k" aria-label="New people brought in per person"></span>
+            new people a month, who start at
+            <select id="gm-to" aria-label="Step new people start at">${opts(L.to)}</select>.</p>
+          <p class="calc-note" id="gm-loop-note"></p>
+        </div>`;
+      $('#gm-loop-on').addEventListener('change', e => { L.on = e.target.checked; buildLoop(); update(); });
+      $('#gm-loop-name').addEventListener('input', e => { L.name = e.target.value.slice(0, 40); update(); });
+      $('#gm-from').addEventListener('change', e => { L.from = +e.target.value; update(); });
+      $('#gm-to').addEventListener('change', e => { L.to = +e.target.value; update(); });
+      $('#gm-k').addEventListener('input', e => { L.k = clamp(num(e.target.value), 0, 100); update(); });
+    }
+
+    $('#gm-add').addEventListener('click', () => {
+      if (model.steps.length >= MAX_STEPS) return;
+      model.steps.push(['New step', 50]);
+      buildSteps(); buildLoop(); update();
+      const names = stepsEl.querySelectorAll('.gm-name');
+      const el = names[names.length - 1]; el.focus(); el.select();
+    });
+
+    // The diagram: one bar per step, sized by people, with the loop drawn back up
+    function diagram(res, limit) {
+      const m = model, n = m.steps.length, counts = res.counts;
+      const W = 360, rowH = 80, top = 10, barX = 0, barMax = 220;
+      const h = top + n * rowH + 8;
+      const max = Math.max(...counts, 1);
+      const T = (x, y, t, cls, anchor, style) => `<text class="${cls}" x="${x}" y="${y}" text-anchor="${anchor || 'start'}"${style ? ` style="${style}"` : ''}>${t}</text>`;
+      let b = '';
+      m.steps.forEach((s, i) => {
+        const y = top + i * rowH;
+        const w = Math.max(2, barMax * counts[i] / max);
+        const isLimit = limit === i, isLast = i === n - 1;
+        if (i > 0) {
+          const lost = counts[i - 1] * (1 - s[1] / 100);
+          b += T(barX, y - 8, `&darr; ${+s[1].toFixed(1)}%`, 'f-num', 'start', isLimit ? 'fill:var(--f-ink)' : '');
+          if (lost >= 0.5) b += T(barX + 70, y - 8, `${commas(lost)} leave`, 'f-num');
+        }
+        b += T(barX, y + 20, esc(s[0] || 'Step ' + (i + 1)), 'f-up', 'start', isLimit ? '' : 'fill:var(--f-soft)');
+        b += `<rect x="${barX}" y="${y + 30}" width="${w.toFixed(1)}" height="14" fill="${isLimit ? 'var(--f-ink)' : 'var(--f-mid)'}"/>`;
+        b += T(barX + w + 8, y + 42, commas(counts[i]), 'f-num', 'start', 'fill:var(--f-ink)');
+        if (isLimit) b += T(334, y - 8, 'rate-limiting step', 'f-it', 'end', 'fill:var(--f-ink)');
+      });
+      const L = m.loop;
+      if (L.on && L.k > 0 && L.from >= L.to) {
+        const y1 = top + L.from * rowH + 37, y2 = top + L.to * rowH + 37;
+        const x = W - 4, xb = 340;
+        const d = y1 === y2
+          ? `M ${xb} ${y1 + 6} C ${x + 14} ${y1 + 24}, ${x + 14} ${y1 - 24}, ${xb} ${y1 - 6}`
+          : `M ${xb} ${y1} L ${x - 10} ${y1} Q ${x} ${y1} ${x} ${y1 - 10} L ${x} ${y2 + 10} Q ${x} ${y2} ${x - 10} ${y2} L ${xb} ${y2}`;
+        b += `<path d="${d}" fill="none" stroke="var(--f-soft)" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#gm-arr)"/>`;
+        const my = (y1 + y2) / 2;
+        b += `<text class="f-num" transform="translate(${x + 14} ${my}) rotate(90)" text-anchor="middle">${esc(L.name || 'Loop')} &middot; +${commas(res.looped)}</text>`;
+      }
+      return `<svg viewBox="0 0 ${W + 26} ${h}" role="img" aria-label="Your growth model: ${m.steps.map((s, i) => esc(s[0]) + ' ' + commas(counts[i])).join(', ')}">
+        <defs><marker id="gm-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9" fill="none" stroke="var(--f-soft)" stroke-width="1.2"/></marker></defs>${b}</svg>`;
+    }
+
+    function update() {
+      const m = model, L = m.loop;
+      const { base, end, list } = levers(m);
+      const note = $('#gm-loop-note');
+      if (note) note.textContent = L.on && L.from < L.to ? 'A loop needs to start at or after the step people come back to.' : '';
+
+      if (base.compounding) {
+        $('#gm-diagram').innerHTML = `<p class="gm-compound">This loop brings back more people than it starts with, about ${base.gain.toFixed(2)} for every one, so it grows every cycle without limit. Real loops rarely sustain that: check the numbers, or lower how many people each person brings in.</p>`;
+        $('#gm-out').innerHTML = '';
+        $('#gm-result').hidden = true;
+        save();
+        return;
+      }
+
+      const ranked = list.filter(x => x.room).sort((a, b) => b.gain - a.gain);
+      const top = ranked[0];
+      const limit = top && top.gain > 0.5 ? top.i : -1;
+      $('#gm-diagram').innerHTML = diagram(base, limit);
+
+      const endName = esc(m.steps[m.steps.length - 1][0] || 'the last step');
+      const maxGain = Math.max(...list.map(x => x.gain), 1);
+      $('#gm-result').hidden = false;
+      $('#gm-end').textContent = commas(end);
+      $('#gm-end-label').innerHTML = `Reach &ldquo;${endName}&rdquo; each month`;
+      $('#gm-lift-v').textContent = lift;
+      $('#gm-lift').value = lift;
+      let out = '';
+      if (limit < 0) {
+        out += `<p class="calc-sentence">Every step is already at 100%, so there is no single step holding you back. Growth here comes from bringing more people in at the top.</p>`;
+      } else {
+        const s = m.steps[limit], prev = m.steps[limit - 1];
+        const inLoop = L.on && L.k > 0 && L.from >= L.to && limit > L.to && limit <= L.from;
+        const lowest = list.every(x => m.steps[x.i][1] >= s[1]);
+        const second = ranked[1];
+        const loopWhy = `It&rsquo;s also part of your &ldquo;${esc(L.name || 'loop')}&rdquo; loop, so each extra person brings more people back in.`;
+        const why = lowest
+          ? `Only ${+s[1].toFixed(1)}% of people get past it, the lowest of any step, so each point is worth more here.${inLoop ? ' ' + loopWhy : ''}`
+          : (inLoop ? loopWhy : `Each point here carries through to more people at the end than at any other step.`);
+        out += `
+          <div class="gm-insight">
+            <span class="calc-label">Your rate-limiting step</span>
+            <p class="gm-step-name">${esc(prev[0])} &rarr; ${esc(s[0])}</p>
+            <p class="calc-sentence">Lifting it by ${lift} points brings about <b>${commas(top.gain)}</b> more people to &ldquo;${endName}&rdquo; each month${second && second.gain > 0.5 ? `, ${top.gain / second.gain >= 1.15 ? `${(top.gain / second.gain).toFixed(1)} times` : 'a little more than'} the next best step` : ''}. ${why}</p>
+          </div>
+          <div class="gm-levers">
+            <span class="calc-label">Extra people each month, by step</span>
+            ${list.map(x => `
+              <div class="gm-lever${x.i === limit ? ' on' : ''}">
+                <span class="gm-lever-name">${esc(m.steps[x.i][0])}</span>
+                <span class="gm-lever-bar"><i style="width:${x.room ? (100 * Math.max(0, x.gain) / maxGain).toFixed(1) : 0}%"></i></span>
+                <span class="gm-lever-n">${x.room ? '+' + commas(x.gain) : 'at 100%'}</span>
+              </div>`).join('')}
+          </div>
+          <div class="gm-insight gm-next">
+            <span class="calc-label">What to do next</span>
+            <p class="calc-sentence">Before changing anything, talk to five people who reached &ldquo;${esc(prev[0])}&rdquo; but never got to &ldquo;${esc(s[0])}&rdquo;. Ask what they expected to happen next, and what got in the way. Their answers tell you which change is worth testing.</p>
+            <p class="calc-note">A point isn&rsquo;t equally easy to win at every step. Use this to choose where to look, not what to build.</p>
+          </div>`;
+      }
+      $('#gm-out').innerHTML = out;
+      save();
+    }
+
+    function save() {
+      const url = location.pathname + '#m=' + encode(model);
+      try { history.replaceState(history.state, '', url); } catch (e) {}
+    }
+
+    $('#gm-lift').addEventListener('input', e => { lift = +e.target.value; update(); });
+    $('#gm-share').addEventListener('click', async e => {
+      const btn = e.currentTarget, label = 'Copy link to this model';
+      try { await navigator.clipboard.writeText(location.origin + location.pathname + '#m=' + encode(model)); btn.textContent = 'Link copied'; }
+      catch (err) { btn.textContent = 'Couldn’t copy'; }
+      setTimeout(() => { btn.textContent = label; }, 2000);
+    });
+    $('#gm-reset').addEventListener('click', () => {
+      Object.assign(model, clone(DEFAULT));
+      lift = 5;
+      buildSteps(); buildLoop(); update();
+    });
+
+    buildSteps(); buildLoop(); update();
   }
 
   // Live projects and the function that draws each one
@@ -3071,6 +3383,7 @@
     'sample-size': renderSampleSize,
     'causal-method-finder': renderMethodFinder,
     'markov-attribution': renderMarkov,
+    'growth-model': renderGrowthModel,
   };
 
   // The button names the mode it switches to
@@ -3122,24 +3435,9 @@
   let idx = 0;   // which photo (0–23)
   let pos = 1;   // where the track is, counting the copy at the start
 
-  // Only the photo in the middle can be focused and opened; copies at the ends never can
   function setActive() {
     allSlides.forEach(s => s.classList.remove('active'));
     allSlides[pos].classList.add('active');
-    const hadFocus = document.activeElement && document.activeElement.matches('.carousel-slide img');
-    slides.forEach((s, i) => {
-      const img = s.querySelector('img');
-      if (i === idx) {
-        img.tabIndex = 0;
-        img.setAttribute('role', 'button');
-        img.setAttribute('aria-label', `Photo ${i + 1} of ${total}. Open full size`);
-      } else {
-        img.removeAttribute('tabindex');
-        img.removeAttribute('role');
-        img.removeAttribute('aria-label');
-      }
-    });
-    if (hadFocus) slides[idx].querySelector('img').focus({ preventScroll: true });
   }
 
   function positionTrack(animated = true) {
@@ -3175,7 +3473,6 @@
     counter.textContent = (idx + 1) + ' / ' + total;
     const nextImg = slides[(idx + 1) % total].querySelector('img');
     if (nextImg) nextImg.loading = 'eager';
-    if (!lightbox.hidden) showInLightbox();
   }
 
   function onPhotographyShown() {
@@ -3196,6 +3493,12 @@
   document.getElementById('carousel-prev').addEventListener('click', () => goTo(idx - 1));
   document.getElementById('carousel-next').addEventListener('click', () => goTo(idx + 1));
 
+  document.addEventListener('keydown', e => {
+    if (!document.getElementById('photography').classList.contains('visible')) return;
+    if (e.key === 'ArrowLeft') goTo(idx - 1);
+    if (e.key === 'ArrowRight') goTo(idx + 1);
+  });
+
   let touchStartX = 0;
   track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
   track.addEventListener('touchend', e => {
@@ -3203,72 +3506,37 @@
     if (Math.abs(diff) > 40) goTo(diff > 0 ? idx + 1 : idx - 1);
   });
 
-  // ── Lightbox ──────────────────────────────────────
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
-  const lightboxClose = document.getElementById('lightbox-close');
-  let focusBeforeLightbox = null;
 
-  // The lightbox always shows the carousel's current photo, so the two never disagree
-  function showInLightbox() {
-    lightboxImg.src = slides[idx].querySelector('img').src;
-    lightboxImg.alt = `Photo ${idx + 1} of ${total}`;
-  }
-
-  function openLightbox() {
-    focusBeforeLightbox = document.activeElement;
-    showInLightbox();
-    lightbox.hidden = false;
+  function openLightbox(src) {
+    lightboxImg.src = src;
     lightbox.classList.add('open');
     document.body.style.overflow = 'hidden';
-    lightboxClose.focus({ preventScroll: true });
   }
 
-  function closeLightbox(restoreFocus = true) {
+  function closeLightbox() {
     lightbox.classList.remove('open');
-    lightbox.hidden = true;
-    lightboxImg.removeAttribute('src');
+    lightboxImg.src = '';
     document.body.style.overflow = '';
-    if (restoreFocus && focusBeforeLightbox && document.contains(focusBeforeLightbox)) {
-      // If it was opened from a photo, return to the photo now showing, which may have changed
-      const back = focusBeforeLightbox.matches('.carousel-slide img') ? slides[idx].querySelector('img') : focusBeforeLightbox;
-      back.focus({ preventScroll: true });
-    }
-    focusBeforeLightbox = null;
   }
 
-  track.addEventListener('click', e => {
-    if (e.target.closest('.carousel-slide.active img')) openLightbox();
+  document.getElementById('carousel-track').addEventListener('click', e => {
+    const img = e.target.closest('.carousel-slide.active img');
+    if (img) openLightbox(img.src);
   });
 
   lightbox.addEventListener('click', e => {
     if (e.target === lightbox) closeLightbox();
   });
 
-  lightboxClose.addEventListener('click', () => closeLightbox());
+  document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
 
-  // One keyboard handler, so the lightbox and carousel never both react to a key
   document.addEventListener('keydown', e => {
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (!lightbox.hidden) {
-      if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
-      else if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(idx - 1); }
-      else if (e.key === 'ArrowRight') { e.preventDefault(); goTo(idx + 1); }
-      else if (e.key === 'Tab') { e.preventDefault(); lightboxClose.focus(); }   // keep focus inside
-      return;
-    }
-    if (!document.getElementById('photography').classList.contains('visible')) return;
-    if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable]')) return;
-    if (e.key === 'ArrowLeft') goTo(idx - 1);
-    else if (e.key === 'ArrowRight') goTo(idx + 1);
-    else if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.carousel-slide.active img')) {
-      e.preventDefault();
-      openLightbox();
+    if (['Escape', 'Enter', 'Backspace'].includes(e.key) && lightbox.classList.contains('open')) {
+      closeLightbox();
     }
   });
-
-  setActive();
-
   // ── Living detail: London time + weather ──────────
   const livingEl = document.getElementById('living-detail');
   let weatherText = '';

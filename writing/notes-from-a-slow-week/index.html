@@ -17,7 +17,7 @@
 <meta name="twitter:title" content="Notes from a slow week — Henry">
 <meta name="twitter:description" content="Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.">
 <script>
-  try { sessionStorage.setItem('redirect', location.pathname); } catch (e) {}
+  try { sessionStorage.setItem('redirect', location.pathname + location.search + location.hash); } catch (e) {}
   location.replace('/');
 </script>
 <noscript><meta http-equiv="refresh" content="0; url=/"></noscript>

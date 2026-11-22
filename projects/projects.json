@@ -18,11 +18,13 @@
     "live": true
   },
   {
-    "slug": "placeholder-two",
-    "title": "Consectetur adipiscing",
-    "summary": "Ut enim ad minim veniam, quis nostrud exercitation.",
-    "tag": "In progress",
-    "size": "s"
+    "slug": "growth-model",
+    "title": "Draw your growth model",
+    "summary": "Sketch how people move through your product, and find the one step that most limits your growth.",
+    "tag": "Tool",
+    "size": "s",
+    "art": "loop",
+    "live": true
   },
   {
     "slug": "placeholder-three",

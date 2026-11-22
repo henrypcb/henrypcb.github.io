@@ -17,7 +17,7 @@
 <meta name="twitter:title" content="Why I keep a notebook — Henry">
 <meta name="twitter:description" content="Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.">
 <script>
-  try { sessionStorage.setItem('redirect', location.pathname); } catch (e) {}
+  try { sessionStorage.setItem('redirect', location.pathname + location.search + location.hash); } catch (e) {}
   location.replace('/');
 </script>
 <noscript><meta http-equiv="refresh" content="0; url=/"></noscript>
