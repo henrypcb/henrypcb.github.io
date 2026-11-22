@@ -3543,9 +3543,9 @@
             <p class="gm-ch-p">One number that shows customers getting value from your product. Then break it into the parts that multiply or add up to it, such as customers &times; share who buy &times; spend per buyer. Choose the one part your growth model in chapter 2 will count.</p>
             <div class="gm-ns-eg"><span>Start from an example:</span> ${EXAMPLES.map(([t], i) => `<button type="button" class="calc-link" data-ex="${i}">${t}</button>`).join('')}<span class="gm-undo" id="gm-undo" hidden><button type="button" class="calc-link" id="gm-undo-btn">Undo</button></span></div>
             <div class="gm-ai" id="gm-ai" hidden>
-              <label class="calc-label" for="gm-ai-text">Or describe your product, and Chrome&rsquo;s built-in AI will draft a model to edit</label>
+              <label class="calc-label" for="gm-ai-text">Or describe your product, and get a starting model to edit</label>
               <textarea class="f-text gm-ai-text" id="gm-ai-text" maxlength="800" placeholder="For example: a budgeting app. People download it, connect their bank, set a budget, then check in each week. Most keep going month to month, and happy users tell friends. Value shows up as people who stick to a budget."></textarea>
-              <div class="f-actions"><button type="button" class="f-btn" id="gm-ai-go">Draft my model</button><span class="calc-help" id="gm-ai-status">Runs on your device with Chrome&rsquo;s built-in AI. The more you say about the steps and what customers value, the better the draft. Nothing you type leaves your browser.</span></div>
+              <div class="f-actions"><button type="button" class="f-btn" id="gm-ai-go">Draft my model</button><span class="calc-help" id="gm-ai-status">The more you say about the steps and what customers value, the better the draft.</span></div>
             </div>
             <div class="mt" id="gm-tree"></div>
             <p class="calc-help mt-note" id="gm-tree-note"></p>
@@ -3596,7 +3596,7 @@
 
         <div class="f-actions gm-actions">
           <button type="button" class="f-btn" id="gm-share">Copy link to this model</button>
-          <button type="button" class="calc-link" id="gm-prompt">Copy as a prompt for your AI assistant</button>
+          <button type="button" class="calc-link" id="gm-prompt">Copy as a prompt</button>
           <button type="button" class="calc-link" id="gm-reset">Start again</button>
         </div>
         <div class="calc-how">
@@ -4258,8 +4258,8 @@
       setTimeout(() => { btn.textContent = text; }, 2000);
     });
     $('#gm-prompt').addEventListener('click', async e => {
-      const btn = e.currentTarget, text = 'Copy as a prompt for your AI assistant';
-      try { await navigator.clipboard.writeText(promptText()); btn.textContent = 'Copied. Paste it into your AI assistant'; }
+      const btn = e.currentTarget, text = 'Copy as a prompt';
+      try { await navigator.clipboard.writeText(promptText()); btn.textContent = 'Copied to your clipboard'; }
       catch (err) { btn.textContent = 'Couldn’t copy'; }
       setTimeout(() => { btn.textContent = text; }, 2500);
     });
