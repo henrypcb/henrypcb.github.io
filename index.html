@@ -453,6 +453,37 @@
   .f-caveat { font-family: Georgia, serif; font-style: italic; font-size: 14px; line-height: 1.6; color: var(--gray); margin-top: 32px; max-width: 600px; }
   html.dark body .f-sum, html.dark body .f-body, html.dark body .f-list li { color: #cfcfcf; }
 
+  .mdiag svg { display: block; width: 100%; max-width: 480px; height: auto; overflow: visible; }
+  .mdiag text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  .mdiag .f-up { font-size: 11.5px; }
+  .mdiag .f-ax { font-size: 11px; }
+  .mdiag .f-it { font-size: 14px; }
+  .f-result .post-body .fig { margin: 34px 0 6px; }
+
+  .f-lib-back { display: inline-block; margin-top: 36px; }
+  .f-lib-group { margin-top: 30px; }
+  .f-lib-group .calc-label { margin-bottom: 6px; }
+  .f-lib-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 20px;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--border);
+    padding: 16px 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .f-lib-group .f-lib-item:last-child { border-bottom: 1px solid var(--border); }
+  .f-lib-item:hover { opacity: 0.6; }
+  .f-lib-name { font-family: Georgia, serif; font-size: 21px; color: var(--black); }
+  .f-lib-sum { grid-column: 1; font-size: 13px; line-height: 1.55; color: var(--gray); max-width: 560px; }
+  .f-lib-arrow { grid-row: 1 / span 2; grid-column: 2; align-self: center; color: var(--gray); }
+
   html.dark body .calc-intro,
   html.dark body .calc-sentence { color: #cfcfcf; }
 
@@ -2309,9 +2340,201 @@
     }
   };
 
+
+  const FINDER_EXTRA = {
+    ab: { figTitle: 'A coin flip makes the groups alike',
+      plain: 'Think of a fair coin deciding who tries a new recipe. Because chance alone splits people, the two groups are alike in every other way, so any difference in how things turn out comes from the change.',
+      caption: 'People are split at random, so the only systematic difference between the groups is the change.' },
+    holdout: { figTitle: 'A group kept back shows the long-run effect',
+      plain: 'Like keeping one room of a house exactly as it was while you renovate the rest. Months later, comparing that room with the others shows what all the work really added up to.',
+      caption: 'The holdout never gets the changes, so the gap that builds up over months is their combined effect.' },
+    switchback: { figTitle: 'Switching the whole system over time',
+      plain: 'Like a restaurant trying a new menu on randomly chosen evenings. Everyone that evening gets the same menu, so diners can’t affect each other’s experience, and over many evenings the difference shows.',
+      caption: 'Filled periods ran the new version and outlined ones the old. Comparing their averages gives the effect.' },
+    geo: { figTitle: 'Randomising whole areas',
+      plain: 'Like trialling a new shop layout in randomly chosen towns. Each town gets one version, so customers in the same town never see a mix of the two.',
+      caption: 'Filled areas got the change and outlined ones didn’t, chosen at random.' },
+    did: { figTitle: 'Parallel before, apart after',
+      plain: 'If two runners hold the same pace for miles and then one gets new shoes, the gap that opens up afterwards is down to the shoes, not to the runners being different.',
+      caption: 'The dotted line carries the earlier gap forward. The distance between it and what happened is the effect.' },
+    synth: { figTitle: 'Building a twin from other places',
+      plain: 'When only one city got the change, build a stand-in “twin” from a mix of other cities that moved just like it beforehand. After the change, the twin shows what would have happened without it.',
+      caption: 'The dashed blend tracks the affected unit until the change. The gap afterwards is the effect.' },
+    rdd: { figTitle: 'A jump at the line',
+      plain: 'Students who score 69 and 70 on an exam are almost identical, but only one of them passes. Comparing people just either side of a line shows the effect of being over it.',
+      caption: 'Each dot is a person. The step at the cutoff, not the overall slope, is the effect.' },
+    its: { figTitle: 'The past, projected forward',
+      plain: 'Like predicting where a ball will land from the path it was already on. If the trend before the change was steady, the gap between that prediction and what actually happened is the effect.',
+      caption: 'The dashed line projects the earlier trend forward. The gap to what happened is the effect.' },
+    matching: { figTitle: 'Comparing like with like',
+      plain: 'Compare each person who used it with a lookalike who didn’t: similar history, similar habits. It’s only fair if you’ve captured everything that matters, which is why it’s the shakiest of the ten.',
+      caption: 'Lines join each user to a similar non-user. People without a good match are left out.' },
+    iv: { figTitle: 'A nudge that only works through take-up',
+      plain: 'If a random invitation made some people more likely to try something, and the invitation changes nothing else, then comparing invited and uninvited people reveals the effect of trying it.',
+      caption: 'Arrows show what causes what. The nudge shifts take-up, and take-up shifts the outcome.' }
+  };
+  Object.keys(FINDER_EXTRA).forEach(k => Object.assign(FINDER_METHODS[k], FINDER_EXTRA[k]));
+
+  // ── One still diagram per method, in the figure style ──
+  let mdUid = 0;
+  function methodDiagram(key) {
+    const id = 'md' + (++mdUid);
+    const rnd = i => { const v = Math.sin(i * 12.9898 + 4.1) * 43758.5453; return v - Math.floor(v); };
+    const T = (x, y, t, cls, anchor, soft) => `<text class="${cls}" x="${x}" y="${y}" text-anchor="${anchor || 'start'}"${soft ? ' style="fill:var(--f-soft)"' : ''}>${t}</text>`;
+    const L = (x1, y1, x2, y2, c, w, dash, arrow) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--f-${c || 'ink'})" stroke-width="${w || 1}"${dash ? ` stroke-dasharray="${dash}"` : ''}${arrow ? ` marker-end="url(#${id}${c === 'ink' ? 'i' : 's'})"` : ''}/>`;
+    const P = (pts, c, w, dash) => `<path d="${pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ')}" fill="none" stroke="var(--f-${c})" stroke-width="${w || 2}" stroke-linejoin="round" stroke-linecap="round"${dash ? ` stroke-dasharray="${dash}"` : ''}/>`;
+    const C = (x, y, r, fill) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="var(--f-${fill})"/>`;
+    const Hollow = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="var(--f-mid)" stroke-width="1" stroke-dasharray="2 2"/>`;
+    const R = (x, y, w, h, on) => on
+      ? `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="var(--f-ink)"/>`
+      : `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="var(--f-wash)" stroke="var(--f-mid)" stroke-width="0.8"/>`;
+    const range = (a, b, step) => { const o = []; for (let x = a; x <= b + 1e-9; x += step) o.push(x); return o; };
+    const frame = axis => L(30, 170, 420, 170, 'ink', 1) + T(30, 190, axis, 'f-ax');
+    const change = (x, label) => L(x, 30, x, 170, 'soft', 1, '3 3') + (label === false ? '' : T(x, 22, label || 'CHANGE', 'f-up', 'middle', true));
+    const bracket = (x, y1, y2, label, right) => L(x, y1, x, y2, 'ink', 1) + L(x - 4, y1, x, y1, 'ink', 1) + L(x - 4, y2, x, y2, 'ink', 1) + (right ? T(x + 6, (y1 + y2) / 2 + 4, label, 'f-it') : T(x - 8, (y1 + y2) / 2 + 4, label, 'f-it', 'end'));
+    let h = 210, b = '';
+
+    switch (key) {
+      case 'ab': {
+        h = 210;
+        b += T(20, 30, 'EVERYONE', 'f-up');
+        for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) b += C(30 + i * 22, 56 + j * 24, 5, 'mid');
+        b += L(112, 78, 185, 52, 'soft', 1.2, null, true) + L(112, 92, 185, 138, 'soft', 1.2, null, true);
+        b += T(200, 30, 'CONTROL', 'f-up', 'start', true) + T(200, 118, 'VARIANT', 'f-up');
+        for (let k = 0; k < 5; k++) b += C(205 + k * 15, 50, 5, 'mid') + C(205 + k * 15, 138, 5, 'ink');
+        b += T(300, 30, 'OUTCOME', 'f-up', 'start', true);
+        b += R(300, 40, 80, 20, false) + R(300, 128, 115, 20, true);
+        b += L(380, 36, 380, 156, 'soft', 1, '3 3') + L(380, 162, 415, 162, 'ink', 1) + T(397.5, 180, 'effect', 'f-it', 'middle');
+        b += T(20, 202, 'a coin flip decides who goes where', 'f-it');
+        break;
+      }
+      case 'holdout': {
+        h = 200;
+        b += frame('MONTHS →');
+        b += P(range(30, 400, 10).map(x => [x, 140 - (x - 30) * 0.03]), 'mid', 2, '5 4');
+        b += P([[30, 140], [110, 137], [125, 126], [200, 122], [215, 110], [290, 105], [305, 92], [350, 88], [365, 80], [400, 76]], 'ink', 2);
+        [117, 207, 297, 357].forEach(x => { b += L(x, 170, x, 161, 'ink', 1.2); });
+        b += T(400, 64, 'EVERYONE ELSE', 'f-up', 'end') + T(30, 160, 'HOLDOUT', 'f-up', 'start', true);
+        b += bracket(414, 76, 129, 'long-run effect');
+        b += T(30, 22, 'each tick: a change ships to everyone else', 'f-it');
+        break;
+      }
+      case 'switchback': {
+        h = 205;
+        const pat = [1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1];
+        pat.forEach((on, i) => { b += R(20 + i * 34.5, 28, 30, 24, on); });
+        b += R(20, 70, 10, 10, true) + T(36, 79, 'NEW VERSION', 'f-up') + R(150, 70, 10, 10, false) + T(166, 79, 'OLD VERSION', 'f-up', 'start', true);
+        b += L(20, 112, 430, 112, 'ink', 1.2) + L(20, 140, 430, 140, 'mid', 1.2, '4 4');
+        pat.forEach((on, i) => { b += C(35 + i * 34.5, (on ? 112 : 140) + (rnd(i) - 0.5) * 12, 4, on ? 'ink' : 'mid'); });
+        b += T(20, 170, 'TIME, IN HOURS OR DAYS →', 'f-ax');
+        b += T(20, 197, 'the whole system switches, in a random order', 'f-it');
+        break;
+      }
+      case 'geo': {
+        h = 190;
+        b += T(20, 20, 'REGIONS, MARKETS OR STORES', 'f-up', 'start', true);
+        const on = [1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0];
+        on.forEach((v, k) => { b += R(20 + (k % 7) * 40, 30 + Math.floor(k / 7) * 40, 34, 34, v); });
+        b += R(320, 40, 12, 12, true) + T(340, 50, 'GET THE CHANGE', 'f-up') + R(320, 64, 12, 12, false) + T(340, 74, 'DON’T', 'f-up', 'start', true);
+        b += T(20, 180, 'whole areas are randomised, so neighbours don’t mix', 'f-it');
+        break;
+      }
+      case 'did': {
+        h = 200;
+        const sl = -30 / 390, cx = 230, base = x => 110 + sl * (x - 30);
+        b += frame('TIME →') + change(cx);
+        b += P(range(30, 380, 10).map(x => [x, 140 + sl * (x - 30)]), 'mid', 2, '5 4');
+        b += P(range(cx, 380, 10).map(x => [x, base(x)]), 'soft', 1.5, '2 4');
+        b += P(range(30, 380, 5).map(x => [x, base(x) - (x <= cx ? 0 : Math.min(1, (x - cx) / 20) * 25)]), 'ink', 2);
+        b += T(30, 84, 'GOT THE CHANGE', 'f-up') + T(30, 160, 'DIDN’T', 'f-up', 'start', true);
+        b += bracket(390, base(380) - 25, base(380), 'effect', true);
+        b += T(236, 153, 'dotted: where it would have been', 'f-it');
+        break;
+      }
+      case 'synth': {
+        h = 215;
+        const cx = 250;
+        const blend = x => 112 + 6 * Math.sin(x / 22) - 0.03 * (x - 30);
+        const treat = x => blend(x) + (x < cx ? 1.5 * Math.sin(x / 9) : -Math.min(1, (x - cx) / 25) * 30);
+        b += frame('TIME →') + change(cx, false);
+        b += '<g opacity="0.55">' + [50, 75, 140, 150, 160].map((bs, k) =>
+          P(range(30, 380, 6).map(x => [x, bs + 6 * Math.sin((x + k * 40) / 28) - 0.02 * (x - 30)]), 'soft', 1)).join('') + '</g>';
+        b += P(range(30, 380, 4).map(x => [x, blend(x)]), 'mid', 2, '5 4');
+        b += P(range(30, 380, 4).map(x => [x, treat(x)]), 'ink', 2);
+        b += L(30, 18, 48, 18, 'ink', 2) + T(54, 22, 'AFFECTED', 'f-up');
+        b += L(150, 18, 168, 18, 'mid', 2, '5 4') + T(174, 22, 'BLEND', 'f-up', 'start', true);
+        b += L(260, 18, 278, 18, 'soft', 1) + T(284, 22, 'OTHER PLACES', 'f-up', 'start', true);
+        b += bracket(390, treat(380), blend(380), 'effect', true);
+        b += T(30, 208, 'the blend matches before the change, so it stands in after', 'f-it');
+        break;
+      }
+      case 'rdd': {
+        h = 215;
+        const cut = 225, f = x => 150 - (x - 30) * 0.18;
+        b += frame('SCORE →') + change(cut, 'CUTOFF');
+        b += P([[30, f(30)], [cut, f(cut)]], 'mid', 2) + P([[cut, f(cut) - 28], [420, f(420) - 28]], 'ink', 2);
+        for (let i = 0; i <= 40; i++) {
+          const x = 34 + i * 9.6, up = x >= cut;
+          b += C(x, f(x) - (up ? 28 : 0) + (rnd(i) - 0.5) * 22, 3.2, up ? 'ink' : 'mid');
+        }
+        b += L(cut + 8, f(cut) - 28, cut + 8, f(cut), 'ink', 1) + T(cut + 14, 134, 'the jump is the effect', 'f-it');
+        b += T(34, 48, 'BELOW: NO CHANGE', 'f-up', 'start', true) + T(416, 48, 'ABOVE: GOT IT', 'f-up', 'end');
+        b += T(30, 208, 'people just either side of the line are nearly identical', 'f-it');
+        break;
+      }
+      case 'its': {
+        h = 215;
+        const cx = 270, tr = x => 128 - (x - 30) * 0.07 + 7 * Math.sin((x - 30) / 16);
+        b += frame('TIME →') + change(cx);
+        b += T(150, 22, 'BEFORE', 'f-up', 'middle', true) + T(355, 22, 'AFTER', 'f-up', 'middle', true);
+        b += P(range(cx, 380, 4).map(x => [x, tr(x)]), 'mid', 2, '5 4');
+        b += P(range(30, 380, 4).map(x => [x, tr(x) - (x < cx ? 0 : Math.min(1, (x - cx) / 16) * 26)]), 'ink', 2);
+        b += bracket(390, tr(380) - 26, tr(380), 'effect', true);
+        b += T(30, 208, 'dashed: the earlier trend, projected forward', 'f-it');
+        break;
+      }
+      case 'matching': {
+        h = 235;
+        b += L(30, 176, 30, 42, 'soft', 1, null, true);
+        b += `<text class="f-ax" transform="translate(22,176) rotate(-90)">HOW ACTIVE BEFORE →</text>`;
+        b += T(115, 22, 'USED IT', 'f-up', 'middle') + T(335, 22, 'DIDN’T', 'f-up', 'middle', true);
+        const users = [[95, 48], [125, 62], [105, 78], [135, 92], [100, 106], [130, 122], [110, 140]];
+        const others = [[320, 76], [350, 90], [330, 108], [355, 120], [325, 138], [345, 152], [320, 162], [352, 170]];
+        for (let k = 0; k < 5; k++) b += L(users[k + 2][0] + 7, users[k + 2][1], others[k][0] - 7, others[k][1], 'soft', 1);
+        users.forEach(([x, y], k) => { b += k < 2 ? Hollow(x, y, 5) : C(x, y, 5, 'ink'); });
+        others.forEach(([x, y], k) => { b += k >= 5 ? Hollow(x, y, 5) : C(x, y, 5, 'mid'); });
+        b += T(225, 205, 'lines join each user to a lookalike', 'f-it', 'middle');
+        b += T(225, 224, 'hollow dots have no good match, so they’re left out', 'f-it', 'middle');
+        break;
+      }
+      case 'iv': {
+        h = 210;
+        const box = (x, y, w, hh, label, soft) => `<rect x="${x}" y="${y}" width="${w}" height="${hh}" fill="none" stroke="var(--f-${soft ? 'mid' : 'ink'})" stroke-width="1"${soft ? ' stroke-dasharray="4 3"' : ''}/>` + T(x + w / 2, y + hh / 2 + 4, label, 'f-up', 'middle', soft);
+        b += box(20, 95, 100, 34, 'NUDGE') + box(170, 95, 100, 34, 'TAKE-UP') + box(320, 95, 100, 34, 'OUTCOME') + box(215, 20, 140, 30, 'OTHER FACTORS', true);
+        b += L(122, 112, 166, 112, 'ink', 1.4, null, true) + L(272, 112, 316, 112, 'ink', 1.4, null, true);
+        b += L(250, 52, 233, 91, 'soft', 1.2, '4 3', true) + L(320, 52, 352, 91, 'soft', 1.2, '4 3', true);
+        b += `<path d="M70,131 C70,178 370,178 370,133" fill="none" stroke="var(--f-mid)" stroke-width="1.2" stroke-dasharray="4 4"/>`;
+        b += L(213, 160, 227, 173, 'ink', 1.4) + L(227, 160, 213, 173, 'ink', 1.4);
+        b += T(220, 202, 'no direct path: the nudge only matters through take-up', 'f-it', 'middle');
+        break;
+      }
+    }
+    const defs = `<defs>
+      <marker id="${id}i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9" fill="none" stroke="var(--f-ink)" stroke-width="1.2"/></marker>
+      <marker id="${id}s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9" fill="none" stroke="var(--f-soft)" stroke-width="1.2"/></marker>
+    </defs>`;
+    const m = FINDER_METHODS[key];
+    if (!m) return '';
+    return `<svg viewBox="0 0 440 ${h}" role="img" aria-label="${esc(m.name + ': ' + m.caption)}">${defs}${b}</svg>`;
+  }
+
   function renderMethodFinder(root, project) {
     const M = FINDER_METHODS, Q = FINDER_QUESTIONS;
-    let started = false, problem = '', path = [];
+    const GROUPS = [
+      ['Experiments: when you can choose who gets it', ['ab', 'holdout', 'switchback', 'geo']],
+      ['When you can’t run an experiment', ['did', 'synth', 'rdd', 'its', 'matching', 'iv']]
+    ];
+    let started = false, problem = '', path = [], mode = 'flow', libKey = null;
 
     root.innerHTML = `
       <div class="finder">
@@ -2341,25 +2564,43 @@
       if (r.top < 0) window.scrollTo({ top: window.scrollY + r.top - 100 });
     }
 
+    function focusHeading(sel) {
+      const h = stage.querySelector(sel);
+      if (h) h.focus({ preventScroll: true });
+    }
+
+    function openLibrary() { mode = 'library'; render(); keepInView(); }
+    function toFinder() { mode = 'flow'; started = false; path = []; render(); keepInView(); }
+
     function render() {
+      if (mode === 'library') { renderLibrary(); return; }
+      if (mode === 'method') { renderResult(libKey, true); return; }
+
       if (!started) {
         stage.innerHTML = `
           <div class="f-step w-enter">
             <label class="calc-label" for="f-text">What are you trying to learn? (optional)</label>
             <textarea class="f-text" id="f-text" placeholder="For example: did our new onboarding flow increase the number of people who make a first payment?">${esc(problem)}</textarea>
             <p class="f-help">This stays in your browser. It&rsquo;s only used to label your plan.</p>
-            <div class="f-actions"><button type="button" class="f-btn" id="f-start">Start</button></div>
+            <div class="f-actions">
+              <button type="button" class="f-btn" id="f-start">Start</button>
+              <button type="button" class="calc-link" id="f-browse">Or browse all ten methods</button>
+            </div>
           </div>`;
         stage.querySelector('#f-start').addEventListener('click', () => {
           problem = stage.querySelector('#f-text').value.trim();
           started = true;
           render();
         });
+        stage.querySelector('#f-browse').addEventListener('click', () => {
+          problem = stage.querySelector('#f-text').value.trim();
+          openLibrary();
+        });
         return;
       }
 
       const node = currentNode();
-      if (M[node]) { renderResult(node); return; }
+      if (M[node]) { renderResult(node, false); return; }
 
       const q = Q[node];
       stage.innerHTML = trail() + `
@@ -2380,8 +2621,7 @@
         render();
       });
       wireTrail();
-      const h = stage.querySelector('.f-q');
-      if (path.length && h) h.focus({ preventScroll: true });
+      if (path.length) focusHeading('.f-q');
     }
 
     function wireTrail() {
@@ -2393,17 +2633,48 @@
       }));
     }
 
-    function renderResult(key) {
+    function renderLibrary() {
+      stage.innerHTML = `
+        <div class="f-step w-enter">
+          <p class="f-num">All methods</p>
+          <h2 class="f-q" tabindex="-1">Ten ways to find a cause</h2>
+          <p class="f-help">Each one answers &ldquo;did this change cause that outcome?&rdquo; in a different situation. Choose any to see how it works.</p>
+          ${GROUPS.map(([label, keys]) => `
+            <div class="f-lib-group"><span class="calc-label">${label}</span>
+              ${keys.map(k => `<button type="button" class="f-lib-item" data-k="${k}"><span class="f-lib-name">${M[k].name}</span><span class="f-lib-sum">${M[k].summary}</span><span class="f-lib-arrow" aria-hidden="true">&rarr;</span></button>`).join('')}
+            </div>`).join('')}
+          <div class="f-actions"><button type="button" class="f-btn" id="f-lib-start">Use the finder</button></div>
+        </div>`;
+      stage.querySelectorAll('.f-lib-item').forEach(b => b.addEventListener('click', () => {
+        mode = 'method'; libKey = b.dataset.k;
+        render();
+        keepInView();
+      }));
+      stage.querySelector('#f-lib-start').addEventListener('click', toFinder);
+      focusHeading('.f-q');
+    }
+
+    function renderResult(key, fromLib) {
       const m = M[key];
-      const weak = path.some(s => s.q === 'nudge' && s.v === 'thin');
+      const weak = !fromLib && path.some(s => s.q === 'nudge' && s.v === 'thin');
       const list = items => `<ul class="f-list">${items.map(t => `<li>${t}</li>`).join('')}</ul>`;
-      stage.innerHTML = trail() + `
+      const copyLabel = fromLib ? 'Copy as notes' : 'Copy as a plan';
+      stage.innerHTML = (fromLib ? '<button type="button" class="calc-link f-lib-back" id="f-lib-back">&larr; All methods</button>' : trail()) + `
         <div class="f-result w-enter">
-          <p class="post-kicker">Recommended approach</p>
+          <p class="post-kicker">${fromLib ? 'Method' : 'Recommended approach'}</p>
           <h2 class="f-method" tabindex="-1">${m.name}</h2>
           <p class="f-sum">${m.summary}</p>
           ${weak ? '<p class="calc-note">With limited data, any estimate here will be fragile. If you can, randomise who gets invited instead.</p>' : ''}
-          <div class="f-sec"><h3 class="calc-label">Why it fits</h3><p class="f-body">${m.why}</p></div>
+          <div class="post-body">
+            <figure class="fig mdiag">
+              <p class="fig-k">Fig. 1 &middot; How it works</p>
+              <p class="fig-t">${m.figTitle}</p>
+              ${methodDiagram(key)}
+              <figcaption><span><em>Fig. 1</em> &mdash; ${m.caption}</span></figcaption>
+            </figure>
+          </div>
+          <div class="f-sec f-plain"><h3 class="calc-label">In plain terms</h3><p class="f-body">${m.plain}</p></div>
+          <div class="f-sec"><h3 class="calc-label">${fromLib ? 'When it fits' : 'Why it fits'}</h3><p class="f-body">${m.why}</p></div>
           <div class="f-sec"><h3 class="calc-label">Assumptions to check</h3>${list(m.assumptions)}</div>
           <div class="f-sec"><h3 class="calc-label">Data you&rsquo;ll need</h3>${list(m.data)}</div>
           <div class="f-sec"><h3 class="calc-label">Watch out for</h3>${list(m.watch)}</div>
@@ -2411,16 +2682,20 @@
           ${m.calc ? '<div class="f-sec"><p class="f-body"><a class="f-calc" href="/projects/sample-size" id="f-calc">Size it with the sample size calculator &rarr;</a></p></div>' : ''}
           <p class="f-caveat">A starting point, not a verdict. Real problems often need more than one method, and the assumptions matter more than the name.</p>
           <div class="f-actions">
-            <button type="button" class="f-btn" id="f-copy">Copy as a plan</button>
-            <button type="button" class="calc-link" id="f-restart">Start again</button>
+            <button type="button" class="f-btn" id="f-copy">${copyLabel}</button>
+            <button type="button" class="calc-link" id="f-restart">${fromLib ? 'Use the finder' : 'Start again'}</button>
+            ${fromLib ? '' : '<button type="button" class="calc-link" id="f-browse2">Browse all methods</button>'}
           </div>
         </div>`;
-      wireTrail();
 
+      if (fromLib) stage.querySelector('#f-lib-back').addEventListener('click', openLibrary);
+      else {
+        wireTrail();
+        stage.querySelector('#f-browse2').addEventListener('click', openLibrary);
+      }
       stage.querySelector('#f-restart').addEventListener('click', () => {
-        started = false; problem = ''; path = [];
-        render();
-        keepInView();
+        if (!fromLib) problem = '';
+        toFinder();
       });
       const calcLink = stage.querySelector('#f-calc');
       if (calcLink) calcLink.addEventListener('click', e => {
@@ -2429,11 +2704,14 @@
         show('projects/sample-size');
       });
       stage.querySelector('#f-copy').addEventListener('click', async e => {
-        const lines = ['Causal method finder: plan', ''];
-        if (problem) lines.push('What we’re trying to learn: ' + problem, '');
-        lines.push('How the change reaches people:');
-        path.forEach(step => lines.push('- ' + Q[step.q].text + ' ' + optOf(step)[1]));
-        lines.push('', 'Recommended approach: ' + m.name, m.summary, '', 'Why it fits: ' + m.why, '');
+        const lines = [fromLib ? 'Causal method: ' + m.name : 'Causal method finder: plan', ''];
+        if (!fromLib) {
+          if (problem) lines.push('What we’re trying to learn: ' + problem, '');
+          lines.push('How the change reaches people:');
+          path.forEach(step => lines.push('- ' + Q[step.q].text + ' ' + optOf(step)[1]));
+          lines.push('', 'Recommended approach: ' + m.name);
+        }
+        lines.push(m.summary, '', 'In plain terms: ' + m.plain, '', (fromLib ? 'When it fits: ' : 'Why it fits: ') + m.why, '');
         lines.push('Assumptions to check:', ...m.assumptions.map(t => '- ' + t), '');
         lines.push('Data needed:', ...m.data.map(t => '- ' + t), '');
         lines.push('Watch out for:', ...m.watch.map(t => '- ' + t), '');
@@ -2445,10 +2723,9 @@
         } catch (err) {
           btn.textContent = 'Couldn’t copy';
         }
-        setTimeout(() => { btn.textContent = 'Copy as a plan'; }, 2000);
+        setTimeout(() => { btn.textContent = copyLabel; }, 2000);
       });
-      const h = stage.querySelector('.f-method');
-      if (h) h.focus({ preventScroll: true });
+      focusHeading('.f-method');
     }
 
     render();

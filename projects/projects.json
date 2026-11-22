@@ -9,11 +9,13 @@
     "live": true
   },
   {
-    "slug": "placeholder-one",
-    "title": "Lorem ipsum dolor",
-    "summary": "Sed do eiusmod tempor incididunt ut labore et dolore.",
-    "tag": "In progress",
-    "size": "s"
+    "slug": "markov-attribution",
+    "title": "Markov chain attribution",
+    "summary": "Which marketing channels really drive conversions? Crediting each by how much the customer journey falls apart without it.",
+    "tag": "Case study",
+    "size": "s",
+    "art": "chain",
+    "live": true
   },
   {
     "slug": "placeholder-two",
