@@ -545,6 +545,39 @@
   .gm-ch-p { font-size: 15px; line-height: 1.75; color: #444; max-width: 620px; margin-top: 10px; }
   .gm-ch-p b { font-weight: 600; color: var(--black); }
   html.dark body .gm-ch-p { color: #cfcfcf; }
+  .mt { margin-top: 26px; max-width: 760px; }
+  .mt-row { display: grid; grid-template-columns: 24px minmax(120px, 1fr) auto auto; gap: 14px; align-items: end; padding: 5px 0; }
+  .mt-root > .mt-row { grid-template-columns: 0 minmax(120px, 1fr) auto auto; gap: 0 14px; }
+  .mt-root > .mt-row .mt-name { font-family: Georgia, serif; font-size: 24px; padding-bottom: 6px; }
+  .mt-root > .mt-row .mt-out { font-size: 26px; }
+  .mt-kids { margin-left: 4px; padding-left: 20px; border-left: 1px solid var(--border); }
+  .mt-op { font-family: Georgia, serif; font-size: 20px; line-height: 1; color: var(--black); background: none; border: 0; padding: 0 0 10px; cursor: pointer; text-align: center; }
+  button.mt-op:hover { color: var(--gray); }
+  .mt-eq { color: var(--gray); cursor: default; }
+  .mt-val { display: flex; align-items: baseline; gap: 8px; padding-bottom: 8px; white-space: nowrap; }
+  .mt-out { font-family: Georgia, serif; font-size: 20px; color: var(--black); font-variant-numeric: tabular-nums; }
+  .mt-link { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); }
+  .mt-in { display: inline-flex; align-items: baseline; gap: 6px; border-bottom: 1px solid var(--border); }
+  .mt-in:focus-within { border-bottom-color: var(--black); }
+  .mt-v { width: 92px; font-family: Georgia, serif; font-size: 20px; text-align: right; color: var(--black); background: none; border: 0; outline: none; padding: 2px 0 4px; }
+  .mt-u { border-bottom: 0; font-size: 12px; color: var(--gray); }
+  .mt-acts { display: flex; align-items: center; gap: 14px; padding-bottom: 10px; white-space: nowrap; }
+  .mt-acts .calc-link { margin-left: 0; font-size: 11px; color: var(--gray); }
+  .mt-acts .calc-link:hover { color: var(--black); }
+  .mt-acts .gm-del { padding-bottom: 0; }
+  .mt-note { margin-top: 10px; color: var(--black); }
+  @media (hover: hover) {
+    .mt-linkbtn { opacity: 0; transition: opacity 0.2s; }
+    .mt-row:hover .mt-linkbtn, .mt-row:focus-within .mt-linkbtn, .mt-linkbtn:focus { opacity: 1; }
+  }
+  .mt-kind { color: var(--gray) !important; font-style: normal; font-family: inherit !important; font-size: 11px !important; }
+  @media (max-width: 720px) {
+    .mt-row, .mt-root > .mt-row { grid-template-columns: 22px minmax(0, 1fr); gap: 2px 10px; }
+    .mt-root > .mt-row { grid-template-columns: 0 minmax(0, 1fr); }
+    .mt-val, .mt-acts { grid-column: 2; padding-bottom: 4px; }
+    .mt-acts { flex-wrap: wrap; gap: 6px 14px; padding-bottom: 8px; }
+    .mt-kids { padding-left: 12px; }
+  }
   .gm-ns { margin-top: 24px; max-width: 520px; }
   .gm-ns input { font-size: 26px !important; }
   .gm-ns-eg { font-size: 12px; color: var(--gray); margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; }
@@ -3452,14 +3485,15 @@
         { name: 'Invite a friend', from: 'd', to: 'a', k: 0.5 },
         { name: 'Content brings visits', from: 'e', to: 'a', k: 2 }
       ],
-      goal: 'd'
+      goal: 'd',
+      tree: { id: 't0', name: 'Weekly active customers', op: 'x', unit: 'n', v: 1, link: true, kids: [], inf: [1, 1, 1] }
     };
     const clone = o => JSON.parse(JSON.stringify(o));
     const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
     const num = v => { const n = parseFloat(String(v).replace(/,/g, '')); return isFinite(n) ? n : 0; };
     const commas = n => Math.round(n).toLocaleString('en-GB');
     const short = n => String(+(+n).toFixed(2));
-    let model = null, nextId = 0;
+    let model = null, nextId = 0, nextTid = 0;
     const newId = () => { let id; do { id = 's' + (nextId++).toString(36); } while (model.steps.some(s => s.id === id)); return id; };
 
     // ── Links: a compact, readable format. #g=entry;north star;checks;goal;steps;loops
@@ -3473,11 +3507,12 @@
         m.ns.checks.map(c => c || '-').join('').replace(/^-+$/, ''),
         at[m.goal],
         m.steps.map((s, i) => { const inf = s.inf.join(''); return [encName(s.name), i ? at[s.from] : ''].concat(i ? [short(s.rate)] : []).concat(inf !== '111' ? [inf] : []).join(','); }).join(':'),
-        m.loops.map(l => [encName(l.name), at[l.from], at[l.to], short(l.k)].join(',')).join(':')
+        m.loops.map(l => [encName(l.name), at[l.from], at[l.to], short(l.k)].join(',')).join(':'),
+        flatTree(m.tree).map(({ n, p }) => { const inf = n.inf.join(''); return [encName(n.name), p, n.op === 'p' ? 'p' : '', n.kids.length ? '' : n.unit, n.kids.length || n.link ? '' : short(n.v), n.link ? 1 : '', inf !== '111' ? inf : ''].join(',').replace(/,+$/, ''); }).join(':')
       ].join(';');
     }
     function parseCompact(str) {
-      const [entry, ns, checks, goal, steps, loops] = str.split(';');
+      const [entry, ns, checks, goal, steps, loops, tree] = str.split(';');
       const st = (steps || '').split(':').map((t, i) => {
         const [name, from, rate, inf] = t.split(',');
         return { id: 'k' + i, name: decName(name), from: i ? 'k' + from : null, rate: i ? num(rate) : 100, inf: String((i ? inf : rate) || '111').split('').map(Number) };
@@ -3487,8 +3522,24 @@
         ns: { name: decName(ns), checks: String(checks || '---').split('').map(c => (c === 'y' || c === 'n' ? c : '')) },
         steps: st,
         loops: (loops ? loops.split(':') : []).map(t => { const [name, a, b, k] = t.split(','); return { name: decName(name), from: 'k' + a, to: 'k' + b, k: num(k) }; }),
-        goal: 'k' + goal
+        goal: 'k' + goal,
+        tree: tree ? unflatTree(tree) : null
       };
+    }
+    // The North Star's breakdown is stored as a flat list: name, parent, op, unit, value, linked, influence
+    function flatTree(t) {
+      const out = [];
+      const go = (n, p) => { const i = out.length; out.push({ n, p }); n.kids.forEach(k => go(k, i)); };
+      go(t, '');
+      return out;
+    }
+    function unflatTree(str) {
+      const nodes = str.split(':').map(t => {
+        const [name, p, op, unit, v, link, inf] = t.split(',');
+        return { name: decName(name), p: p === '' || p === undefined ? -1 : +p, op: op === 'p' ? 'p' : 'x', unit: unit || 'n', v: v === undefined || v === '' ? 1 : num(v), link: link === '1', kids: [], inf: String(inf || '111').split('').map(Number) };
+      });
+      nodes.forEach((n, i) => { if (i && nodes[n.p] && n.p < i) nodes[n.p].kids.push(n); });
+      return nodes[0];
     }
     function parseOld(s) {
       // Earlier links held the whole model as encoded JSON
@@ -3521,12 +3572,29 @@
         .filter(l => seen.has(String(l.from)) && seen.has(String(l.to)))
         .map(l => ({ name: String(l.name || 'Loop').slice(0, 40), from: String(l.from), to: String(l.to), k: clamp(num(l.k), 0, 100) }));
       const ns = m.ns || {};
+      const nsName = String(ns.name || DEFAULT.ns.name).slice(0, 60);
       return {
         entry: clamp(num(m.entry), 0, 1e9),
-        ns: { name: String(ns.name || DEFAULT.ns.name).slice(0, 60), checks: [0, 1, 2].map(j => { const c = (ns.checks || [])[j]; return c === 'y' || c === 'n' ? c : ''; }) },
+        ns: { name: nsName, checks: [0, 1, 2].map(j => { const c = (ns.checks || [])[j]; return c === 'y' || c === 'n' ? c : ''; }) },
         steps, loops,
-        goal: seen.has(String(m.goal)) ? String(m.goal) : steps[steps.length - 1].id
+        goal: seen.has(String(m.goal)) ? String(m.goal) : steps[steps.length - 1].id,
+        tree: cleanTree(m.tree, nsName)
       };
+    }
+    function cleanTree(t, nsName) {
+      let links = 0, k = 0;
+      const go = (n, d) => {
+        const node = {
+          id: 't' + (k++), name: String(n.name || 'Part').slice(0, 60), op: n.op === 'p' ? 'p' : 'x',
+          unit: ['n', 'p', 'g'].includes(n.unit) ? n.unit : 'n', v: clamp(num(n.v), 0, 1e12), link: false, kids: [],
+          inf: [0, 1, 2].map(j => clamp(Math.round(num(Array.isArray(n.inf) ? n.inf[j] : 1)), 0, 2))
+        };
+        if (d < 2 && Array.isArray(n.kids) && n.kids.length >= 2) node.kids = n.kids.slice(0, 6).map(c => go(c, d + 1));
+        if (!node.kids.length && n.link && !links) { node.link = true; links++; }
+        return node;
+      };
+      if (!t || typeof t !== 'object') return { id: 't0', name: nsName, op: 'x', unit: 'n', v: 1, link: true, kids: [], inf: [1, 1, 1] };
+      return go(t, 0);
     }
     function fromHash() {
       try {
@@ -3548,6 +3616,36 @@
     const infScore = s => s.inf.reduce((t, v) => t + v, 0);
     const infLevel = s => { const v = infScore(s); return v >= 5 ? 'High' : (v >= 3 ? 'Medium' : 'Low'); };
     const INF_WEIGHT = { High: 1, Medium: 0.6, Low: 0.25 };
+
+    // ── The North Star's breakdown
+    const walkTree = (n, f, d = 0, p = null, i = 0) => { f(n, d, p, i); n.kids.forEach((k, j) => walkTree(k, f, d + 1, n, j)); };
+    const findNode = id => { let r = null; walkTree(model.tree, n => { if (n.id === id) r = n; }); return r; };
+    const parentOf = id => { let r = null; walkTree(model.tree, (n, d, p) => { if (n.id === id) r = p; }); return r; };
+    const linkedNode = () => { let r = null; walkTree(model.tree, n => { if (!n.kids.length && n.link) r = n; }); return r; };
+    const newTid = () => { let id; do { id = 'n' + (nextTid++).toString(36); } while (findNode(id)); return id; };
+    function unitOf(n) {
+      if (!n.kids.length) return n.link ? 'n' : n.unit;
+      const us = n.kids.map(unitOf);
+      if (n.op === 'p') return us[0];
+      return us.includes('g') ? 'g' : (us.every(u => u === 'p') ? 'p' : 'n');
+    }
+    // Value of a box: the growth model supplies the linked box; `over` swaps in a changed value
+    function valOf(n, people, over) {
+      if (!n.kids.length) {
+        if (n.link) return people;
+        const v = over && over[n.id] !== undefined ? over[n.id] : n.v;
+        return n.unit === 'p' ? v / 100 : v;
+      }
+      const vs = n.kids.map(k => valOf(k, people, over));
+      return n.op === 'p' ? vs.reduce((a, b) => a + b, 0) : vs.reduce((a, b) => a * b, 1);
+    }
+    function fmtU(v, u) {
+      if (!isFinite(v)) return '–';
+      if (u === 'p') return +(v * 100).toFixed(1) + '%';
+      const s = Math.abs(v) >= 100 ? commas(v) : String(+v.toFixed(2));
+      return (u === 'g' ? '£' : '') + s;
+    }
+    const nsLabel = () => (model.tree.name.trim() || 'your North Star');
 
     // ── People reaching each step per month: c = b + A·c
     function solve(m, rates) {
@@ -3578,17 +3676,26 @@
     function levers() {
       const base = solve(model);
       if (base.compounding) return { base, list: [] };
-      const g = idx(model.goal), end = base.counts[g];
+      const g = idx(model.goal), people = base.counts[g];
+      const linked = !!linkedNode(), end = valOf(model.tree, people);
       const list = model.steps.map((s, i) => {
         if (i === 0) return null;
         const r = model.steps.map(x => x.rate);
         r[i] = Math.min(100, r[i] + lift);
         const f = solve(model, r);
-        const gain = f.compounding ? Infinity : Math.max(0, f.counts[g] - end);
+        const gain = !linked ? 0 : (f.compounding ? Infinity : Math.max(0, valOf(model.tree, f.counts[g]) - end));
         const level = infLevel(s);
-        return { i, s, room: s.rate < 100, takesOff: f.compounding, gain, level, priority: (isFinite(gain) ? gain : 1e12) * INF_WEIGHT[level] };
+        return { kind: 'step', i, s, room: s.rate < 100, takesOff: f.compounding && linked, gain, level, priority: (isFinite(gain) ? gain : 1e15) * INF_WEIGHT[level] };
       }).filter(Boolean);
-      return { base, end, list };
+      // Values in the breakdown: a % rises by points, anything else by the same percent
+      walkTree(model.tree, (n, d) => {
+        if (d === 0 || n.kids.length || n.link) return;
+        const nv = n.unit === 'p' ? Math.min(100, n.v + lift) : n.v * (1 + lift / 100);
+        const gain = Math.max(0, valOf(model.tree, people, { [n.id]: nv }) - end);
+        const level = infLevel(n);
+        list.push({ kind: 'value', s: n, room: n.unit === 'p' ? n.v < 100 : n.v > 0, takesOff: false, gain, level, priority: gain * INF_WEIGHT[level] });
+      });
+      return { base, people, end, list };
     }
 
     // ── Page
@@ -3601,10 +3708,11 @@
         <section class="gm-ch" aria-labelledby="gm-h1">
           <p class="gm-ch-n">01</p>
           <div class="gm-ch-body">
-            <h2 class="gm-ch-t" id="gm-h1">Choose your North Star</h2>
-            <p class="gm-ch-p">One number that shows customers getting value from your product. Everything else in this model leads to it.</p>
-            <div class="calc-input gm-ns"><input type="text" id="gm-ns" maxlength="60" autocomplete="off" aria-label="Your North Star metric"></div>
-            <div class="gm-ns-eg"><span>For example:</span> ${['Weekly active customers', 'Customers who save every month', 'Orders delivered on time'].map(t => `<button type="button" class="calc-link" data-eg="${t}">${t}</button>`).join('')}</div>
+            <h2 class="gm-ch-t" id="gm-h1">Choose your North Star, and break it down</h2>
+            <p class="gm-ch-p">One number that shows customers getting value from your product. Then break it into the parts that multiply or add up to it, such as customers &times; share who buy &times; spend per buyer. Choose the one part your growth model in chapter 2 will count.</p>
+            <div class="gm-ns-eg"><span>For example:</span> ${['Weekly active customers', 'Total spend', 'Orders delivered on time'].map(t => `<button type="button" class="calc-link" data-eg="${t}">${t}</button>`).join('')}</div>
+            <div class="mt" id="gm-tree"></div>
+            <p class="calc-help mt-note" id="gm-tree-note"></p>
             <div class="gm-checks" id="gm-checks"></div>
             <p class="gm-ns-note" id="gm-ns-note" aria-live="polite"></p>
           </div>
@@ -3629,8 +3737,9 @@
             <div id="gm-loops"></div>
             <button type="button" class="calc-link gm-add gm-add-loop" id="gm-add-loop">+ Add a loop</button>
             <div class="gm-goal">
-              <label class="calc-label" for="gm-goal">Your North Star is reached at</label>
+              <label class="calc-label" for="gm-goal">Your growth model counts people who reach</label>
               <select id="gm-goal" class="gm-sel gm-goal-sel"></select>
+              <p class="calc-help" id="gm-goal-note"></p>
             </div>
           </div>
         </div>
@@ -3639,9 +3748,9 @@
           <p class="gm-ch-n">03</p>
           <div class="gm-ch-body">
             <h2 class="gm-ch-t" id="gm-h3">Find your rate-limiting step</h2>
-            <p class="gm-ch-p">Two things decide where to focus. <b>Impact</b>: how many more people would reach your North Star if a step improved. <b>Influence</b>: how much you can actually change it today. Answer three quick questions for each step.</p>
+            <p class="gm-ch-p">Two things decide where to focus. <b>Impact</b>: how much your North Star would grow if a step in your journey, or a value in its breakdown, improved. <b>Influence</b>: how much you can actually change it today. Answer three quick questions for each.</p>
             <div class="gm-liftrow">
-              <label class="calc-label" for="gm-lift">Impact if a step improved by <span id="gm-lift-v">5</span> points</label>
+              <label class="calc-label" for="gm-lift">Impact if a step improved by <span id="gm-lift-v">5</span> points, or a value by <span id="gm-lift-v2">5</span>%</label>
               <input class="calc-range" id="gm-lift" type="range" min="1" max="20" step="1" value="5">
             </div>
             <div id="gm-rank"></div>
@@ -3655,7 +3764,8 @@
         </div>
         <div class="calc-how">
           <p><b>How the numbers work.</b> Each % is the share of people from the step before who reach the next one. A loop adds new people: each person who reaches one step brings in a number of new people at another. The model works out how many people reach each step in a typical month, with every loop included.</p>
-          <p><b>Impact</b> raises one step at a time by the same number of points and counts the extra people who reach your North Star. Steps that convert few people, and steps inside a loop, gain the most. <b>Influence</b> comes from your three answers: Yes counts 2, Partly 1 and No 0, so 5 or 6 is high, 3 or 4 medium, and less is low.</p>
+          <p><b>Your North Star&rsquo;s breakdown</b> multiplies or adds its parts. One part comes from your growth model: the people who reach a step each month. The rest are values you enter.</p>
+          <p><b>Impact</b> improves one thing at a time and measures how much your North Star grows: a step by a number of points, a value by the same percent (or points, for a %). Steps that convert few people, and steps inside a loop, gain the most. <b>Influence</b> comes from your three answers: Yes counts 2, Partly 1 and No 0, so 5 or 6 is high, 3 or 4 medium, and less is low.</p>
           <p>The <b>rate-limiting step</b> is the one with the most impact: the narrowest point in your journey. If you have little influence over it today, the model also shows the best place to start: the most impact once your influence is taken into account.</p>
           <p>Inspired by Matt Lerner&rsquo;s <em>Growth Levers and How to Find Them</em>. Your model stays in your browser and in the link.</p>
         </div>
@@ -3667,9 +3777,70 @@
       .map(s => `<option value="${s.id}"${s.id === sel ? ' selected' : ''}>${esc(label(s))}</option>`).join('');
 
     // ── Chapter 1: North Star
-    const nsInput = $('#gm-ns');
+    const treeEl = $('#gm-tree');
+    const valText = n => (n.v >= 1000 ? commas(n.v) : String(+n.v.toFixed(2)));
+    function nodeHtml(n, d, parent, i) {
+      const leaf = !n.kids.length;
+      const op = !parent ? '' : (i === 0 ? '<span class="mt-op mt-eq" aria-hidden="true">=</span>'
+        : `<button type="button" class="mt-op" data-op="${parent.id}" title="Switch between multiply and add" aria-label="${parent.op === 'x' ? 'Multiplied' : 'Added'}; switch">${parent.op === 'x' ? '&times;' : '+'}</button>`);
+      const val = leaf
+        ? (n.link ? `<span class="mt-out" data-out="${n.id}"></span><span class="mt-link">from your growth model</span>`
+          : `<span class="mt-in"><input type="text" inputmode="decimal" autocomplete="off" class="mt-v" data-id="${n.id}" value="${valText(n)}" aria-label="Value of ${esc(n.name)}"><select class="gm-sel mt-u" data-id="${n.id}" aria-label="Unit of ${esc(n.name)}">${[['n', 'number'], ['p', '%'], ['g', '£']].map(([u, t]) => `<option value="${u}"${n.unit === u ? ' selected' : ''}>${t}</option>`).join('')}</select></span>`)
+        : `<span class="mt-out" data-out="${n.id}"></span>`;
+      const acts = [
+        leaf && !n.link ? `<button type="button" class="calc-link mt-linkbtn" data-act="link" data-id="${n.id}">Count with growth model</button>` : '',
+        leaf && d < 2 ? `<button type="button" class="calc-link" data-act="split" data-id="${n.id}">Break down</button>` : '',
+        !leaf && n.kids.length < 6 ? `<button type="button" class="calc-link" data-act="add" data-id="${n.id}">+ Add a part</button>` : '',
+        parent ? `<button type="button" class="gm-del" data-act="del" data-id="${n.id}" aria-label="Remove ${esc(n.name)}">&times;</button>` : ''
+      ].join('');
+      return `<div class="mt-node${d === 0 ? ' mt-root' : ''}">
+        <div class="mt-row">${op || '<span></span>'}
+          <input class="gm-name mt-name" type="text" maxlength="60" value="${esc(n.name)}" data-id="${n.id}" aria-label="${d === 0 ? 'Your North Star' : 'Part name'}">
+          <span class="mt-val">${val}</span>
+          <span class="mt-acts">${acts}</span>
+        </div>
+        ${leaf ? '' : `<div class="mt-kids">${n.kids.map((k, j) => nodeHtml(k, d + 1, n, j)).join('')}</div>`}
+      </div>`;
+    }
+    function buildTree() {
+      treeEl.innerHTML = nodeHtml(model.tree, 0, null, 0);
+      treeEl.querySelectorAll('.mt-name').forEach(el => el.addEventListener('input', () => {
+        findNode(el.dataset.id).name = el.value.slice(0, 60);
+        if (el.dataset.id === model.tree.id) model.ns.name = model.tree.name;
+        update();
+      }));
+      treeEl.querySelectorAll('.mt-v').forEach(el => {
+        el.addEventListener('input', () => { findNode(el.dataset.id).v = clamp(num(el.value), 0, 1e12); update(); });
+        el.addEventListener('blur', () => { el.value = valText(findNode(el.dataset.id)); });
+      });
+      treeEl.querySelectorAll('.mt-u').forEach(el => el.addEventListener('change', () => { findNode(el.dataset.id).unit = el.value; update(); }));
+      treeEl.querySelectorAll('[data-op]').forEach(b => b.addEventListener('click', () => { const p = findNode(b.dataset.op); p.op = p.op === 'x' ? 'p' : 'x'; buildTree(); update(); }));
+      treeEl.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', () => {
+        const n = findNode(b.dataset.id), act = b.dataset.act;
+        if (act === 'link') { walkTree(model.tree, x => { x.link = false; }); n.link = true; }
+        if (act === 'split') {
+          n.kids = [
+            { id: newTid(), name: 'Part 1', op: 'x', unit: n.link ? 'n' : n.unit, v: n.v, link: n.link, kids: [], inf: [1, 1, 1] },
+            { id: newTid(), name: 'Part 2', op: 'x', unit: 'n', v: 1, link: false, kids: [], inf: [1, 1, 1] }
+          ];
+          n.link = false; n.op = 'x';
+        }
+        if (act === 'add') n.kids.push({ id: newTid(), name: 'New part', op: 'x', unit: 'n', v: 1, link: false, kids: [], inf: [1, 1, 1] });
+        if (act === 'del') {
+          const p = parentOf(n.id);
+          p.kids = p.kids.filter(k => k.id !== n.id);
+          if (p.kids.length === 1) {
+            const only = p.kids[0];
+            if (only.kids.length) { p.kids = only.kids; p.op = only.op; }
+            else { p.kids = []; p.v = only.v; p.unit = only.unit; p.link = only.link; p.inf = only.inf; }
+          }
+        }
+        buildTree(); update();
+        if (act === 'split' || act === 'add') { const names = treeEl.querySelectorAll(`.mt-name`); const last = [...names].find(x => findNode(x.dataset.id).name === (act === 'add' ? 'New part' : 'Part 1')); if (last) { last.focus(); last.select(); } }
+      }));
+    }
     function buildNs() {
-      nsInput.value = model.ns.name;
+      buildTree();
       $('#gm-checks').innerHTML = NS_CHECKS.map(([q], j) => `
         <div class="gm-check-row"><span>${q}</span>
           <div class="seg seg-small" role="group" aria-label="${q}">${[['y', 'Yes'], ['n', 'No']].map(([v, t]) => `<button type="button" data-j="${j}" data-v="${v}" class="${model.ns.checks[j] === v ? 'on' : ''}" aria-pressed="${model.ns.checks[j] === v}">${t}</button>`).join('')}</div>
@@ -3682,8 +3853,11 @@
       $('#gm-ns-note').textContent = no >= 0 ? NS_CHECKS[no][1]
         : (c.every(v => v === 'y') ? 'A strong North Star. Next, map how people reach it.' : 'Check your North Star against these three questions.');
     }
-    nsInput.addEventListener('input', () => { model.ns.name = nsInput.value.slice(0, 60); update(); });
-    root.querySelectorAll('[data-eg]').forEach(b => b.addEventListener('click', () => { model.ns.name = b.dataset.eg; nsInput.value = b.dataset.eg; update(); }));
+    root.querySelectorAll('[data-eg]').forEach(b => b.addEventListener('click', () => {
+      model.tree.name = model.ns.name = b.dataset.eg;
+      const el = treeEl.querySelector(`.mt-name[data-id="${model.tree.id}"]`); if (el) el.value = b.dataset.eg;
+      update();
+    }));
 
     // ── Chapter 2: the journey
     function buildSteps() {
@@ -3878,65 +4052,77 @@
     });
 
     // ── Chapter 3: impact and influence
-    function buildRank(list, limit, start) {
+    function buildRank(list, limit, start, ru, tiny) {
       const finite = list.filter(x => x.room && isFinite(x.gain));
       const maxGain = Math.max(1, ...finite.map(x => x.gain));
       $('#gm-rank').innerHTML = `
-        <div class="gm-rank-head" aria-hidden="true"><span>Step</span><span>Impact a month</span>${INF_QS.map(q => `<span>${q[0]}</span>`).join('')}<span>Influence</span></div>
+        <div class="gm-rank-head" aria-hidden="true"><span>Step or value</span><span>Impact</span>${INF_QS.map(q => `<span>${q[0]}</span>`).join('')}<span>Influence</span></div>
         ${list.map(x => {
           const s = x.s, w = !x.room ? 0 : (x.takesOff ? 100 : 100 * x.gain / maxGain);
-          const impact = !x.room ? 'at 100%' : (x.takesOff ? 'takes off' : (x.gain < 0.5 ? 'none' : '+' + commas(x.gain)));
-          const tag = limit && s.id === limit.id ? 'rate-limiting step' : (start && s.id === start.id ? 'start here' : '');
+          const impact = !x.room ? (x.kind === 'step' ? 'at 100%' : 'none') : (x.takesOff ? 'takes off' : (x.gain <= tiny ? 'none' : '+' + fmtU(x.gain, ru)));
+          const tag = limit && s.id === limit.id ? (x.kind === 'value' ? 'rate-limiting lever' : 'rate-limiting step') : (start && s.id === start.id ? 'start here' : '');
           return `
           <div class="gm-rank-row${tag ? ' on' : ''}">
-            <span class="gm-rank-name"><b>${esc(label(s))}</b>${tag ? `<em>${tag}</em>` : ''}</span>
+            <span class="gm-rank-name"><b>${esc(label(s))}</b>${tag ? `<em>${tag}</em>` : (x.kind === 'value' ? '<em class="mt-kind">in your North Star</em>' : '')}</span>
             <span class="gm-rank-impact"><span class="gm-lever-bar"><i style="width:${w.toFixed(1)}%"></i></span><span class="gm-lever-n">${impact}</span></span>
             ${INF_QS.map((q, j) => `<span class="gm-rank-q"><span class="gm-rank-ql">${q[0]}</span><span class="seg seg-small" role="group" aria-label="${esc(label(s))}: ${q[0]}">${INF_OPTS.map(([v, t]) => `<button type="button" data-id="${s.id}" data-j="${j}" data-v="${v}" class="${s.inf[j] === v ? 'on' : ''}" aria-pressed="${s.inf[j] === v}">${t}</button>`).join('')}</span></span>`).join('')}
             <span class="gm-rank-inf gm-inf-${x.level.toLowerCase()}">${x.level}</span>
           </div>`;
         }).join('')}`;
       $('#gm-rank').querySelectorAll('button[data-j]').forEach(b => b.addEventListener('click', () => {
-        byId(b.dataset.id).inf[+b.dataset.j] = +b.dataset.v;
+        (findNode(b.dataset.id) || byId(b.dataset.id)).inf[+b.dataset.j] = +b.dataset.v;
         update();
       }));
     }
 
     function update() {
       const m = model;
-      const { base, end, list } = levers();
+      const { base, people, end, list } = levers();
       const over = m.steps.filter(p => childrenOf(p.id).reduce((t, c) => t + c.rate, 0) > 100.001);
       const note = $('#gm-step-note');
       note.textContent = over.length
         ? `The paths after “${label(over[0])}” add up to more than 100%. Each person can only take one path.`
         : 'Each % is the share of people from the step before who reach this one.';
       note.classList.toggle('gm-warn', over.length > 0);
-      $('#gm-lift-v').textContent = lift;
+      $('#gm-lift-v').textContent = lift; $('#gm-lift-v2').textContent = lift;
 
       if (base.compounding) {
         mapEl.innerHTML = `<p class="gm-compound">Your loops bring back more people than they start with, so this model grows every month without limit. Real loops rarely sustain that: check the numbers, or lower how many people each person brings in.</p>`;
         $('#gm-cap').innerHTML = ''; $('#gm-rank').innerHTML = ''; $('#gm-out').innerHTML = '';
+        treeEl.querySelectorAll('[data-out]').forEach(el => { el.textContent = '–'; });
         save();
         return;
       }
 
-      const ranked = list.filter(x => x.room && x.gain > 0.5).sort((a, b) => b.gain - a.gain);
+      const ru = unitOf(model.tree), lk = linkedNode();
+      const tiny = Math.max(Math.abs(end) * 1e-6, ru === 'p' ? 1e-6 : 0.005);
+      treeEl.querySelectorAll('[data-out]').forEach(el => { const n = findNode(el.dataset.out); el.textContent = n.link ? commas(people) : fmtU(valOf(n, people), unitOf(n)); });
+      $('#gm-tree-note').textContent = lk ? '' : 'Choose “Count with growth model” on one part, so the map in chapter 2 feeds your North Star.';
+      $('#gm-goal-note').innerHTML = lk ? `This gives &ldquo;${esc(lk.name.trim() || 'Part')}&rdquo; in your North Star.` : 'No part of your North Star uses this yet.';
+      const ranked = list.filter(x => x.room && x.gain > tiny).sort((a, b) => b.gain - a.gain);
       const limit = ranked[0] ? ranked[0].s : null;
+      const limitStep = ranked[0] && ranked[0].kind === 'step' ? ranked[0].s : null;
       const byPriority = ranked.slice().sort((a, b) => b.priority - a.priority);
       const start = byPriority[0] ? byPriority[0].s : null;
-      mapEl.innerHTML = diagram(base.counts, limit && limit.id, start && start.id);
+      const startStep = byPriority[0] && byPriority[0].kind === 'step' ? byPriority[0].s : null;
+      mapEl.innerHTML = diagram(base.counts, limitStep && limitStep.id, startStep && startStep.id);
       const wide = mapEl.scrollWidth > mapEl.clientWidth + 2;
       $('#gm-cap').innerHTML = `<span>Each band is as wide as the number of people moving along it each month. Bands underneath are loops bringing new people in. ${matchMedia('(hover: hover)').matches ? 'Hover over' : 'Tap'} a step to trace its path.${wide ? ' Scroll sideways to see the whole model.' : ''}</span>`;
-      buildRank(list, limit, start);
+      buildRank(list, limit, start, ru, tiny);
 
-      const nsName = esc(m.ns.name.trim() || 'your North Star');
+      const nsName = esc(nsLabel());
       const goalName = esc(label(byId(m.goal)));
-      let out = `<div class="calc-result gm-result"><div><div class="calc-n">${commas(end)}</div><p class="calc-sub">Reach &ldquo;${goalName}&rdquo; each month</p></div>
-        <p class="gm-result-note">Your North Star, ${nsName.charAt(0).toLowerCase() + nsName.slice(1)}, is counted at &ldquo;${goalName}&rdquo;.</p></div>`;
+      let out = `<div class="calc-result gm-result"><div><div class="calc-n">${fmtU(end, ru)}</div><p class="calc-sub">${nsName}</p></div>
+        <p class="gm-result-note">${lk ? `Worked out from your breakdown, with &ldquo;${esc(lk.name.trim() || 'Part')}&rdquo; from your growth model: the ${commas(people)} people a month who reach &ldquo;${goalName}&rdquo;.` : 'None of your North Star comes from your growth model yet, so steps in the journey can&rsquo;t move it.'}</p></div>`;
       if (!limit) {
-        out += `<p class="calc-sentence">No single step is holding you back${list.every(x => !x.room) ? ': every step is already at 100%' : ''}. Growth here comes from bringing more people in at the start.</p>`;
+        out += `<p class="calc-sentence">${lk ? `No single step or value is holding you back. Growth here comes from bringing more people in at the start.` : 'Link one part of your North Star to your growth model to see which step limits it.'}</p>`;
       } else {
         const L = ranked[0], S = byPriority[0];
         const why = x => {
+          if (x.kind === 'value') {
+            const p = parentOf(x.s.id);
+            return p && p.op === 'p' ? `it adds straight to ${p === model.tree ? 'your North Star' : `&ldquo;${esc(p.name)}&rdquo;`}, and it&rsquo;s the biggest part` : `it multiplies everything else in ${p === model.tree ? 'your North Star' : `&ldquo;${esc(p.name)}&rdquo;`}, so even a small rise carries all the way through`;
+          }
           const loop = m.loops.find(l => l.k > 0 && leadsTo(l.to, x.s.id) && leadsTo(x.s.id, l.from));
           const parts = [];
           if (ranked.every(r => r.s.rate >= x.s.rate)) parts.push(`only ${+x.s.rate.toFixed(1)}% of people get past it, the lowest of any step that matters`);
@@ -3947,17 +4133,18 @@
         const gap = x => INF_QS.filter((q, j) => x.s.inf[j] < 2).map((q, j) => q[1]);
         const gapText = x => {
           const g = INF_QS.map((q, j) => [q, x.s.inf[j]]).filter(([q, v]) => v < 2).map(([q]) => q[1]);
-          const say = { own: 'bring in whoever owns it', why: 'talk to people who stopped there to learn why', test: 'find a cheaper way to test changes' };
+          const say = { own: 'bring in whoever owns it', why: x.kind === 'value' ? 'talk to customers to learn what holds it back' : 'talk to people who stopped there to learn why', test: 'find a cheaper way to test changes' };
           return g.map(k => say[k]).join(', ');
         };
-        const step = x => `${esc(label(byId(x.s.from)))} &rarr; ${esc(label(x.s))}`;
+        const step = x => x.kind === 'value' ? esc(label(x.s)) : `${esc(label(byId(x.s.from)))} &rarr; ${esc(label(x.s))}`;
+        const by = x => x.kind === 'value' && x.s.unit !== 'p' ? `${lift}%` : `${lift} points`;
         out += `
           <div class="gm-insight">
-            <span class="calc-label">Your rate-limiting step</span>
+            <span class="calc-label">Your rate-limiting ${L.kind === 'value' ? 'lever' : 'step'}</span>
             <p class="gm-step-name">${step(L)}</p>
             <p class="calc-sentence">${L.takesOff
-              ? `Lifting it by ${lift} points would tip your loops into growing on their own. Check your loop numbers are realistic first.`
-              : `Lifting it by ${lift} points brings about <b>${commas(L.gain)}</b> more people to your North Star each month${ranked[1] ? `, ${L.gain / ranked[1].gain >= 1.15 ? `${(L.gain / ranked[1].gain).toFixed(1)} times` : 'a little more than'} the next step` : ''}. It matters most because ${why(L)}.`}
+              ? `Lifting it by ${by(L)} would tip your loops into growing on their own. Check your loop numbers are realistic first.`
+              : `Lifting it by ${by(L)} adds about <b>${fmtU(L.gain, ru)}</b> to ${nsName.charAt(0).toLowerCase() + nsName.slice(1)}${ranked[1] ? `, ${L.gain / ranked[1].gain >= 1.15 ? `${(L.gain / ranked[1].gain).toFixed(1)} times` : 'a little more than'} the next best` : ''}. It matters most because ${why(L)}.`}
               Your influence over it is <b>${L.level.toLowerCase()}</b>.</p>
           </div>`;
         if (S.s.id !== L.s.id) {
@@ -3965,7 +4152,7 @@
           <div class="gm-insight gm-start">
             <span class="calc-label">Where to start</span>
             <p class="gm-step-name">${step(S)}</p>
-            <p class="calc-sentence">Your influence over the rate-limiting step is ${L.level.toLowerCase()} today, so start here instead: about <b>${commas(S.gain)}</b> more a month, with ${S.level.toLowerCase()} influence. Meanwhile, raise your influence over &ldquo;${esc(label(L.s))}&rdquo;: ${gapText(L) || 'keep building the case'}.</p>
+            <p class="calc-sentence">Your influence over the rate-limiting step is ${L.level.toLowerCase()} today, so start here instead: about <b>${fmtU(S.gain, ru)}</b> more, with ${S.level.toLowerCase()} influence. Meanwhile, raise your influence over &ldquo;${esc(label(L.s))}&rdquo;: ${gapText(L) || 'keep building the case'}.</p>
           </div>`;
         } else if (L.level !== 'High') {
           out += `<p class="calc-sentence gm-tip-line">To raise your influence here: ${gapText(L)}.</p>`;
