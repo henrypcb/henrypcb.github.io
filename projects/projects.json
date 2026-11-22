@@ -43,5 +43,19 @@
     "size": "l",
     "art": "curves",
     "live": true
+  },
+  {
+    "slug": "coming-soon-1",
+    "title": "Coming soon",
+    "summary": "",
+    "tag": "In progress",
+    "size": "m"
+  },
+  {
+    "slug": "coming-soon-2",
+    "title": "Coming soon",
+    "summary": "",
+    "tag": "In progress",
+    "size": "m"
   }
 ]
