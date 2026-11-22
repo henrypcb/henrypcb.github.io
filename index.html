@@ -428,6 +428,8 @@
   .f-text:focus { border-bottom-color: var(--black); }
   .f-text::placeholder { color: var(--gray); opacity: 0.7; }
   .f-actions { display: flex; align-items: center; gap: 22px; margin-top: 24px; flex-wrap: wrap; }
+  .f-btn:disabled, .f-btn:disabled:hover { opacity: 0.35; cursor: default; background: none; color: var(--black); }
+  .calc .f-actions { margin-top: 18px; }
   .f-btn {
     background: none;
     border: 1px solid var(--black);
@@ -2044,8 +2046,55 @@
   const fmtInt = n => Math.round(n).toLocaleString('en-GB');
   const fmtNum = n => (+n.toFixed(2)).toLocaleString('en-GB', { maximumFractionDigits: 2 });
   function renderSampleSize(root, project) {
-    const st = { metric: 'rate', rate: 10, mean: 50, sd: 40, liftMode: 'rel', lift: 5, conf: 95, power: 80,
-                 groups: 2, correct: true, control: 50, evenSplit: true, traffic: 5000 };
+    const DEFAULTS = { goal: 'n', metric: 'rate', rate: 10, mean: 50, sd: 40, liftMode: 'rel', lift: 5, conf: 95, power: 80,
+                       groups: 2, correct: true, control: 50, evenSplit: true, traffic: 5000, weeks: 2, cuped: false, r: 0.5 };
+    const st = Object.assign({}, DEFAULTS);
+
+    // ── Shareable links: the inputs live in the address ──
+    // Short, readable names; only values that differ from the defaults are written.
+    const URL_KEYS = { goal: 'goal', metric: 'metric', rate: 'rate', mean: 'mean', sd: 'sd', liftMode: 'lift_type', lift: 'lift',
+                       conf: 'confidence', power: 'power', groups: 'groups', correct: 'correction', control: 'control',
+                       traffic: 'traffic', weeks: 'weeks', cuped: 'cuped', r: 'r' };
+    const ENUMS = { goal: ['n', 'mde'], metric: ['rate', 'mean'], liftMode: ['rel', 'abs'], conf: [90, 95, 99], power: [80, 90], groups: [2, 3, 4] };
+    function readUrl() {
+      let q;
+      try { q = new URLSearchParams(location.search); } catch (e) { return; }
+      for (const [key, name] of Object.entries(URL_KEYS)) {
+        if (!q.has(name)) continue;
+        const raw = q.get(name);
+        if (key === 'correct' || key === 'cuped') { if (raw === 'on' || raw === 'off') st[key] = raw === 'on'; continue; }
+        if (ENUMS[key]) {
+          const v = typeof ENUMS[key][0] === 'number' ? +raw : raw;
+          if (ENUMS[key].includes(v)) st[key] = v;
+          continue;
+        }
+        const v = parseFloat(raw);
+        if (!isFinite(v)) continue;
+        if (key === 'r') st.r = Math.min(0.95, Math.max(0, v));
+        else st[key] = v;
+        if (key === 'control') st.evenSplit = false;
+      }
+      if (st.evenSplit) st.control = Math.round(10000 / st.groups) / 100;
+    }
+    function urlQuery() {
+      const q = new URLSearchParams();
+      for (const [key, name] of Object.entries(URL_KEYS)) {
+        if (key === 'control' && st.evenSplit) continue;
+        const v = st[key];
+        if (typeof v === 'number' && !isFinite(v)) continue;
+        if (v === DEFAULTS[key] && key !== 'control') continue;
+        q.set(name, typeof v === 'boolean' ? (v ? 'on' : 'off') : String(+v === v ? +v.toPrecision(6) : v));
+      }
+      const s = q.toString();
+      return s ? '?' + s : '';
+    }
+    function syncUrl() {
+      if (!stillAt('/projects', project.slug)) return;
+      const next = '/projects/' + project.slug + urlQuery();
+      if (location.pathname + location.search !== next) history.replaceState(null, '', next);
+    }
+    readUrl();
+
     const on = (key, v) => String(st[key]) === String(v);
     const seg = (key, opts, cls) => `<div class="seg${cls ? ' ' + cls : ''}" data-key="${key}">` +
       opts.map(([v, label]) => `<button type="button" data-v="${v}" class="${on(key, v) ? 'on' : ''}" aria-pressed="${on(key, v)}">${label}</button>`).join('') + '</div>';
@@ -2057,9 +2106,9 @@
       const [whole, dec] = raw.split('.');
       return whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (dec !== undefined ? '.' + dec : '');
     };
-    const input = (key, unit, min) => COMMAS.includes(key)
+    const input = (key, unit, min, extra) => COMMAS.includes(key)
       ? `<div class="calc-input"><input id="calc-${key}" type="text" inputmode="decimal" autocomplete="off" value="${withCommas(st[key])}" data-key="${key}" data-commas><span class="calc-unit" id="calc-${key}-unit">${unit || ''}</span></div>`
-      : `<div class="calc-input"><input id="calc-${key}" type="number" inputmode="decimal" min="${min || 0}" step="any" value="${st[key]}" data-key="${key}"><span class="calc-unit" id="calc-${key}-unit">${unit || ''}</span></div>`;
+      : `<div class="calc-input"><input id="calc-${key}" type="number" inputmode="decimal" min="${min || 0}" step="any"${extra || ''} value="${st[key]}" data-key="${key}"><span class="calc-unit" id="calc-${key}-unit">${unit || ''}</span></div>`;
 
     // Add commas as you type, keeping the cursor in the same place among the digits
     function formatField(inp) {
@@ -2077,7 +2126,12 @@
       <div class="calc">
         <p class="post-kicker">${esc(project.tag || 'Tool')} &middot; Experimentation</p>
         <h1 class="post-title">${esc(project.title)}</h1>
-        <p class="calc-intro">Before running an A/B test, check it can actually detect the change you care about. Set your numbers to see how many people the test needs, and how long it will take.</p>
+        <p class="calc-intro">Before running an A/B test, check it can actually detect the change you care about. Set your numbers to see how many people the test needs and how long it will take, or how small a change it can pick up in the time you have.</p>
+
+        <div class="calc-metric">
+          <span class="calc-label">What do you want to find out?</span>
+          ${seg('goal', [['n', 'How many people, and for how long'], ['mde', 'The smallest lift I can detect']])}
+        </div>
 
         <div class="calc-metric">
           <span class="calc-label">What are you measuring?</span>
@@ -2097,12 +2151,17 @@
             <label class="calc-label" for="calc-sd">Standard deviation</label>${input('sd', '')}
             <p class="calc-help">How spread out the values are. Take it from recent data.</p>
           </div>
-          <div class="calc-field">
+          <div class="calc-field" data-for="n">
             <label class="calc-label" for="calc-lift">Smallest lift worth detecting</label>
             ${seg('liftMode', [['rel', 'Relative'], ['abs', 'Percentage points']], 'seg-small')}
             ${input('lift', '% relative', 0)}
             <input class="calc-range" id="calc-lift-range" type="range" min="0.5" max="50" step="0.5" value="${st.lift}" aria-label="Smallest lift worth detecting">
             <p class="calc-help" id="calc-lift-help"></p>
+          </div>
+          <div class="calc-field" data-for="mde">
+            <span class="calc-label">Show the lift as</span>
+            ${seg('liftMode', [['rel', 'Relative'], ['abs', 'Percentage points']], 'seg-small')}
+            <p class="calc-help">Relative compares with today&rsquo;s value: a 10% lift on a 5% rate takes it to 5.5%.</p>
           </div>
           <div class="calc-field"><span class="calc-label">Confidence</span>${seg('conf', [[90, '90%'], [95, '95%'], [99, '99%']])}</div>
           <div class="calc-field"><span class="calc-label">Power</span>${seg('power', [[80, '80%'], [90, '90%']])}</div>
@@ -2119,10 +2178,23 @@
           <div class="calc-field">
             <label class="calc-label" for="calc-traffic">People entering the test per day</label>${input('traffic', 'a day')}
           </div>
+          <div class="calc-field" data-for="mde">
+            <label class="calc-label" for="calc-weeks-in">How long can it run?</label>
+            <div class="calc-input"><input id="calc-weeks-in" type="number" inputmode="decimal" min="0" step="1" value="${st.weeks}" data-key="weeks"><span class="calc-unit">weeks</span></div>
+            <p class="calc-help">Whole weeks are best, so every day of the week counts equally.</p>
+          </div>
+          <div class="calc-field">
+            <span class="calc-label">Adjust for data from before the test</span>${seg('cuped', [['true', 'On'], ['false', 'Off']])}
+            <p class="calc-help">Known as CUPED. It removes noise you can already predict, so the test needs fewer people.</p>
+          </div>
+          <div class="calc-field" data-for="cuped">
+            <label class="calc-label" for="calc-r">Correlation with the same metric before the test</label>${input('r', 'from 0 to 0.95', 0, ' max="0.95"')}
+            <p class="calc-help" id="calc-r-help"></p>
+          </div>
         </div>
 
         <div class="calc-result">
-          <div><div class="calc-n" id="calc-n">&ndash;</div><p class="calc-sub">People in total</p></div>
+          <div><div class="calc-n" id="calc-n">&ndash;</div><p class="calc-sub" id="calc-n-label">People in total</p></div>
           <div class="calc-stats">
             <div class="calc-stat"><b id="calc-nc">&ndash;</b><p class="calc-sub">Control</p></div>
             <div class="calc-stat"><b id="calc-nv">&ndash;</b><p class="calc-sub" id="calc-nv-label">Variant</p></div>
@@ -2131,13 +2203,17 @@
         </div>
         <p class="calc-sentence" id="calc-sentence" aria-live="polite"></p>
         <p class="calc-note" id="calc-note"></p>
+        <div class="f-actions">
+          <button type="button" class="f-btn" id="calc-copy">Copy as a plan</button>
+          <button type="button" class="calc-link" id="calc-share">Copy link</button>
+        </div>
 
         <div class="post-body">
           <figure class="fig">
             <p class="fig-k">Fig. 1 &middot; Change over lift</p>
             <p class="fig-t">Smaller lifts need far more people</p>
             <div class="fig-wrap"><div class="fig-chart" id="calc-chart"></div><div class="fig-tip"></div></div>
-            <figcaption><span><em>Fig. 1</em> &mdash; Total people needed across a range of lifts, with your current settings marked.</span></figcaption>
+            <figcaption><span><em>Fig. 1</em> &mdash; <span id="calc-fig-cap">Total people needed across a range of lifts, with your current settings marked.</span></span></figcaption>
           </figure>
         </div>
 
@@ -2145,14 +2221,24 @@
           <p>How it&rsquo;s worked out: a standard two-sided test. For conversion rates it compares two proportions; for averages it assumes the metric is roughly normally distributed and uses your standard deviation for every group.</p>
           <p>Groups can be different sizes. You set the control&rsquo;s share, and the rest is split equally across the variants. Each variant is compared with the control.</p>
           <p>With more than one variant, the Bonferroni correction divides the allowance for false positives across the comparisons, so each one needs more confidence. It&rsquo;s slightly cautious, which suits planning. Durations are rounded up to whole weeks, because behaviour often differs by day of the week.</p>
+          <p>To find the smallest lift you can detect, it works backwards: it searches for the lift where the people you&rsquo;ll get are exactly enough, and rounds up.</p>
+          <p>Adjusting for data from before the test (CUPED) uses each person&rsquo;s value of the same metric from before the test to remove noise that was predictable anyway. The people needed shrink by the square of the correlation, so 0.5 means 25% fewer. You&rsquo;ll need that earlier data for everyone in the test, and the analysis has to use the same adjustment.</p>
         </div>
       </div>`;
 
     const $ = id => root.querySelector('#' + id);
     const liftRange = $('calc-lift-range'), controlRange = $('calc-control-range');
     const isRate = () => st.metric === 'rate';
+    const isMde = () => st.goal === 'mde';
     const evenShare = () => Math.round(10000 / st.groups) / 100;
     const liftUnit = () => st.liftMode === 'rel' ? '%' : (isRate() ? 'pp' : '');
+    const cupedFactor = () => st.cuped ? 1 - st.r * st.r : 1;
+    const cupedOk = () => !st.cuped || (st.r >= 0 && st.r <= 0.95);
+    const shares = () => {
+      const m = st.groups - 1, c = st.evenSplit ? 1 / st.groups : st.control / 100;
+      return { m, c, v: (1 - c) / m };
+    };
+    const peopleAvailable = () => st.traffic * st.weeks * 7;
 
     // The target value after the lift, as a rate (0–1) or an average
     function target(L) {
@@ -2161,12 +2247,11 @@
     }
 
     function compute(L) {
-      const m = st.groups - 1;
+      const { m, c, v } = shares(), r = v / c;
       const alpha = 1 - st.conf / 100;
       const a = st.correct && m > 1 ? alpha / m : alpha;
       const za = invNorm(1 - a / 2), zb = invNorm(st.power / 100);
-      const c = st.evenSplit ? 1 / st.groups : st.control / 100, v = (1 - c) / m, r = v / c;
-      if (!(L > 0 && c > 0 && c < 1)) return null;
+      if (!(L > 0 && c > 0 && c < 1) || !cupedOk()) return null;
       let nc;
       if (isRate()) {
         const p1 = st.rate / 100, p2 = target(L);
@@ -2179,9 +2264,37 @@
         if (!(delta > 0 && st.sd > 0 && st.mean > 0)) return null;
         nc = Math.pow(za + zb, 2) * st.sd * st.sd * (1 + 1 / r) / (delta * delta);
       }
-      nc = Math.ceil(nc);
+      nc = Math.ceil(nc * cupedFactor());
       const nv = Math.ceil(nc * r);
       return { nc, nv, total: nc + m * nv, m };
+    }
+
+    // The largest lift that still makes sense: a rate can't reach 100%
+    function maxLift() {
+      if (isRate()) {
+        const p1 = st.rate / 100;
+        return st.liftMode === 'rel' ? (1 / p1 - 1) * 100 * 0.999 : (100 - st.rate) * 0.999;
+      }
+      return st.liftMode === 'rel' ? 1000 : st.mean * 10;
+    }
+
+    // Smallest lift the available people can detect: search between a tiny lift and the largest
+    // possible one, keeping the smallest that needs no more people than the test will get.
+    // People needed fall steadily as the lift grows, so halving the gap each time converges.
+    function solveMde() {
+      const N = peopleAvailable();
+      if (!(N > 0)) return null;
+      let hi = maxLift();
+      const top = compute(hi);
+      if (!top || top.total > N) return { none: true, N };
+      let lo = hi * 1e-7;
+      for (let k = 0; k < 90; k++) {
+        const mid = Math.sqrt(lo * hi), res = compute(mid);
+        if (res && res.total <= N) hi = mid; else lo = mid;
+      }
+      // Round up, so the lift shown is always one the test can detect
+      const L = Math.ceil(hi * 100 - 1e-9) / 100;
+      return { L, N };
     }
 
     function setLiftRange() {
@@ -2192,7 +2305,7 @@
       liftRange.min = min; liftRange.max = max; liftRange.step = step;
       if (isFinite(st.lift)) liftRange.value = Math.min(max, Math.max(min, st.lift));
       $('calc-lift-unit').textContent = st.liftMode === 'rel' ? '% relative' : (isRate() ? 'percentage points' : 'absolute');
-      root.querySelector('.seg[data-key="liftMode"] [data-v="abs"]').textContent = isRate() ? 'Percentage points' : 'Absolute';
+      root.querySelectorAll('.seg[data-key="liftMode"] [data-v="abs"]').forEach(b => b.textContent = isRate() ? 'Percentage points' : 'Absolute');
     }
 
     // Switch the lift between relative and absolute without changing the effect it describes
@@ -2212,14 +2325,27 @@
       }));
     }
 
+    // A lift written out in words and numbers, for results and plans
+    function liftWords(L) {
+      return isRate()
+        ? (st.liftMode === 'rel' ? `${fmtNum(L)}% relative lift` : `${fmtNum(L)} percentage point lift`)
+        : (st.liftMode === 'rel' ? `${fmtNum(L)}% lift` : `lift of ${fmtNum(L)}`);
+    }
+    function fromTo(L) {
+      const t = target(L);
+      return isRate() ? `${fmtNum(st.rate)}% to ${fmtNum(t * 100)}%` : `${fmtNum(st.mean)} to ${fmtNum(t)}`;
+    }
+
     function drawChart() {
       const box = $('calc-chart');
       const W = Math.round(box.clientWidth);
       box.innerHTML = '';
-      const cur = compute(st.lift);
+      const sol = isMde() ? solveMde() : null;
+      const L0 = isMde() ? (sol && !sol.none ? sol.L : NaN) : st.lift;
+      const cur = compute(L0);
       if (!W || !cur) return;
-      const L0 = st.lift, u = liftUnit();
-      const lo = st.liftMode === 'rel' ? Math.max(0.5, L0 * 0.5) : L0 * 0.4, hi = L0 * 2.5;
+      const u = liftUnit();
+      const lo = st.liftMode === 'rel' ? Math.max(0.5, L0 * 0.5) : L0 * 0.4, hi = Math.min(L0 * 2.5, maxLift());
       const pts = [];
       for (let i = 0; i <= 60; i++) {
         const L = lo + (hi - lo) * i / 60, res = compute(L);
@@ -2250,7 +2376,8 @@
       sv('line', { x1: cx, x2: cx, y1: cy, y2: H - m.b, stroke: 'var(--f-mid)', 'stroke-width': 1, 'stroke-dasharray': '3 3' }, svg);
       sv('circle', { cx, cy, r: 5, fill: 'var(--f-ink)', stroke: 'var(--f-bg)', 'stroke-width': 2 }, svg);
       const right = cx < W * 0.6;
-      svText(svg, 'f-it', cx + (right ? 12 : -12), cy - 10, `your test: ${fmtInt(cur.total)} in total`, right ? 'start' : 'end');
+      const label = isMde() ? `smallest you can detect: ${fmtNum(L0)}${u}` : `your test: ${fmtInt(cur.total)} in total`;
+      svText(svg, 'f-it', cx + (right ? 12 : -12), cy - 10, label, right ? 'start' : 'end');
 
       const wrap = box.parentNode;
       const cross = sv('line', { y1: m.t, y2: H - m.b, stroke: 'var(--f-soft)', 'stroke-width': 1, opacity: 0 }, svg);
@@ -2269,24 +2396,43 @@
     }
 
     // Says which number stops the calculation, checked in the order the fields appear
-    function inputProblem() {
+    function inputProblem(sol) {
       if (isRate()) {
         if (!(st.rate > 0 && st.rate < 100)) return 'The current conversion rate needs to be above 0% and below 100%.';
       } else {
         if (!(st.mean > 0)) return 'The current average needs to be above zero.';
         if (!(st.sd > 0)) return 'The standard deviation needs to be above zero.';
       }
-      if (!(st.lift > 0)) return 'The smallest lift worth detecting needs to be above zero.';
-      if (isRate() && !(target(st.lift) < 1)) return 'That lift takes the conversion rate to 100% or more. Choose a smaller lift.';
+      if (!isMde()) {
+        if (!(st.lift > 0)) return 'The smallest lift worth detecting needs to be above zero.';
+        if (isRate() && !(target(st.lift) < 1)) return 'That lift takes the conversion rate to 100% or more. Choose a smaller lift.';
+      }
       if (!st.evenSplit && !(st.control > 0 && st.control < 100)) return 'The control’s share of traffic needs to be above 0% and below 100%.';
+      if (isMde()) {
+        if (!(st.traffic > 0)) return 'The number of people entering the test each day needs to be above zero.';
+        if (!(st.weeks > 0)) return 'How long it can run needs to be above zero.';
+      }
+      if (!cupedOk()) return 'The correlation needs to be between 0 and 0.95.';
+      if (sol && sol.none) return `Even a very large lift wouldn’t be detectable with ${fmtInt(sol.N)} people. Run it for longer, send more people into the test, or use fewer groups.`;
       return 'Check the numbers above.';
     }
+
+    function setResult(big, bigLabel, nc, nv, third, thirdLabel) {
+      $('calc-n').textContent = big; $('calc-n-label').textContent = bigLabel;
+      $('calc-nc').textContent = nc; $('calc-nv').textContent = nv;
+      $('calc-weeks').textContent = third; $('calc-days').textContent = thirdLabel;
+    }
+
+    let plan = null;   // the latest valid result, used by "Copy as a plan"
 
     function update() {
       const mVar = st.groups - 1;
       root.querySelectorAll('[data-for="rate"]').forEach(e => e.hidden = !isRate());
       root.querySelectorAll('[data-for="mean"]').forEach(e => e.hidden = isRate());
+      root.querySelectorAll('[data-for="n"]').forEach(e => e.hidden = isMde());
+      root.querySelectorAll('[data-for="mde"]').forEach(e => e.hidden = !isMde());
       root.querySelector('[data-for="correct"]').hidden = mVar < 2;
+      root.querySelector('[data-for="cuped"]').hidden = !st.cuped;
 
       // Lift: what it means in plain numbers
       const t = target(st.lift);
@@ -2294,7 +2440,7 @@
         ? `${fmtNum(st.rate)}% becomes ${fmtNum(t * 100)}%.`
         : `${fmtNum(st.mean)} becomes ${fmtNum(t)}.`;
 
-      // Split and correction
+      // Split, correction and pre-test adjustment
       const vShare = st.evenSplit ? 100 / st.groups : (100 - st.control) / mVar;
       $('calc-split-help').textContent = !(vShare > 0 && vShare < 100) ? ''
         : mVar === 1 ? `The variant gets ${fmtNum(vShare)}%.`
@@ -2303,44 +2449,124 @@
       $('calc-correct-help').textContent = st.correct
         ? `Each of the ${mVar} comparisons uses ${fmtNum(100 - (100 - st.conf) / mVar)}% confidence.`
         : `Without it, the chance of at least one false win rises to about ${fmtNum((1 - Math.pow(st.conf / 100, mVar)) * 100)}%.`;
+      $('calc-r-help').textContent = cupedOk() && st.cuped
+        ? (st.r > 0 ? `At ${fmtNum(st.r)}, the test needs ${fmtNum(st.r * st.r * 100)}% fewer people. To find yours, correlate each person’s value over a few weeks with their value over the few weeks before.`
+                    : 'At 0, data from before the test doesn’t help.')
+        : 'Use the correlation between each person’s value before the test and during it.';
+      $('calc-fig-cap').textContent = isMde()
+        ? 'Total people needed across a range of lifts. The marked point is the smallest lift your test can detect with the people it will get.'
+        : 'Total people needed across a range of lifts, with your current settings marked.';
 
-      const res = compute(st.lift);
       const sentence = $('calc-sentence'), note = $('calc-note');
       $('calc-nv-label').textContent = mVar === 1 ? 'Variant' : 'Each variant';
-      if (!res) {
-        ['calc-n', 'calc-nc', 'calc-nv', 'calc-weeks'].forEach(id => $(id).textContent = '–');
-        $('calc-days').textContent = 'To run';
-        sentence.textContent = '';
-        note.textContent = inputProblem();
-        drawChart();
-        return;
-      }
-      const days = st.traffic > 0 ? Math.ceil(res.total / st.traffic) : NaN;
-      const weeks = Math.max(1, Math.ceil(days / 7));
-      $('calc-n').textContent = fmtInt(res.total);
-      $('calc-nc').textContent = fmtInt(res.nc);
-      $('calc-nv').textContent = fmtInt(res.nv);
-      $('calc-weeks').textContent = isFinite(days) ? (weeks === 1 ? '1 week' : weeks + ' weeks') : '–';
-      $('calc-days').textContent = isFinite(days) ? `To run · ${days === 1 ? '1 day' : fmtInt(days) + ' days'} minimum` : 'To run';
+      const cupedText = st.cuped && st.r > 0
+        ? ` That&rsquo;s after adjusting for data from before the test, which cuts the people needed by ${fmtNum(st.r * st.r * 100)}%.` : '';
+      const confText = `with ${st.conf}% confidence and ${st.power}% power`;
+      plan = null;
 
-      let base;
-      if (isRate()) {
-        const lt = st.liftMode === 'rel' ? `${fmtNum(st.lift)}% relative lift` : `${fmtNum(st.lift)} percentage point lift`;
-        base = `To detect a ${lt} on a ${fmtNum(st.rate)}% conversion rate (${fmtNum(st.rate)}% to ${fmtNum(t * 100)}%)`;
+      if (isMde()) {
+        const sol = solveMde();
+        if (!sol || sol.none) {
+          setResult('–', 'Smallest lift you can detect', '–', '–', '–', 'People in the test');
+          sentence.textContent = '';
+          note.textContent = inputProblem(sol);
+        } else {
+          const { m, c, v } = shares();
+          const nc = Math.floor(sol.N * c), nv = Math.floor(sol.N * v);
+          setResult(fmtNum(sol.L) + (st.liftMode === 'rel' ? '%' : (isRate() ? 'pp' : '')), 'Smallest lift you can detect',
+            fmtInt(nc), fmtInt(nv), fmtInt(sol.N), `People over ${fmtNum(st.weeks)} ${st.weeks === 1 ? 'week' : 'weeks'}`);
+          sentence.innerHTML = `With ${fmtInt(st.traffic)} people a day for ${fmtNum(st.weeks)} ${st.weeks === 1 ? 'week' : 'weeks'} (${fmtInt(sol.N)} people), ${confText}, the smallest change you can reliably detect is a ${liftWords(sol.L)}: ${fromTo(sol.L)}. If the real effect is smaller than that, the test will probably miss it.${cupedText}`;
+          // Flag results that are technically right but too big to be useful
+          const base = isRate() ? st.rate / 100 : st.mean, relChange = (target(sol.L) / base - 1) * 100;
+          note.textContent = relChange > 50
+            ? `That’s a ${fmtNum(relChange)}% change, far bigger than most tests ever see. As set up, this test is too small to tell you much: run it for longer, send more people into it, or use fewer groups.`
+            : (st.weeks % 1 ? 'Rounding to whole weeks keeps every day of the week equally represented.' : '');
+          plan = { mde: sol, nc, nv, m };
+        }
       } else {
-        const lt = st.liftMode === 'rel' ? `a ${fmtNum(st.lift)}% lift` : `a lift of ${fmtNum(st.lift)}`;
-        base = `To detect ${lt} on an average of ${fmtNum(st.mean)} (to ${fmtNum(t)}), with a standard deviation of ${fmtNum(st.sd)}`;
+        const res = compute(st.lift);
+        if (!res) {
+          setResult('–', 'People in total', '–', '–', '–', 'To run');
+          sentence.textContent = '';
+          note.textContent = inputProblem();
+        } else {
+          const days = st.traffic > 0 ? Math.ceil(res.total / st.traffic) : NaN;
+          const weeks = Math.max(1, Math.ceil(days / 7));
+          setResult(fmtInt(res.total), 'People in total', fmtInt(res.nc), fmtInt(res.nv),
+            isFinite(days) ? (weeks === 1 ? '1 week' : weeks + ' weeks') : '–',
+            isFinite(days) ? `To run · ${days === 1 ? '1 day' : fmtInt(days) + ' days'} minimum` : 'To run');
+          let base = isRate()
+            ? `To detect a ${liftWords(st.lift)} on a ${fmtNum(st.rate)}% conversion rate (${fromTo(st.lift)})`
+            : `To detect a ${liftWords(st.lift)} on an average of ${fmtNum(st.mean)} (to ${fmtNum(target(st.lift))}), with a standard deviation of ${fmtNum(st.sd)}`;
+          let text = `${base}, ${confText}, the test needs ${fmtInt(res.total)} people: ${fmtInt(res.nc)} in the control and ${fmtInt(res.nv)} in ${mVar === 1 ? 'the variant' : 'each of the ' + mVar + ' variants'}.`;
+          if (isFinite(days)) {
+            text += ` At ${fmtInt(st.traffic)} people a day, that&rsquo;s ${days === 1 ? '1 day' : fmtInt(days) + ' days'}. Round up to ${weeks === 1 ? '1 full week' : weeks + ' full weeks'}, so every day of the week counts equally.`;
+          }
+          sentence.innerHTML = text + cupedText;
+          note.textContent = isFinite(days) && days > 90
+            ? 'That’s a long test. A bigger lift, more traffic, fewer groups or adjusting for data from before the test would shorten it.'
+            : (mVar > 1 && !st.correct ? 'Without a correction, a variant can look like a winner by chance more often than your confidence level suggests.' : '');
+          plan = { res, days, weeks };
+        }
       }
-      let text = `${base}, with ${st.conf}% confidence and ${st.power}% power, the test needs ${fmtInt(res.total)} people: ${fmtInt(res.nc)} in the control and ${fmtInt(res.nv)} in ${mVar === 1 ? 'the variant' : 'each of the ' + mVar + ' variants'}.`;
-      if (isFinite(days)) {
-        text += ` At ${fmtInt(st.traffic)} people a day, that&rsquo;s ${days === 1 ? '1 day' : fmtInt(days) + ' days'}. Round up to ${weeks === 1 ? '1 full week' : weeks + ' full weeks'}, so every day of the week counts equally.`;
-      }
-      sentence.innerHTML = text;
-      note.textContent = isFinite(days) && days > 90
-        ? 'That’s a long test. A bigger lift, more traffic or fewer groups would shorten it.'
-        : (mVar > 1 && !st.correct ? 'Without a correction, a variant can look like a winner by chance more often than your confidence level suggests.' : '');
+      $('calc-copy').disabled = !plan;
       drawChart();
+      syncUrl();
     }
+
+    // ── Copy as a plan / Copy link ──
+    function shareUrl() {
+      return location.origin + '/projects/' + project.slug + urlQuery();
+    }
+    async function copyText(text) {
+      try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+      // Fallback for browsers that block the clipboard API
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      ta.remove();
+      return ok;
+    }
+    function flash(btn, msg, label) {
+      btn.textContent = msg;
+      setTimeout(() => { btn.textContent = label; }, 2000);
+    }
+    function planText() {
+      const { m, c, v } = shares();
+      const plain = s => s.replace(/&rsquo;/g, '’');
+      const lines = ['Sample size plan', ''];
+      lines.push('Question: ' + (isMde() ? 'what’s the smallest lift this test can detect?' : 'how many people does this test need, and for how long?'));
+      lines.push('Metric: ' + (isRate() ? `conversion rate, currently ${fmtNum(st.rate)}%` : `average, currently ${fmtNum(st.mean)} (standard deviation ${fmtNum(st.sd)})`));
+      if (!isMde()) lines.push(`Smallest lift worth detecting: ${liftWords(st.lift)} (${fromTo(st.lift)})`);
+      else lines.push(`Run time: ${fmtNum(st.weeks)} ${st.weeks === 1 ? 'week' : 'weeks'} at ${fmtInt(st.traffic)} people a day`);
+      lines.push(`Confidence: ${st.conf}%  ·  Power: ${st.power}%`);
+      lines.push(`Groups: ${st.groups} (control ${fmtNum(c * 100)}%, ${m === 1 ? 'variant' : 'each variant'} ${fmtNum(v * 100)}%)`);
+      if (m > 1) lines.push('Correction for multiple comparisons: ' + (st.correct ? 'Bonferroni' : 'none'));
+      lines.push('Adjusting for data from before the test (CUPED): ' + (st.cuped ? `yes, correlation ${fmtNum(st.r)}` : 'no'));
+      lines.push('', 'Result:');
+      if (isMde()) {
+        const { mde, nc, nv } = plan;
+        lines.push(`- Smallest lift you can detect: ${liftWords(mde.L)} (${fromTo(mde.L)})`);
+        lines.push(`- People in the test: ${fmtInt(mde.N)} (control ${fmtInt(nc)}, ${m === 1 ? 'variant' : 'each variant'} ${fmtInt(nv)})`);
+        lines.push('- A real effect smaller than this will probably be missed.');
+      } else {
+        const { res, days, weeks } = plan;
+        lines.push(`- People needed: ${fmtInt(res.total)} (control ${fmtInt(res.nc)}, ${m === 1 ? 'variant' : 'each variant'} ${fmtInt(res.nv)})`);
+        if (isFinite(days)) lines.push(`- Run time: ${fmtInt(days)} ${days === 1 ? 'day' : 'days'} at ${fmtInt(st.traffic)} a day, rounded up to ${weeks} ${weeks === 1 ? 'week' : 'weeks'}`);
+      }
+      lines.push('', 'Open these settings: ' + shareUrl());
+      return plain(lines.join('\n'));
+    }
+    $('calc-copy').addEventListener('click', async e => {
+      const btn = e.currentTarget;
+      if (!plan) return;
+      flash(btn, await copyText(planText()) ? 'Copied' : 'Couldn’t copy', 'Copy as a plan');
+    });
+    $('calc-share').addEventListener('click', async e => {
+      flash(e.currentTarget, await copyText(shareUrl()) ? 'Link copied' : 'Couldn’t copy', 'Copy link');
+    });
 
     // Typing into a number box
     root.querySelectorAll('.calc-input input').forEach(inp => inp.addEventListener('input', () => {
@@ -2381,7 +2607,7 @@
     root.querySelectorAll('.seg').forEach(g => g.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
       const key = g.dataset.key, raw = btn.dataset.v;
       const prevMetric = st.metric, prevMode = st.liftMode;
-      const val = key === 'correct' ? raw === 'true' : (isNaN(+raw) ? raw : +raw);
+      const val = key === 'correct' || key === 'cuped' ? raw === 'true' : (isNaN(+raw) ? raw : +raw);
       if (key === 'metric' && val !== prevMetric && prevMode === 'abs') { convertLift('rel', prevMetric); st.liftMode = 'rel'; }
       if (key === 'liftMode' && val !== prevMode) convertLift(val, st.metric);
       st[key] = val;
